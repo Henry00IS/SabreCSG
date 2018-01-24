@@ -44,10 +44,11 @@ namespace Sabresaurus.SabreCSG
 
         /// <summary>
         /// Got no idea whether this implementation is correct... ~ Henry
+        /// (updated) I think this is more correct now?
         /// </summary>
         public static Fix64 Acos(Fix64 value)
         {
-            return Cos((Fix64)0.5f) * ((Fix64)180 / Fix64.Pi);
+            return Cos(value) * -(Fix64)1;
         }
 
         public static Fix64 Clamp(Fix64 value, Fix64 min, Fix64 max)
