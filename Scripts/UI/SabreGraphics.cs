@@ -142,25 +142,25 @@ namespace Sabresaurus.SabreCSG
 			GL.Vertex(center - right + forward + up);
 		}
 
-	    public static void DrawPlane(UnityEngine.Plane plane, Vector3 center, Color colorFront, Color colorBack, float size)
+	    public static void DrawPlane(UnityEngine.Plane plane, FixVector3 center, Color colorFront, Color colorBack, Fix64 size)
 	    {
 			SabreCSGResources.GetPlaneMaterial().SetPass(0);
 
 	        GL.Begin(GL.QUADS);
 
-	        Vector3 normal = plane.normal.normalized;
-	        Vector3 tangent;
+            FixVector3 normal = (FixVector3)plane.normal.normalized;
+            FixVector3 tangent;
 
-	        if (normal == Vector3.up || normal == Vector3.down)
+	        if (normal == FixVector3.up || normal == FixVector3.down)
 	        {
-	            tangent = Vector3.Cross(normal, Vector3.forward).normalized;
+	            tangent = FixVector3.Cross(normal, FixVector3.forward).normalized;
 	        }
 	        else
 	        {
-	            tangent = Vector3.Cross(normal, Vector3.up).normalized;
+	            tangent = FixVector3.Cross(normal, FixVector3.up).normalized;
 	        }
 
-	        Vector3 binormal = Quaternion.AngleAxis(90, normal) * tangent;
+            FixVector3 binormal = (FixVector3)(Quaternion.AngleAxis(90, (Vector3)normal) * (Vector3)tangent);
 
 	        //		GL.Color(colorFront);
 	        //		GL.Vertex(center + (normal * -plane.distance) - tangent * size - binormal * size);
@@ -175,16 +175,16 @@ namespace Sabresaurus.SabreCSG
 	        //		GL.Vertex(center + (normal * -plane.distance) - tangent * size - binormal * size);
 
 	        GL.Color(colorFront);
-	        GL.Vertex(center - tangent * size - binormal * size);
-	        GL.Vertex(center + tangent * size - binormal * size);
-	        GL.Vertex(center + tangent * size + binormal * size);
-	        GL.Vertex(center - tangent * size + binormal * size);
+	        GL.Vertex((Vector3)(center - tangent * size - binormal * size));
+	        GL.Vertex((Vector3)(center + tangent * size - binormal * size));
+	        GL.Vertex((Vector3)(center + tangent * size + binormal * size));
+	        GL.Vertex((Vector3)(center - tangent * size + binormal * size));
 
 	        GL.Color(colorBack);
-	        GL.Vertex(center - tangent * size + binormal * size);
-	        GL.Vertex(center + tangent * size + binormal * size);
-	        GL.Vertex(center + tangent * size - binormal * size);
-	        GL.Vertex(center - tangent * size - binormal * size);
+	        GL.Vertex((Vector3)(center - tangent * size + binormal * size));
+	        GL.Vertex((Vector3)(center + tangent * size + binormal * size));
+	        GL.Vertex((Vector3)(center + tangent * size - binormal * size));
+	        GL.Vertex((Vector3)(center - tangent * size - binormal * size));
 
 	        GL.End();
 
@@ -193,49 +193,49 @@ namespace Sabresaurus.SabreCSG
 
 			GL.Color(Color.white);
 
-			GL.Vertex(center - tangent * size + binormal * size);
-			GL.Vertex(center + tangent * size + binormal * size);
+			GL.Vertex((Vector3)(center - tangent * size + binormal * size));
+			GL.Vertex((Vector3)(center + tangent * size + binormal * size));
 
-			GL.Vertex(center + tangent * size + binormal * size);
-			GL.Vertex(center + tangent * size - binormal * size);
+			GL.Vertex((Vector3)(center + tangent * size + binormal * size));
+			GL.Vertex((Vector3)(center + tangent * size - binormal * size));
 
-			GL.Vertex(center + tangent * size - binormal * size);
-			GL.Vertex(center - tangent * size - binormal * size);
+			GL.Vertex((Vector3)(center + tangent * size - binormal * size));
+			GL.Vertex((Vector3)(center - tangent * size - binormal * size));
 
-			GL.Vertex(center - tangent * size - binormal * size);
-			GL.Vertex(center - tangent * size + binormal * size);
+			GL.Vertex((Vector3)(center - tangent * size - binormal * size));
+			GL.Vertex((Vector3)(center - tangent * size + binormal * size));
 
 			GL.Color(Color.green);
 
-			Vector3 normalOffset = -normal * 0.01f;
+			FixVector3 normalOffset = -normal * (Fix64)0.01f;
 
-			GL.Vertex(center + normalOffset - tangent * size + binormal * size);
-			GL.Vertex(center + normalOffset + tangent * size + binormal * size);
+			GL.Vertex((Vector3)(center + normalOffset - tangent * size + binormal * size));
+			GL.Vertex((Vector3)(center + normalOffset + tangent * size + binormal * size));
 			
-			GL.Vertex(center + normalOffset + tangent * size + binormal * size);
-			GL.Vertex(center + normalOffset + tangent * size - binormal * size);
+			GL.Vertex((Vector3)(center + normalOffset + tangent * size + binormal * size));
+			GL.Vertex((Vector3)(center + normalOffset + tangent * size - binormal * size));
 			
-			GL.Vertex(center + normalOffset + tangent * size - binormal * size);
-			GL.Vertex(center + normalOffset - tangent * size - binormal * size);
+			GL.Vertex((Vector3)(center + normalOffset + tangent * size - binormal * size));
+			GL.Vertex((Vector3)(center + normalOffset - tangent * size - binormal * size));
 			
-			GL.Vertex(center + normalOffset - tangent * size - binormal * size);
-			GL.Vertex(center + normalOffset - tangent * size + binormal * size);
+			GL.Vertex((Vector3)(center + normalOffset - tangent * size - binormal * size));
+			GL.Vertex((Vector3)(center + normalOffset - tangent * size + binormal * size));
 
 			GL.Color(Color.red);
 
-			normalOffset = normal * 0.01f;
+			normalOffset = normal * (Fix64)0.01f;
 			
-			GL.Vertex(center + normalOffset - tangent * size + binormal * size);
-			GL.Vertex(center + normalOffset + tangent * size + binormal * size);
+			GL.Vertex((Vector3)(center + normalOffset - tangent * size + binormal * size));
+			GL.Vertex((Vector3)(center + normalOffset + tangent * size + binormal * size));
 			
-			GL.Vertex(center + normalOffset + tangent * size + binormal * size);
-			GL.Vertex(center + normalOffset + tangent * size - binormal * size);
+			GL.Vertex((Vector3)(center + normalOffset + tangent * size + binormal * size));
+			GL.Vertex((Vector3)(center + normalOffset + tangent * size - binormal * size));
 			
-			GL.Vertex(center + normalOffset + tangent * size - binormal * size);
-			GL.Vertex(center + normalOffset - tangent * size - binormal * size);
+			GL.Vertex((Vector3)(center + normalOffset + tangent * size - binormal * size));
+			GL.Vertex((Vector3)(center + normalOffset - tangent * size - binormal * size));
 			
-			GL.Vertex(center + normalOffset - tangent * size - binormal * size);
-			GL.Vertex(center + normalOffset - tangent * size + binormal * size);
+			GL.Vertex((Vector3)(center + normalOffset - tangent * size - binormal * size));
+			GL.Vertex((Vector3)(center + normalOffset - tangent * size + binormal * size));
 			
 			GL.End();
 	    }
@@ -336,11 +336,11 @@ namespace Sabresaurus.SabreCSG
 				Polygon polygon = polygons[j];
 				for (int i = 0; i < polygon.Vertices.Length - 1; i++)
 				{
-					GL.Vertex(transform.TransformPoint(polygon.Vertices[i].Position));
-					GL.Vertex(transform.TransformPoint(polygon.Vertices[i + 1].Position));
+					GL.Vertex(transform.TransformPoint((Vector3)polygon.Vertices[i].Position));
+					GL.Vertex(transform.TransformPoint((Vector3)polygon.Vertices[i + 1].Position));
 				}
-				GL.Vertex(transform.TransformPoint(polygon.Vertices[polygon.Vertices.Length - 1].Position));
-				GL.Vertex(transform.TransformPoint(polygon.Vertices[0].Position));
+				GL.Vertex(transform.TransformPoint((Vector3)polygon.Vertices[polygon.Vertices.Length - 1].Position));
+				GL.Vertex(transform.TransformPoint((Vector3)polygon.Vertices[0].Position));
 			}
 			
 			GL.End();
@@ -352,13 +352,13 @@ namespace Sabresaurus.SabreCSG
 			for (int j = 0; j < polygons.Length; j++) 
 			{
 				Polygon polygon = polygons[j];
-				Vector3 position1 = polygon.Vertices[0].Position;
+				Vector3 position1 = (Vector3)polygon.Vertices[0].Position;
 				
 				for (int i = 1; i < polygon.Vertices.Length - 1; i++)
 				{
 					GL.Vertex(transform.TransformPoint(position1));
-					GL.Vertex(transform.TransformPoint(polygon.Vertices[i].Position));
-					GL.Vertex(transform.TransformPoint(polygon.Vertices[i + 1].Position));
+					GL.Vertex(transform.TransformPoint((Vector3)polygon.Vertices[i].Position));
+					GL.Vertex(transform.TransformPoint((Vector3)polygon.Vertices[i + 1].Position));
 				}
 			}
 			GL.End();
@@ -376,11 +376,11 @@ namespace Sabresaurus.SabreCSG
                 Polygon polygon = polygons[j];
 				for (int i = 0; i < polygon.Vertices.Length - 1; i++)
 				{
-					GL.Vertex(polygon.Vertices[i].Position + offset);
-					GL.Vertex(polygon.Vertices[i + 1].Position + offset);
+					GL.Vertex((Vector3)polygon.Vertices[i].Position + offset);
+					GL.Vertex((Vector3)polygon.Vertices[i + 1].Position + offset);
 				}
-				GL.Vertex(polygon.Vertices[polygon.Vertices.Length - 1].Position + offset);
-				GL.Vertex(polygon.Vertices[0].Position + offset);
+				GL.Vertex((Vector3)polygon.Vertices[polygon.Vertices.Length - 1].Position + offset);
+				GL.Vertex((Vector3)polygon.Vertices[0].Position + offset);
 			}
 			
 			GL.End();
@@ -395,13 +395,13 @@ namespace Sabresaurus.SabreCSG
                 Vector3 offset = polygons[j].Plane.normal * 0.001f;
 
                 Polygon polygon = polygons[j];
-				Vector3 position1 = polygon.Vertices[0].Position;
+				Vector3 position1 = (Vector3)polygon.Vertices[0].Position;
 				
 				for (int i = 1; i < polygon.Vertices.Length - 1; i++)
 				{
 					GL.Vertex(position1 + offset);
-					GL.Vertex(polygon.Vertices[i].Position + offset);
-					GL.Vertex(polygon.Vertices[i + 1].Position + offset);
+					GL.Vertex((Vector3)polygon.Vertices[i].Position + offset);
+					GL.Vertex((Vector3)polygon.Vertices[i + 1].Position + offset);
 				}
 			}
 			GL.End();
@@ -416,13 +416,13 @@ namespace Sabresaurus.SabreCSG
 			for (int j = 0; j < polygons.Length; j++) 
 			{
 				Polygon polygon = polygons[j];
-				Vector3 position1 = polygon.Vertices[0].Position;
+				Vector3 position1 = (Vector3)polygon.Vertices[0].Position;
 
 				for (int i = 1; i < polygon.Vertices.Length - 1; i++)
 				{
 					GL.Vertex(position1);
-					GL.Vertex(polygon.Vertices[i].Position);
-					GL.Vertex(polygon.Vertices[i + 1].Position);
+					GL.Vertex((Vector3)polygon.Vertices[i].Position);
+					GL.Vertex((Vector3)polygon.Vertices[i + 1].Position);
 				}
 			}
 			GL.End();
@@ -441,8 +441,8 @@ namespace Sabresaurus.SabreCSG
 
 				for (int i = 0; i < polygon.Vertices.Length; i++)
 				{
-					Vector3 currentPosition = polygon.Vertices[i].Position + depthAdjust;
-					Vector3 nextPosition = polygon.Vertices[(i + 1)%polygon.Vertices.Length].Position + depthAdjust;
+					Vector3 currentPosition = (Vector3)polygon.Vertices[i].Position + depthAdjust;
+					Vector3 nextPosition = (Vector3)polygon.Vertices[(i + 1)%polygon.Vertices.Length].Position + depthAdjust;
 
 					GL.Vertex(currentPosition);
 					GL.Vertex(nextPosition);
@@ -465,8 +465,8 @@ namespace Sabresaurus.SabreCSG
 
 				for (int i = 0; i < polygon.Vertices.Length; i++)
 				{
-					Vector3 currentPosition = polygon.Vertices[i].Position + depthAdjust;
-					Vector3 nextPosition = polygon.Vertices[(i + 1)%polygon.Vertices.Length].Position + depthAdjust;
+					Vector3 currentPosition = (Vector3)polygon.Vertices[i].Position + depthAdjust;
+					Vector3 nextPosition = (Vector3)polygon.Vertices[(i + 1)%polygon.Vertices.Length].Position + depthAdjust;
 
 					GL.TexCoord2(0,0);
 					GL.Vertex(currentPosition);

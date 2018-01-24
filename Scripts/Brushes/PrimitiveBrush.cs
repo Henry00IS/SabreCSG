@@ -234,13 +234,13 @@ namespace Sabresaurus.SabreCSG
 			for (int j = 0; j < polygons.Length; j++) 
 			{
 				Polygon polygon = polygons[j];
-				Vector3 position1 = polygon.Vertices[0].Position;
+				Vector3 position1 = (Vector3)polygon.Vertices[0].Position;
 				
 				for (int i = 1; i < polygon.Vertices.Length - 1; i++)
 				{
 					GL.Vertex(transform.TransformPoint(position1));
-					GL.Vertex(transform.TransformPoint(polygon.Vertices[i].Position));
-					GL.Vertex(transform.TransformPoint(polygon.Vertices[i + 1].Position));
+					GL.Vertex(transform.TransformPoint((Vector3)polygon.Vertices[i].Position));
+					GL.Vertex(transform.TransformPoint((Vector3)polygon.Vertices[i + 1].Position));
 				}
 			}
 			GL.End();
@@ -262,16 +262,16 @@ namespace Sabresaurus.SabreCSG
 		{
 			Polygon[] polygonsCopy = polygons.DeepCopy<Polygon>();
 
-			Vector3 center = transform.position;
+            FixVector3 center = (FixVector3)transform.position;
 			Quaternion rotation = transform.rotation;
-			Vector3 scale = transform.localScale;
+			FixVector3 scale = (FixVector3)transform.localScale;
 
 			for (int i = 0; i < polygons.Length; i++)
 			{
 				for (int j = 0; j < polygons[i].Vertices.Length; j++)
 				{
-					polygonsCopy[i].Vertices[j].Position = rotation * polygonsCopy[i].Vertices[j].Position.Multiply(scale) + center;
-					polygonsCopy[i].Vertices[j].Normal = rotation * polygonsCopy[i].Vertices[j].Normal;
+					polygonsCopy[i].Vertices[j].Position = (FixVector3)(rotation * (Vector3)polygonsCopy[i].Vertices[j].Position.Multiply(scale) + (Vector3)center);
+					polygonsCopy[i].Vertices[j].Normal = (FixVector3)(rotation * (Vector3)polygonsCopy[i].Vertices[j].Normal);
 				}
 
 				// Just updated a load of vertex positions, so make sure the cached plane is updated
@@ -688,13 +688,13 @@ namespace Sabresaurus.SabreCSG
         {
 			if (polygons.Length > 0)
 			{
-				Bounds bounds = new Bounds(polygons[0].Vertices[0].Position, Vector3.zero);
+				Bounds bounds = new Bounds((Vector3)polygons[0].Vertices[0].Position, Vector3.zero);
 				
 				for (int i = 0; i < polygons.Length; i++)
 				{
 					for (int j = 0; j < polygons[i].Vertices.Length; j++)
 					{
-						bounds.Encapsulate(polygons[i].Vertices[j].Position);
+						bounds.Encapsulate((Vector3)polygons[i].Vertices[j].Position);
 					}
 				}
 				return bounds;
@@ -714,13 +714,13 @@ namespace Sabresaurus.SabreCSG
 		{
 			if (polygons.Length > 0)
 			{
-				Bounds bounds = new Bounds(transform.TransformPoint(polygons[0].Vertices[0].Position), Vector3.zero);
+				Bounds bounds = new Bounds(transform.TransformPoint((Vector3)polygons[0].Vertices[0].Position), Vector3.zero);
 
 				for (int i = 0; i < polygons.Length; i++)
 				{
 					for (int j = 0; j < polygons[i].Vertices.Length; j++)
 					{
-						bounds.Encapsulate(transform.TransformPoint(polygons[i].Vertices[j].Position));
+						bounds.Encapsulate(transform.TransformPoint((Vector3)polygons[i].Vertices[j].Position));
 					}
 				}
 				return bounds;
@@ -735,13 +735,13 @@ namespace Sabresaurus.SabreCSG
         {
             if (polygons.Length > 0)
             {
-                Bounds bounds = new Bounds(otherTransform.InverseTransformPoint(transform.TransformPoint(polygons[0].Vertices[0].Position)), Vector3.zero);
+                Bounds bounds = new Bounds(otherTransform.InverseTransformPoint(transform.TransformPoint((Vector3)polygons[0].Vertices[0].Position)), Vector3.zero);
 
                 for (int i = 0; i < polygons.Length; i++)
                 {
                     for (int j = 0; j < polygons[i].Vertices.Length; j++)
                     {
-                        bounds.Encapsulate(otherTransform.InverseTransformPoint(transform.TransformPoint(polygons[i].Vertices[j].Position)));
+                        bounds.Encapsulate(otherTransform.InverseTransformPoint(transform.TransformPoint((Vector3)polygons[i].Vertices[j].Position)));
                     }
                 }
                 return bounds;
@@ -752,21 +752,21 @@ namespace Sabresaurus.SabreCSG
             }
         }
 
-        public float CalculateExtentsInAxis(Vector3 worldAxis)
+        public Fix64 CalculateExtentsInAxis(FixVector3 worldAxis)
 		{
-			// Transform the world axis direction to local
-			Vector3 localAxis = transform.InverseTransformDirection(worldAxis);
+            // Transform the world axis direction to local
+            FixVector3 localAxis = (FixVector3)transform.InverseTransformDirection((Vector3)worldAxis);
 
-			float minDot = Vector3.Dot(polygons[0].Vertices[0].Position, localAxis);
-			float maxDot = minDot;
+			Fix64 minDot = FixVector3.Dot(polygons[0].Vertices[0].Position, localAxis);
+            Fix64 maxDot = minDot;
 
 			for (int i = 0; i < polygons.Length; i++)
 			{
 				for (int j = 0; j < polygons[i].Vertices.Length; j++)
 				{
-					float dot = Vector3.Dot(polygons[i].Vertices[j].Position, localAxis);
-					minDot = Mathf.Min(dot, minDot);
-					maxDot = Mathf.Max(dot, maxDot);
+                    Fix64 dot = FixVector3.Dot(polygons[i].Vertices[j].Position, localAxis);
+					minDot = Fix64.Min(dot, minDot);
+					maxDot = Fix64.Max(dot, maxDot);
 				}
 			}
 
@@ -806,7 +806,7 @@ namespace Sabresaurus.SabreCSG
 		/// </summary>
 		public void ResetPivot()
 		{			
-			Vector3 delta = GetBounds().center;
+			FixVector3 delta = (FixVector3)GetBounds().center;
 
 			for (int i = 0; i < polygons.Length; i++) 
 			{
@@ -817,7 +817,7 @@ namespace Sabresaurus.SabreCSG
 			}
 
 			// Bounds is aligned with the object
-			transform.Translate(delta.Multiply(transform.localScale));
+			transform.Translate((Vector3)delta.Multiply((FixVector3)transform.localScale));
 
 			// Counter the delta offset
 			Transform[] childTransforms = transform.GetComponentsInChildren<Transform>(true);
@@ -826,12 +826,12 @@ namespace Sabresaurus.SabreCSG
 			{
 				if(childTransforms[i] != transform)
 				{
-					childTransforms[i].Translate(-delta);
+					childTransforms[i].Translate(-(Vector3)delta);
 				}
 			}
 
 			// Only invalidate if it's actually been realigned
-			if(delta != Vector3.zero)
+			if(delta != FixVector3.zero)
 			{
 				Invalidate(true);
 			}

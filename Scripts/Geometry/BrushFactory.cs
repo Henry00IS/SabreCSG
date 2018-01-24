@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace Sabresaurus.SabreCSG
 {
@@ -30,50 +31,50 @@ namespace Sabresaurus.SabreCSG
 
 			// Back
 			polygons[0] = new Polygon(new Vertex[] {
-				new Vertex(new Vector3(-1, -1, 1), new Vector3(0, 0, 1), new Vector2(1,0)),
-				new Vertex(new Vector3(1, -1, 1), new Vector3(0, 0, 1), new Vector2(0,0)),
-				new Vertex(new Vector3(1, 1, 1), new Vector3(0, 0, 1), new Vector2(0,1)),
-				new Vertex(new Vector3(-1, 1, 1), new Vector3(0, 0, 1), new Vector2(1,1)),
+				new Vertex(new FixVector3(-1, -1, 1), new FixVector3(0, 0, 1), new Vector2(1,0)),
+				new Vertex(new FixVector3(1, -1, 1), new FixVector3(0, 0, 1), new Vector2(0,0)),
+				new Vertex(new FixVector3(1, 1, 1), new FixVector3(0, 0, 1), new Vector2(0,1)),
+				new Vertex(new FixVector3(-1, 1, 1), new FixVector3(0, 0, 1), new Vector2(1,1)),
 			}, null, false, false);
 
 			// Left
 			polygons[1] = new Polygon(new Vertex[] {
-				new Vertex(new Vector3(-1, -1, -1), new Vector3(-1, 0, 0), new Vector2(1,0)),
-				new Vertex(new Vector3(-1, -1, 1), new Vector3(-1, 0, 0), new Vector2(0,0)),
-				new Vertex(new Vector3(-1, 1, 1), new Vector3(-1, 0, 0), new Vector2(0,1)),
-				new Vertex(new Vector3(-1, 1, -1), new Vector3(-1, 0, 0), new Vector2(1,1)),
+				new Vertex(new FixVector3(-1, -1, -1), new FixVector3(-1, 0, 0), new Vector2(1,0)),
+				new Vertex(new FixVector3(-1, -1, 1), new FixVector3(-1, 0, 0), new Vector2(0,0)),
+				new Vertex(new FixVector3(-1, 1, 1), new FixVector3(-1, 0, 0), new Vector2(0,1)),
+				new Vertex(new FixVector3(-1, 1, -1), new FixVector3(-1, 0, 0), new Vector2(1,1)),
 			}, null, false, false);
 
 			// Front
 			polygons[2] = new Polygon(new Vertex[] {
-				new Vertex(new Vector3(1, -1, 1), new Vector3(1, 0, 0), new Vector2(1,0)),
-				new Vertex(new Vector3(1, -1, -1), new Vector3(1, 0, 0), new Vector2(0,0)),
-				new Vertex(new Vector3(1, 1, -1), new Vector3(1, 0, 0), new Vector2(0,1)),
-				new Vertex(new Vector3(1, 1, 1), new Vector3(1, 0, 0), new Vector2(1,1)),
+				new Vertex(new FixVector3(1, -1, 1), new FixVector3(1, 0, 0), new Vector2(1,0)),
+				new Vertex(new FixVector3(1, -1, -1), new FixVector3(1, 0, 0), new Vector2(0,0)),
+				new Vertex(new FixVector3(1, 1, -1), new FixVector3(1, 0, 0), new Vector2(0,1)),
+				new Vertex(new FixVector3(1, 1, 1), new FixVector3(1, 0, 0), new Vector2(1,1)),
 			}, null, false, false);
 
 			// Right
 			polygons[3] = new Polygon(new Vertex[] {
-				new Vertex(new Vector3(1, -1, -1), new Vector3(0, 0, -1), new Vector2(1,0)),
-				new Vertex(new Vector3(-1, -1, -1), new Vector3(0, 0, -1), new Vector2(0,0)),
-				new Vertex(new Vector3(-1, 1, -1), new Vector3(0, 0, -1), new Vector2(0,1)),
-				new Vertex(new Vector3(1, 1, -1), new Vector3(0, 0, -1), new Vector2(1,1)),
+				new Vertex(new FixVector3(1, -1, -1), new FixVector3(0, 0, -1), new Vector2(1,0)),
+				new Vertex(new FixVector3(-1, -1, -1), new FixVector3(0, 0, -1), new Vector2(0,0)),
+				new Vertex(new FixVector3(-1, 1, -1), new FixVector3(0, 0, -1), new Vector2(0,1)),
+				new Vertex(new FixVector3(1, 1, -1), new FixVector3(0, 0, -1), new Vector2(1,1)),
 			}, null, false, false);
 
 			// Bottom
 			polygons[4] = new Polygon(new Vertex[] {
-				new Vertex(new Vector3(-1, -1, -1), new Vector3(0, -1, 0), new Vector2(1,0)),
-				new Vertex(new Vector3(1, -1, -1), new Vector3(0, -1, 0), new Vector2(0,0)),
-				new Vertex(new Vector3(1, -1, 1), new Vector3(0, -1, 0), new Vector2(0,1)),
-				new Vertex(new Vector3(-1, -1, 1), new Vector3(0, -1, 0), new Vector2(1,1)),
+				new Vertex(new FixVector3(-1, -1, -1), new FixVector3(0, -1, 0), new Vector2(1,0)),
+				new Vertex(new FixVector3(1, -1, -1), new FixVector3(0, -1, 0), new Vector2(0,0)),
+				new Vertex(new FixVector3(1, -1, 1), new FixVector3(0, -1, 0), new Vector2(0,1)),
+				new Vertex(new FixVector3(-1, -1, 1), new FixVector3(0, -1, 0), new Vector2(1,1)),
 			}, null, false, false);
 
 			// Top
 			polygons[5] = new Polygon(new Vertex[] {
-				new Vertex(new Vector3(-1, 1, -1), new Vector3(0, 1, 0), new Vector2(1,0)),
-				new Vertex(new Vector3(-1, 1, 1), new Vector3(0, 1, 0), new Vector2(0,0)),
-				new Vertex(new Vector3(1, 1, 1), new Vector3(0, 1, 0), new Vector2(0,1)),
-				new Vertex(new Vector3(1, 1, -1), new Vector3(0, 1, 0), new Vector2(1,1)),
+				new Vertex(new FixVector3(-1, 1, -1), new FixVector3(0, 1, 0), new Vector2(1,0)),
+				new Vertex(new FixVector3(-1, 1, 1), new FixVector3(0, 1, 0), new Vector2(0,0)),
+				new Vertex(new FixVector3(1, 1, 1), new FixVector3(0, 1, 0), new Vector2(0,1)),
+				new Vertex(new FixVector3(1, 1, -1), new FixVector3(0, 1, 0), new Vector2(1,1)),
 			}, null, false, false);
 
 			return polygons;
@@ -88,44 +89,44 @@ namespace Sabresaurus.SabreCSG
 		{
 			Polygon[] polygons = new Polygon[sideCount * 3];
 
-			float angleDelta = Mathf.PI * 2 / sideCount;
+            Fix64 angleDelta = Fix64.Pi * (Fix64)2 / (Fix64)sideCount;
 
 			for (int i = 0; i < sideCount; i++)
 			{
 				polygons[i] = new Polygon(new Vertex[] 
 					{
-						new Vertex(new Vector3(Mathf.Sin(i * angleDelta), -1, Mathf.Cos(i * angleDelta)), 
-							new Vector3(Mathf.Sin(i * angleDelta), 0, Mathf.Cos(i * angleDelta)), 
+						new Vertex(new FixVector3(Fix64.Sin((Fix64)i * angleDelta), -(Fix64)1, Fix64.Cos((Fix64)i * angleDelta)), 
+							new FixVector3(Fix64.Sin((Fix64)i * angleDelta), (Fix64)0, Fix64.Cos((Fix64)i * angleDelta)), 
 							new Vector2(i * (1f/sideCount),0)),
-						new Vertex(new Vector3(Mathf.Sin((i+1) * angleDelta), -1, Mathf.Cos((i+1) * angleDelta)), 
-							new Vector3(Mathf.Sin((i+1) * angleDelta), 0, Mathf.Cos((i+1) * angleDelta)), 
+						new Vertex(new FixVector3(Fix64.Sin(((Fix64)i+(Fix64)1) * angleDelta), -(Fix64)1, Fix64.Cos(((Fix64)i+(Fix64)1) * angleDelta)), 
+							new FixVector3(Fix64.Sin(((Fix64)i+(Fix64)1) * angleDelta), (Fix64)0, Fix64.Cos(((Fix64)i+(Fix64)1) * angleDelta)), 
 							new Vector2((i+1) * (1f/sideCount),0)),
-						new Vertex(new Vector3(Mathf.Sin((i+1) * angleDelta), 1, Mathf.Cos((i+1) * angleDelta)), 
-							new Vector3(Mathf.Sin((i+1) * angleDelta), 0, Mathf.Cos((i+1) * angleDelta)), 
+						new Vertex(new FixVector3(Fix64.Sin(((Fix64)i+(Fix64)1) * angleDelta), (Fix64)1, Fix64.Cos(((Fix64)i+(Fix64)1) * angleDelta)), 
+							new FixVector3(Fix64.Sin(((Fix64)i+(Fix64)1) * angleDelta), (Fix64)0, Fix64.Cos(((Fix64)i+(Fix64)1) * angleDelta)), 
 							new Vector2((i+1) * (1f/sideCount),1)),
-						new Vertex(new Vector3(Mathf.Sin(i * angleDelta), 1, Mathf.Cos(i * angleDelta)), 
-							new Vector3(Mathf.Sin(i * angleDelta), 0, Mathf.Cos(i * angleDelta)), 
+						new Vertex(new FixVector3(Fix64.Sin((Fix64)i * angleDelta), (Fix64)1, Fix64.Cos((Fix64)i * angleDelta)), 
+							new FixVector3(Fix64.Sin((Fix64)i * angleDelta), (Fix64)0, Fix64.Cos((Fix64)i * angleDelta)), 
 							new Vector2(i * (1f/sideCount),1)),
 					}, null, false, false);
 			}
 
-			Vertex capCenterVertex = new Vertex(new Vector3(0,1,0), Vector3.up, new Vector2(0,0));
+			Vertex capCenterVertex = new Vertex(new FixVector3(0,1,0), FixVector3.up, new Vector2(0,0));
 
 			for (int i = 0; i < sideCount; i++)
 			{
-				Vertex vertex1 = new Vertex(new Vector3(Mathf.Sin(i * angleDelta), 1, Mathf.Cos(i * angleDelta)), Vector3.up, new Vector2(Mathf.Sin(i * angleDelta), Mathf.Cos(i * angleDelta)));
-				Vertex vertex2 = new Vertex(new Vector3(Mathf.Sin((i+1) * angleDelta), 1, Mathf.Cos((i+1) * angleDelta)), Vector3.up, new Vector2(Mathf.Sin((i+1) * angleDelta), Mathf.Cos((i+1) * angleDelta)));
+				Vertex vertex1 = new Vertex(new FixVector3(Fix64.Sin((Fix64)i * angleDelta), (Fix64)1, Fix64.Cos((Fix64)i * angleDelta)), FixVector3.up, new Vector2(Mathf.Sin(i * (float)angleDelta), Mathf.Cos(i * (float)angleDelta)));
+				Vertex vertex2 = new Vertex(new FixVector3(Fix64.Sin(((Fix64)i + (Fix64)1) * angleDelta), (Fix64)1, Fix64.Cos(((Fix64)i + (Fix64)1) * angleDelta)), FixVector3.up, new Vector2(Mathf.Sin((i+1) * (float)angleDelta), Mathf.Cos((i+1) * (float)angleDelta)));
 
 				Vertex[] capVertices = new Vertex[] { vertex1, vertex2, capCenterVertex.DeepCopy() };
 				polygons[sideCount + i] = new Polygon(capVertices, null, false, false);
 			}
 
-			capCenterVertex = new Vertex(new Vector3(0,-1,0), Vector3.down, new Vector2(0,0));
+			capCenterVertex = new Vertex(new FixVector3(0,-1,0), FixVector3.down, new Vector2(0,0));
 
 			for (int i = 0; i < sideCount; i++)
 			{
-				Vertex vertex1 = new Vertex(new Vector3(Mathf.Sin(i * -angleDelta), -1, Mathf.Cos(i * -angleDelta)), Vector3.down, new Vector2(Mathf.Sin(i * angleDelta), Mathf.Cos(i * angleDelta)));
-				Vertex vertex2 = new Vertex(new Vector3(Mathf.Sin((i+1) * -angleDelta), -1, Mathf.Cos((i+1) * -angleDelta)), Vector3.down, new Vector2(Mathf.Sin((i+1) * angleDelta), Mathf.Cos((i+1) * angleDelta)));
+				Vertex vertex1 = new Vertex(new FixVector3(Fix64.Sin((Fix64)i * -angleDelta), -(Fix64)1, Fix64.Cos((Fix64)i * -angleDelta)), FixVector3.down, new Vector2(Mathf.Sin(i * (float)angleDelta), Mathf.Cos(i * (float)angleDelta)));
+				Vertex vertex2 = new Vertex(new FixVector3(Fix64.Sin(((Fix64)i + (Fix64)1) * -angleDelta), -(Fix64)1, Fix64.Cos(((Fix64)i + (Fix64)1) * -angleDelta)), FixVector3.down, new Vector2(Mathf.Sin((i + 1) * (float)angleDelta), Mathf.Cos((i + 1) * (float)angleDelta)));
 
 				Vertex[] capVertices = new Vertex[] { vertex1, vertex2, capCenterVertex.DeepCopy() };
 				polygons[sideCount * 2 + i] = new Polygon(capVertices, null, false, false);
@@ -143,45 +144,45 @@ namespace Sabresaurus.SabreCSG
 		{
 			Polygon[] polygons = new Polygon[sideCount * 3];
 
-			float angleDelta = Mathf.PI * 2 / sideCount;
+			Fix64 angleDelta = Fix64.Pi * (Fix64)2 / (Fix64)sideCount;
 
 			for (int i = 0; i < sideCount; i++)
 			{
-				Vector3 normal = new Vector3(Mathf.Sin((i+0.5f) * angleDelta), 0, Mathf.Cos((i+0.5f) * angleDelta));
+				FixVector3 normal = new FixVector3(Fix64.Sin(((Fix64)i + (Fix64)0.5f) * angleDelta), (Fix64)0, Fix64.Cos(((Fix64)i + (Fix64)0.5f) * angleDelta));
 				polygons[i] = new Polygon(new Vertex[] {
 
-					new Vertex(new Vector3(Mathf.Sin(i * angleDelta), -1, Mathf.Cos(i * angleDelta)), 
+					new Vertex(new FixVector3(Fix64.Sin((Fix64)i * angleDelta), -(Fix64)1, Fix64.Cos((Fix64)i * angleDelta)), 
 						normal,
 						new Vector2(0,0)),
-					new Vertex(new Vector3(Mathf.Sin((i+1) * angleDelta), -1, Mathf.Cos((i+1) * angleDelta)), 
+					new Vertex(new FixVector3(Fix64.Sin(((Fix64)i+(Fix64)1) * angleDelta), -(Fix64)1, Fix64.Cos(((Fix64)i+(Fix64)1) * angleDelta)), 
 						normal,
 						new Vector2(1,0)),
-					new Vertex(new Vector3(Mathf.Sin((i+1) * angleDelta), 1, Mathf.Cos((i+1) * angleDelta)), 
+					new Vertex(new FixVector3(Fix64.Sin(((Fix64)i+(Fix64)1) * angleDelta), (Fix64)1, Fix64.Cos(((Fix64)i+(Fix64)1) * angleDelta)), 
 						normal,
 						new Vector2(1,1)),
-					new Vertex(new Vector3(Mathf.Sin(i * angleDelta), 1, Mathf.Cos(i * angleDelta)), 
+					new Vertex(new FixVector3(Fix64.Sin((Fix64)i * angleDelta), (Fix64)1, Fix64.Cos((Fix64)i * angleDelta)), 
 						normal,
 						new Vector2(0,1)),
 				}, null, false, false);
 			}
 
-			Vertex capCenterVertex = new Vertex(new Vector3(0,1,0), Vector3.up, new Vector2(0,0));
+			Vertex capCenterVertex = new Vertex(new FixVector3(0,1,0), FixVector3.up, new Vector2(0,0));
 
 			for (int i = 0; i < sideCount; i++)
 			{
-				Vertex vertex1 = new Vertex(new Vector3(Mathf.Sin(i * angleDelta), 1, Mathf.Cos(i * angleDelta)), Vector3.up, new Vector2(Mathf.Sin(i * angleDelta), Mathf.Cos(i * angleDelta)));
-				Vertex vertex2 = new Vertex(new Vector3(Mathf.Sin((i+1) * angleDelta), 1, Mathf.Cos((i+1) * angleDelta)), Vector3.up, new Vector2(Mathf.Sin((i+1) * angleDelta), Mathf.Cos((i+1) * angleDelta)));
+				Vertex vertex1 = new Vertex(new FixVector3(Fix64.Sin((Fix64)i * angleDelta), (Fix64)1, Fix64.Cos((Fix64)i * angleDelta)), FixVector3.up, new Vector2(Mathf.Sin(i * (float)angleDelta), Mathf.Cos(i * (float)angleDelta)));
+				Vertex vertex2 = new Vertex(new FixVector3(Fix64.Sin(((Fix64)i + (Fix64)1) * angleDelta), (Fix64)1, Fix64.Cos(((Fix64)i+(Fix64)1) * angleDelta)), FixVector3.up, new Vector2(Mathf.Sin((i+1) * (float)angleDelta), Mathf.Cos((i+1) * (float)angleDelta)));
 
 				Vertex[] capVertices = new Vertex[] { vertex1, vertex2, capCenterVertex.DeepCopy() };
 				polygons[sideCount + i] = new Polygon(capVertices, null, false, false);
 			}
 
-			capCenterVertex = new Vertex(new Vector3(0,-1,0), Vector3.down, new Vector2(0,0));
+			capCenterVertex = new Vertex(new FixVector3(0,-1,0), FixVector3.down, new Vector2(0,0));
 
 			for (int i = 0; i < sideCount; i++)
 			{
-				Vertex vertex1 = new Vertex(new Vector3(Mathf.Sin(i * -angleDelta), -1, Mathf.Cos(i * -angleDelta)), Vector3.down, new Vector2(Mathf.Sin(i * angleDelta), Mathf.Cos(i * angleDelta)));
-				Vertex vertex2 = new Vertex(new Vector3(Mathf.Sin((i+1) * -angleDelta), -1, Mathf.Cos((i+1) * -angleDelta)), Vector3.down, new Vector2(Mathf.Sin((i+1) * angleDelta), Mathf.Cos((i+1) * angleDelta)));
+				Vertex vertex1 = new Vertex(new FixVector3(Fix64.Sin((Fix64)i * -angleDelta), -(Fix64)1, Fix64.Cos((Fix64)i * -angleDelta)), FixVector3.down, new Vector2(Mathf.Sin(i * (float)angleDelta), Mathf.Cos(i * (float)angleDelta)));
+				Vertex vertex2 = new Vertex(new FixVector3(Fix64.Sin(((Fix64)i + (Fix64)1) * -angleDelta), -(Fix64)1, Fix64.Cos(((Fix64)i + (Fix64)1) * -angleDelta)), FixVector3.down, new Vector2(Mathf.Sin((i+1) * (float)angleDelta), Mathf.Cos((i+1) * (float)angleDelta)));
 
 				Vertex[] capVertices = new Vertex[] { vertex1, vertex2, capCenterVertex.DeepCopy() };
 				polygons[sideCount * 2 + i] = new Polygon(capVertices, null, false, false);
@@ -204,28 +205,28 @@ namespace Sabresaurus.SabreCSG
 		public static Polygon[] GenerateIcoSphere(int iterationCount)
 		{
 			// Derived from http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html
-			float longestDimension = (1+Mathf.Sqrt(5f)) / 2f;
-			Vector3 sourceVector = new Vector3(0, 1, longestDimension);
+			Fix64 longestDimension = (Fix64.One + Fix64.Sqrt((Fix64)5f)) / (Fix64)2f;
+			FixVector3 sourceVector = new FixVector3(Fix64.Zero, Fix64.One, longestDimension);
 
 			// Make the longest dimension 1, so the icosphere fits in a 2,2,2 cube
 			sourceVector.Normalize();
 
 			Vertex[] vertices = new Vertex[]
 			{
-				new Vertex(new Vector3(-sourceVector.y,+sourceVector.z,sourceVector.x), Vector3.zero, Vector2.zero),
-				new Vertex(new Vector3(sourceVector.y,+sourceVector.z,sourceVector.x), Vector3.zero, Vector2.zero),
-				new Vertex(new Vector3(-sourceVector.y,-sourceVector.z,sourceVector.x), Vector3.zero, Vector2.zero),
-				new Vertex(new Vector3(sourceVector.y,-sourceVector.z,sourceVector.x), Vector3.zero, Vector2.zero),
+				new Vertex(new FixVector3(-sourceVector.y,+sourceVector.z,sourceVector.x), FixVector3.zero, Vector2.zero),
+				new Vertex(new FixVector3(sourceVector.y,+sourceVector.z,sourceVector.x), FixVector3.zero, Vector2.zero),
+				new Vertex(new FixVector3(-sourceVector.y,-sourceVector.z,sourceVector.x), FixVector3.zero, Vector2.zero),
+				new Vertex(new FixVector3(sourceVector.y,-sourceVector.z,sourceVector.x), FixVector3.zero, Vector2.zero),
 
-				new Vertex(new Vector3(sourceVector.x,-sourceVector.y,+sourceVector.z), Vector3.zero, Vector2.zero),
-				new Vertex(new Vector3(sourceVector.x,+sourceVector.y,+sourceVector.z), Vector3.zero, Vector2.zero),
-				new Vertex(new Vector3(sourceVector.x,-sourceVector.y,-sourceVector.z), Vector3.zero, Vector2.zero),
-				new Vertex(new Vector3(sourceVector.x,+sourceVector.y,-sourceVector.z), Vector3.zero, Vector2.zero),
+				new Vertex(new FixVector3(sourceVector.x,-sourceVector.y,+sourceVector.z), FixVector3.zero, Vector2.zero),
+				new Vertex(new FixVector3(sourceVector.x,+sourceVector.y,+sourceVector.z), FixVector3.zero, Vector2.zero),
+				new Vertex(new FixVector3(sourceVector.x,-sourceVector.y,-sourceVector.z), FixVector3.zero, Vector2.zero),
+				new Vertex(new FixVector3(sourceVector.x,+sourceVector.y,-sourceVector.z), FixVector3.zero, Vector2.zero),
 
-				new Vertex(new Vector3(+sourceVector.z,sourceVector.x,-sourceVector.y), Vector3.zero, Vector2.zero),
-				new Vertex(new Vector3(+sourceVector.z,sourceVector.x,+sourceVector.y), Vector3.zero, Vector2.zero),
-				new Vertex(new Vector3(-sourceVector.z,sourceVector.x,-sourceVector.y), Vector3.zero, Vector2.zero),
-				new Vertex(new Vector3(-sourceVector.z,sourceVector.x,+sourceVector.y), Vector3.zero, Vector2.zero),
+				new Vertex(new FixVector3(+sourceVector.z,sourceVector.x,-sourceVector.y), FixVector3.zero, Vector2.zero),
+				new Vertex(new FixVector3(+sourceVector.z,sourceVector.x,+sourceVector.y), FixVector3.zero, Vector2.zero),
+				new Vertex(new FixVector3(-sourceVector.z,sourceVector.x,-sourceVector.y), FixVector3.zero, Vector2.zero),
+				new Vertex(new FixVector3(-sourceVector.z,sourceVector.x,+sourceVector.y), FixVector3.zero, Vector2.zero),
 			};
 
 			Polygon[] polygons = new Polygon[]
@@ -261,9 +262,9 @@ namespace Sabresaurus.SabreCSG
 				Polygon[] newPolygons = new Polygon[polygons.Length*4];
 				for (int j = 0; j < polygons.Length; j++) 
 				{
-					Vertex a = Vertex.Lerp(polygons[j].Vertices[0], polygons[j].Vertices[1], 0.5f);
-					Vertex b = Vertex.Lerp(polygons[j].Vertices[1], polygons[j].Vertices[2], 0.5f);
-					Vertex c = Vertex.Lerp(polygons[j].Vertices[2], polygons[j].Vertices[0], 0.5f);
+					Vertex a = Vertex.Lerp(polygons[j].Vertices[0], polygons[j].Vertices[1], (Fix64)0.5f);
+					Vertex b = Vertex.Lerp(polygons[j].Vertices[1], polygons[j].Vertices[2], (Fix64)0.5f);
+					Vertex c = Vertex.Lerp(polygons[j].Vertices[2], polygons[j].Vertices[0], (Fix64)0.5f);
 
 					a.Position = a.Position.normalized;
 					b.Position = b.Position.normalized;
@@ -283,32 +284,32 @@ namespace Sabresaurus.SabreCSG
 
                 for (int j = 0; j < polygons[i].Vertices.Length; j++)
                 {
-                    Vector3 normal = polygons[i].Vertices[j].Position.normalized;
+                    FixVector3 normal = polygons[i].Vertices[j].Position.normalized;
                     polygons[i].Vertices[j].Normal = normal;
-                    float piReciprocal = 1f / Mathf.PI;
-                    float u = 0.5f - 0.5f * Mathf.Atan2(normal.x, -normal.z) * piReciprocal;
-                    float v = 1f - Mathf.Acos(normal.y) * piReciprocal;
+                    Fix64 piReciprocal = Fix64.One / Fix64.Pi;
+                    Fix64 u = (Fix64)0.5f - (Fix64)0.5f * Fix64.Atan2(normal.x, -normal.z) * piReciprocal;
+                    Fix64 v = Fix64.One - Fix64.Acos(normal.y) * piReciprocal;
 
-                    if (Mathf.Abs(u) < 0.01f
-                        || Mathf.Abs(1 - Mathf.Abs(u)) < 0.01f)
+                    if (Fix64.Abs(u) < (Fix64)0.01f
+                        || Fix64.Abs(Fix64.One - Fix64.Abs(u)) < (Fix64)0.01f)
                     {
                         if (polygons[i].Plane.normal.x > 0)
                         {
-                            u = 0;
+                            u = Fix64.Zero;
                         }
                         else
                         {
-                            u = 1;
+                            u = Fix64.One;
                         }
                     }
 
-                    if(u > 0.75f)
+                    if(u > (Fix64)0.75f)
                     {
                         anyAboveHalf = true;
                     }
 
                     //Debug.Log(u);
-                    polygons[i].Vertices[j].UV = new Vector2(u, v);
+                    polygons[i].Vertices[j].UV = new Vector2((float)u, (float)v);
 
                     //const float kOneOverPi = 1.0 / 3.14159265;
                     //float u = 0.5 - 0.5 * atan(N.x, -N.z) * kOneOverPi;
@@ -343,8 +344,8 @@ namespace Sabresaurus.SabreCSG
 		{
 			Polygon[] polygons = new Polygon[lateralCount * longitudinalCount];
 
-			float angleDelta = 1f / lateralCount;
-			float longitudinalDelta = 1f / longitudinalCount;
+            Fix64 angleDelta = Fix64.One / (Fix64)lateralCount;
+            Fix64 longitudinalDelta = Fix64.One / (Fix64)longitudinalCount;
 
 			// Generate tris for the top and bottom, then quads for the rest
 			for (int i = 0; i < lateralCount; i++)
@@ -357,31 +358,31 @@ namespace Sabresaurus.SabreCSG
 					{
 						vertices = new Vertex[] {
 
-							new Vertex(new Vector3(Mathf.Sin(Mathf.PI * i * angleDelta) * Mathf.Cos(2 * Mathf.PI * (j+1) * longitudinalDelta),
-								Mathf.Cos(Mathf.PI * i * angleDelta),
-								Mathf.Sin(Mathf.PI * i * angleDelta) * Mathf.Sin(2 * Mathf.PI * (j+1) * longitudinalDelta)
+							new Vertex(new FixVector3(Fix64.Sin(Fix64.Pi * (Fix64)i * angleDelta) * Fix64.Cos((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta),
+                                Fix64.Cos(Fix64.Pi * (Fix64)i * angleDelta),
+                                Fix64.Sin(Fix64.Pi * (Fix64)i * angleDelta) * Fix64.Sin((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta)
 							),
-								new Vector3(Mathf.Sin(Mathf.PI * i * angleDelta) * Mathf.Cos(2 * Mathf.PI * (j+1) * longitudinalDelta),
-									Mathf.Cos(Mathf.PI * i * angleDelta),
-									Mathf.Sin(Mathf.PI * i * angleDelta) * Mathf.Sin(2 * Mathf.PI * (j+1) * longitudinalDelta)
+								new FixVector3(Fix64.Sin(Fix64.Pi * (Fix64)i * angleDelta) * Fix64.Cos((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta),
+                                    Fix64.Cos(Fix64.Pi * (Fix64)i * angleDelta),
+                                    Fix64.Sin(Fix64.Pi * (Fix64)i * angleDelta) * Fix64.Sin((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta)
 								),
 								new Vector2(i * (1f/lateralCount), (j+1) * (1f/longitudinalCount))),
-							new Vertex(new Vector3(Mathf.Sin(Mathf.PI * (i+1) * angleDelta) * Mathf.Cos(2 * Mathf.PI * (j+1) * longitudinalDelta),
-								Mathf.Cos(Mathf.PI * (i+1) * angleDelta),
-								Mathf.Sin(Mathf.PI * (i+1) * angleDelta) * Mathf.Sin(2 * Mathf.PI * (j+1) * longitudinalDelta)
+							new Vertex(new FixVector3(Fix64.Sin(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta) * Fix64.Cos((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta),
+                                Fix64.Cos(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta),
+                                Fix64.Sin(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta) * Fix64.Sin((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta)
 							),
-								new Vector3(Mathf.Sin(Mathf.PI * (i+1) * angleDelta) * Mathf.Cos(2 * Mathf.PI * (j+1) * longitudinalDelta),
-									Mathf.Cos(Mathf.PI * (i+1) * angleDelta),
-									Mathf.Sin(Mathf.PI * (i+1) * angleDelta) * Mathf.Sin(2 * Mathf.PI * (j+1) * longitudinalDelta)
+								new FixVector3(Fix64.Sin(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta) * Fix64.Cos((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta),
+                                    Fix64.Cos(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta),
+                                    Fix64.Sin(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta) * Fix64.Sin((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta)
 								),
 								new Vector2((i+1) * (1f/lateralCount), (j+1) * (1f/longitudinalCount))),
-							new Vertex(new Vector3(Mathf.Sin(Mathf.PI * i * angleDelta) * Mathf.Cos(2 * Mathf.PI * j * longitudinalDelta),
-								Mathf.Cos(Mathf.PI * i * angleDelta),
-								Mathf.Sin(Mathf.PI * i * angleDelta) * Mathf.Sin(2 * Mathf.PI * j * longitudinalDelta)
+							new Vertex(new FixVector3(Fix64.Sin(Fix64.Pi * (Fix64)i * angleDelta) * Fix64.Cos((Fix64)2 * Fix64.Pi * (Fix64)j * longitudinalDelta),
+                                Fix64.Cos(Fix64.Pi * (Fix64)i * angleDelta),
+                                Fix64.Sin(Fix64.Pi * (Fix64)i * angleDelta) * Fix64.Sin((Fix64)2 * Fix64.Pi * (Fix64)j * longitudinalDelta)
 							), 
-								new Vector3(Mathf.Sin(Mathf.PI * i * angleDelta) * Mathf.Cos(2 * Mathf.PI * j * longitudinalDelta),
-									Mathf.Cos(Mathf.PI * i * angleDelta),
-									Mathf.Sin(Mathf.PI * i * angleDelta) * Mathf.Sin(2 * Mathf.PI * j * longitudinalDelta)
+								new FixVector3(Fix64.Sin(Fix64.Pi * (Fix64)i * angleDelta) * Fix64.Cos((Fix64)2 * Fix64.Pi * (Fix64)j * longitudinalDelta),
+                                    Fix64.Cos(Fix64.Pi * (Fix64)i * angleDelta),
+                                    Fix64.Sin(Fix64.Pi * (Fix64)i * angleDelta) * Fix64.Sin((Fix64)2 * Fix64.Pi * (Fix64)j * longitudinalDelta)
 								), 
 								new Vector2(i * (1f/lateralCount), j * (1f/longitudinalCount))),
 						};
@@ -390,40 +391,40 @@ namespace Sabresaurus.SabreCSG
 					{
 						vertices = new Vertex[] {
 
-							new Vertex(new Vector3(Mathf.Sin(Mathf.PI * i * angleDelta) * Mathf.Cos(2 * Mathf.PI * (j+1) * longitudinalDelta),
-								Mathf.Cos(Mathf.PI * i * angleDelta),
-								Mathf.Sin(Mathf.PI * i * angleDelta) * Mathf.Sin(2 * Mathf.PI * (j+1) * longitudinalDelta)
+							new Vertex(new FixVector3(Fix64.Sin(Fix64.Pi * (Fix64)i * angleDelta) * Fix64.Cos((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta),
+								Fix64.Cos(Fix64.Pi * (Fix64)i * angleDelta),
+								Fix64.Sin(Fix64.Pi * (Fix64)i * angleDelta) * Fix64.Sin((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta)
 							),
-								new Vector3(Mathf.Sin(Mathf.PI * i * angleDelta) * Mathf.Cos(2 * Mathf.PI * (j+1) * longitudinalDelta),
-									Mathf.Cos(Mathf.PI * i * angleDelta),
-									Mathf.Sin(Mathf.PI * i * angleDelta) * Mathf.Sin(2 * Mathf.PI * (j+1) * longitudinalDelta)
+								new FixVector3(Fix64.Sin(Fix64.Pi * (Fix64)i * angleDelta) * Fix64.Cos((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta),
+									Fix64.Cos(Fix64.Pi * (Fix64)i * angleDelta),
+									Fix64.Sin(Fix64.Pi * (Fix64)i * angleDelta) * Fix64.Sin((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta)
 								),
 								new Vector2(i * (1f/lateralCount), (j+1) * (1f/longitudinalCount))),
-							new Vertex(new Vector3(Mathf.Sin(Mathf.PI * (i+1) * angleDelta) * Mathf.Cos(2 * Mathf.PI * (j+1) * longitudinalDelta),
-								Mathf.Cos(Mathf.PI * (i+1) * angleDelta),
-								Mathf.Sin(Mathf.PI * (i+1) * angleDelta) * Mathf.Sin(2 * Mathf.PI * (j+1) * longitudinalDelta)
+							new Vertex(new FixVector3(Fix64.Sin(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta) * Fix64.Cos((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta),
+								Fix64.Cos(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta),
+								Fix64.Sin(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta) * Fix64.Sin((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta)
 							),
-								new Vector3(Mathf.Sin(Mathf.PI * (i+1) * angleDelta) * Mathf.Cos(2 * Mathf.PI * (j+1) * longitudinalDelta),
-									Mathf.Cos(Mathf.PI * (i+1) * angleDelta),
-									Mathf.Sin(Mathf.PI * (i+1) * angleDelta) * Mathf.Sin(2 * Mathf.PI * (j+1) * longitudinalDelta)
+								new FixVector3(Fix64.Sin(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta) * Fix64.Cos((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta),
+									Fix64.Cos(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta),
+									Fix64.Sin(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta) * Fix64.Sin((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta)
 								),
 								new Vector2((i+1) * (1f/lateralCount), (j+1) * (1f/longitudinalCount))),
-							new Vertex(new Vector3(Mathf.Sin(Mathf.PI * (i+1) * angleDelta) * Mathf.Cos(2 * Mathf.PI * j * longitudinalDelta),
-								Mathf.Cos(Mathf.PI * (i+1) * angleDelta),
-								Mathf.Sin(Mathf.PI * (i+1) * angleDelta) * Mathf.Sin(2 * Mathf.PI * j * longitudinalDelta)
+							new Vertex(new FixVector3(Fix64.Sin(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta) * Fix64.Cos((Fix64)2 * Fix64.Pi * (Fix64)j * (Fix64)longitudinalDelta),
+								Fix64.Cos(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta),
+								Fix64.Sin(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta) * Fix64.Sin((Fix64)2 * Fix64.Pi * (Fix64)j * (Fix64)longitudinalDelta)
 							), 
-								new Vector3(Mathf.Sin(Mathf.PI * (i+1) * angleDelta) * Mathf.Cos(2 * Mathf.PI * j * longitudinalDelta),
-									Mathf.Cos(Mathf.PI * (i+1) * angleDelta),
-									Mathf.Sin(Mathf.PI * (i+1) * angleDelta) * Mathf.Sin(2 * Mathf.PI * j * longitudinalDelta)
+								new FixVector3(Fix64.Sin(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta) * Fix64.Cos((Fix64)2 * Fix64.Pi * (Fix64)j * (Fix64)longitudinalDelta),
+									Fix64.Cos(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta),
+									Fix64.Sin(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta) * Fix64.Sin((Fix64)2 * Fix64.Pi * (Fix64)j * (Fix64)longitudinalDelta)
 								), 
 								new Vector2((i+1) * (1f/lateralCount), j * (1f/longitudinalCount))),
-							new Vertex(new Vector3(Mathf.Sin(Mathf.PI * i * angleDelta) * Mathf.Cos(2 * Mathf.PI * j * longitudinalDelta),
-								Mathf.Cos(Mathf.PI * i * angleDelta),
-								Mathf.Sin(Mathf.PI * i * angleDelta) * Mathf.Sin(2 * Mathf.PI * j * longitudinalDelta)
+							new Vertex(new FixVector3(Fix64.Sin(Fix64.Pi * (Fix64)i * angleDelta) * Fix64.Cos((Fix64)2 * Fix64.Pi * (Fix64)j * (Fix64)longitudinalDelta),
+								Fix64.Cos(Fix64.Pi * (Fix64)i * angleDelta),
+								Fix64.Sin(Fix64.Pi * (Fix64)i * angleDelta) * Fix64.Sin((Fix64)2 * Fix64.Pi * (Fix64)j * (Fix64)longitudinalDelta)
 							), 
-								new Vector3(Mathf.Sin(Mathf.PI * i * angleDelta) * Mathf.Cos(2 * Mathf.PI * j * longitudinalDelta),
-									Mathf.Cos(Mathf.PI * i * angleDelta),
-									Mathf.Sin(Mathf.PI * i * angleDelta) * Mathf.Sin(2 * Mathf.PI * j * longitudinalDelta)
+								new FixVector3(Fix64.Sin(Fix64.Pi * (Fix64)i * angleDelta) * Fix64.Cos((Fix64)2 * Fix64.Pi * (Fix64)j * (Fix64)longitudinalDelta),
+									Fix64.Cos(Fix64.Pi * (Fix64)i * angleDelta),
+									Fix64.Sin(Fix64.Pi * (Fix64)i * angleDelta) * Fix64.Sin((Fix64)2 * Fix64.Pi * (Fix64)j * (Fix64)longitudinalDelta)
 								), 
 								new Vector2(i * (1f/lateralCount), j * (1f/longitudinalCount))),
 						};
@@ -432,31 +433,31 @@ namespace Sabresaurus.SabreCSG
 					{
 						vertices = new Vertex[] {
 
-							new Vertex(new Vector3(Mathf.Sin(Mathf.PI * i * angleDelta) * Mathf.Cos(2 * Mathf.PI * (j+1) * longitudinalDelta),
-								Mathf.Cos(Mathf.PI * i * angleDelta),
-								Mathf.Sin(Mathf.PI * i * angleDelta) * Mathf.Sin(2 * Mathf.PI * (j+1) * longitudinalDelta)
+							new Vertex(new FixVector3(Fix64.Sin(Fix64.Pi * (Fix64)i * angleDelta) * Fix64.Cos((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta),
+								Fix64.Cos(Fix64.Pi * (Fix64)i * angleDelta),
+								Fix64.Sin(Fix64.Pi * (Fix64)i * angleDelta) * Fix64.Sin((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta)
 							),
-								new Vector3(Mathf.Sin(Mathf.PI * i * angleDelta) * Mathf.Cos(2 * Mathf.PI * (j+1) * longitudinalDelta),
-									Mathf.Cos(Mathf.PI * i * angleDelta),
-									Mathf.Sin(Mathf.PI * i * angleDelta) * Mathf.Sin(2 * Mathf.PI * (j+1) * longitudinalDelta)
+								new FixVector3(Fix64.Sin(Fix64.Pi * (Fix64)i * angleDelta) * Fix64.Cos((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta),
+									Fix64.Cos(Fix64.Pi * (Fix64)i * angleDelta),
+									Fix64.Sin(Fix64.Pi * (Fix64)i * angleDelta) * Fix64.Sin((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta)
 								),
 								new Vector2(i * (1f/lateralCount), (j+1) * (1f/longitudinalCount))),
-							new Vertex(new Vector3(Mathf.Sin(Mathf.PI * (i+1) * angleDelta) * Mathf.Cos(2 * Mathf.PI * (j+1) * longitudinalDelta),
-								Mathf.Cos(Mathf.PI * (i+1) * angleDelta),
-								Mathf.Sin(Mathf.PI * (i+1) * angleDelta) * Mathf.Sin(2 * Mathf.PI * (j+1) * longitudinalDelta)
+							new Vertex(new FixVector3(Fix64.Sin(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta) * Fix64.Cos((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta),
+								Fix64.Cos(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta),
+								Fix64.Sin(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta) * Fix64.Sin((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta)
 							),
-								new Vector3(Mathf.Sin(Mathf.PI * (i+1) * angleDelta) * Mathf.Cos(2 * Mathf.PI * (j+1) * longitudinalDelta),
-									Mathf.Cos(Mathf.PI * (i+1) * angleDelta),
-									Mathf.Sin(Mathf.PI * (i+1) * angleDelta) * Mathf.Sin(2 * Mathf.PI * (j+1) * longitudinalDelta)
+								new FixVector3(Fix64.Sin(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta) * Fix64.Cos((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta),
+									Fix64.Cos(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta),
+									Fix64.Sin(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta) * Fix64.Sin((Fix64)2 * Fix64.Pi * ((Fix64)j+(Fix64)1) * longitudinalDelta)
 								),
 								new Vector2((i+1) * (1f/lateralCount), (j+1) * (1f/longitudinalCount))),
-							new Vertex(new Vector3(Mathf.Sin(Mathf.PI * (i+1) * angleDelta) * Mathf.Cos(2 * Mathf.PI * j * longitudinalDelta),
-								Mathf.Cos(Mathf.PI * (i+1) * angleDelta),
-								Mathf.Sin(Mathf.PI * (i+1) * angleDelta) * Mathf.Sin(2 * Mathf.PI * j * longitudinalDelta)
+							new Vertex(new FixVector3(Fix64.Sin(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta) * Fix64.Cos((Fix64)2 * Fix64.Pi * (Fix64)j * longitudinalDelta),
+								Fix64.Cos(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta),
+								Fix64.Sin(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta) * Fix64.Sin((Fix64)2 * Fix64.Pi * (Fix64)j * longitudinalDelta)
 							), 
-								new Vector3(Mathf.Sin(Mathf.PI * (i+1) * angleDelta) * Mathf.Cos(2 * Mathf.PI * j * longitudinalDelta),
-									Mathf.Cos(Mathf.PI * (i+1) * angleDelta),
-									Mathf.Sin(Mathf.PI * (i+1) * angleDelta) * Mathf.Sin(2 * Mathf.PI * j * longitudinalDelta)
+								new FixVector3(Fix64.Sin(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta) * Fix64.Cos((Fix64)2 * Fix64.Pi * (Fix64)j * longitudinalDelta),
+									Fix64.Cos(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta),
+									Fix64.Sin(Fix64.Pi * ((Fix64)i+(Fix64)1) * angleDelta) * Fix64.Sin((Fix64)2 * Fix64.Pi * (Fix64)j * longitudinalDelta)
 								), 
 								new Vector2((i+1) * (1f/lateralCount), j * (1f/longitudinalCount))),
 						};
@@ -483,34 +484,34 @@ namespace Sabresaurus.SabreCSG
         {
             Polygon[] polygons = new Polygon[sideCount * 2];
 
-            float angleDelta = Mathf.PI * 2 / sideCount;
+            Fix64 angleDelta = Fix64.Pi * (Fix64)2 / (Fix64)sideCount;
 
-            Vertex capCenterVertex = new Vertex(new Vector3(0, 1, 0), Vector3.up, new Vector2(0, 0));
+            Vertex capCenterVertex = new Vertex(new FixVector3(0, 1, 0), FixVector3.up, new Vector2(0, 0));
 
             for (int i = 0; i < sideCount; i++)
             {
-                Vector3 normal = new Vector3(Mathf.Sin((i + 0.5f) * angleDelta), 0, Mathf.Cos((i + 0.5f) * angleDelta));
+                FixVector3 normal = new FixVector3(Fix64.Sin(((Fix64)i + (Fix64)0.5f) * angleDelta), (Fix64)0, Fix64.Cos(((Fix64)i + (Fix64)0.5f) * angleDelta));
 
                 polygons[i] = new Polygon(new Vertex[]
                 {
-                    new Vertex(new Vector3(Mathf.Sin(i * angleDelta), -1, Mathf.Cos(i * angleDelta)),
+                    new Vertex(new FixVector3(Fix64.Sin((Fix64)i * angleDelta), -(Fix64)1, Fix64.Cos((Fix64)i * angleDelta)),
                         normal,
                         new Vector2(i * (1f/sideCount),0)),
-                    new Vertex(new Vector3(Mathf.Sin((i+1) * angleDelta), -1, Mathf.Cos((i+1) * angleDelta)),
+                    new Vertex(new FixVector3(Fix64.Sin(((Fix64)i+(Fix64)1) * angleDelta), -(Fix64)1, Fix64.Cos(((Fix64)i+(Fix64)1) * angleDelta)),
                         normal,
                         new Vector2((i+1) * (1f/sideCount),0)),
-                    new Vertex(new Vector3(0, 1, 0),
+                    new Vertex(new FixVector3(0, 1, 0),
                         normal,
                         new Vector2((((i + 1) * (1f / sideCount)) + (i * (1f / sideCount))) / 2.0f, 1.0f)),
                 }, null, false, false);
             }
 
-            capCenterVertex = new Vertex(new Vector3(0, -1, 0), Vector3.down, new Vector2(0, 0));
+            capCenterVertex = new Vertex(new FixVector3(0, -1, 0), FixVector3.down, new Vector2(0, 0));
 
             for (int i = 0; i < sideCount; i++)
             {
-                Vertex vertex1 = new Vertex(new Vector3(Mathf.Sin(i * -angleDelta), -1, Mathf.Cos(i * -angleDelta)), Vector3.down, new Vector2(Mathf.Sin(i * angleDelta), Mathf.Cos(i * angleDelta)));
-                Vertex vertex2 = new Vertex(new Vector3(Mathf.Sin((i + 1) * -angleDelta), -1, Mathf.Cos((i + 1) * -angleDelta)), Vector3.down, new Vector2(Mathf.Sin((i + 1) * angleDelta), Mathf.Cos((i + 1) * angleDelta)));
+                Vertex vertex1 = new Vertex(new FixVector3(Fix64.Sin((Fix64)i * -angleDelta), -(Fix64)1, Fix64.Cos((Fix64)i * -angleDelta)), FixVector3.down, new Vector2(Mathf.Sin(i * (float)angleDelta), Mathf.Cos(i * (float)angleDelta)));
+                Vertex vertex2 = new Vertex(new FixVector3(Fix64.Sin(((Fix64)i + (Fix64)1) * -angleDelta), -(Fix64)1, Fix64.Cos(((Fix64)i + (Fix64)1) * -angleDelta)), FixVector3.down, new Vector2(Mathf.Sin((i + 1) * (float)angleDelta), Mathf.Cos((i + 1) * (float)angleDelta)));
 
                 Vertex[] capVertices = new Vertex[] { vertex1, vertex2, capCenterVertex.DeepCopy() };
                 polygons[sideCount + i] = new Polygon(capVertices, null, false, false);
@@ -561,8 +562,8 @@ namespace Sabresaurus.SabreCSG
 					{
 						int vertexIndex = indices[j*stride+k];
 
-						vertices[k] = new Vertex(sourceMesh.vertices[vertexIndex], 
-							sourceMesh.normals[vertexIndex], 
+						vertices[k] = new Vertex((FixVector3)sourceMesh.vertices[vertexIndex],
+                            (FixVector3)sourceMesh.normals[vertexIndex], 
 							sourceMesh.uv[vertexIndex]);
 					}
 					// Generate a new polygon using these vertices and add it to the output polygon list
@@ -588,8 +589,8 @@ namespace Sabresaurus.SabreCSG
 			}
 			mesh.Clear();
 			//	        mesh = new Mesh();
-			List<Vector3> vertices = new List<Vector3>();
-			List<Vector3> normals = new List<Vector3>();
+			List<FixVector3> vertices = new List<FixVector3>();
+			List<FixVector3> normals = new List<FixVector3>();
 			List<Vector2> uvs = new List<Vector2>();
 			List<Color> colors = new List<Color>();
 			List<int> triangles = new List<int>();
@@ -638,9 +639,9 @@ namespace Sabresaurus.SabreCSG
 			}
 
 			// Set the mesh buffers
-			mesh.vertices = vertices.ToArray();
-			mesh.normals = normals.ToArray();
-			mesh.colors = colors.ToArray();
+			mesh.vertices = Array.ConvertAll(vertices.ToArray(), item => (Vector3)item);
+			mesh.normals = Array.ConvertAll(normals.ToArray(), item => (Vector3)item);
+            mesh.colors = colors.ToArray();
 			mesh.uv = uvs.ToArray();
 			mesh.triangles = triangles.ToArray();
 		}

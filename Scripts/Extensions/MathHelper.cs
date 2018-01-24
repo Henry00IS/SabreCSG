@@ -253,7 +253,15 @@ namespace Sabresaurus.SabreCSG
 	        return vector;
 	    }
 
-	    public static int Wrap(int i, int range)
+        public static Vector3 Abs(this Vector3 vector)
+        {
+            vector.x = Mathf.Abs(vector.x);
+            vector.y = Mathf.Abs(vector.y);
+            vector.z = Mathf.Abs(vector.z);
+            return vector;
+        }
+
+        public static int Wrap(int i, int range)
 	    {
 	        if (i < 0)
 	        {
@@ -335,7 +343,7 @@ namespace Sabresaurus.SabreCSG
 
         public static bool PlaneEquals(Plane plane1, Plane plane2)
         {
-            if (plane1.distance.EqualsWithEpsilon(plane2.distance) && ((FixVector3)plane1.normal).EqualsWithEpsilon((FixVector3)plane2.normal))
+            if (((Fix64)plane1.distance).EqualsWithEpsilon(((Fix64)plane2.distance)) && ((FixVector3)plane1.normal).EqualsWithEpsilon((FixVector3)plane2.normal))
             {
                 return true;
             }

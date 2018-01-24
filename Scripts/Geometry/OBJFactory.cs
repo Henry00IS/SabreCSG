@@ -4,6 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System;
+using System.Linq;
 
 namespace Sabresaurus.SabreCSG
 {
@@ -49,8 +51,8 @@ namespace Sabresaurus.SabreCSG
 					for (int vertexIndex = 0; vertexIndex < polygon.Vertices.Length; vertexIndex++) 
 					{
 						Vertex vertex = polygon.Vertices[vertexIndex];
-						vertex.Position = transform.InverseTransformPoint(vertex.Position);
-						vertex.Normal = transform.InverseTransformDirection(vertex.Normal);
+						vertex.Position = (FixVector3)transform.InverseTransformPoint((Vector3)vertex.Position);
+						vertex.Normal = (FixVector3)transform.InverseTransformDirection((Vector3)vertex.Normal);
 					}
 				}
 			}
@@ -108,12 +110,12 @@ namespace Sabresaurus.SabreCSG
 					faces.Add(faceVertices);
 				}
 
-				List<Vector3> positions = vertexList.Positions;
-				List<Vector2> uvs = vertexList.UVs;
-				List<Vector3> normals = vertexList.Normals;
+                List<Vector3> positions = Array.ConvertAll(vertexList.Positions.ToArray(), item => (Vector3)item).ToList();
+                List<Vector2> uvs = vertexList.UVs;
+				List<Vector3> normals = Array.ConvertAll(vertexList.Normals.ToArray(), item => (Vector3)item).ToList();
 
-				// Start a new group for the mesh
-				stringBuilder.AppendLine("g Mesh"+meshIndex);
+                // Start a new group for the mesh
+                stringBuilder.AppendLine("g Mesh"+meshIndex);
 
 				// Write all the positions
 				stringBuilder.AppendLine("# Vertex Positions: " + (positions.Count));

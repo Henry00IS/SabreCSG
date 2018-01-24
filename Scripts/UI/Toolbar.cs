@@ -142,15 +142,15 @@ namespace Sabresaurus.SabreCSG
 				List<PolygonRaycastHit> hits = csgModel.RaycastBrushesAll(ray, false);
 				if(hits.Count > 0)
 				{
-					newPosition = hits[0].Point;
+					newPosition = (Vector3)hits[0].Point;
 					// Back a unit, since the brush is around 2 units in each dimensions
-					newPosition += hits[0].Normal;
+					newPosition += (Vector3)hits[0].Normal;
 					newPosition -= csgModel.GetComponent<Transform>().position;
 
 					if(CurrentSettings.PositionSnappingEnabled)
 					{
 						float snapDistance = CurrentSettings.PositionSnapDistance;
-						newPosition = MathHelper.RoundVector3(newPosition, snapDistance);
+						newPosition = (Vector3)MathHelper.RoundFixVector3((FixVector3)newPosition, (Fix64)snapDistance);
 					}
 				}
 				else
@@ -168,7 +168,7 @@ namespace Sabresaurus.SabreCSG
                         if (CurrentSettings.PositionSnappingEnabled)
                         {
                             float snapDistance = CurrentSettings.PositionSnapDistance;
-                            newPosition = MathHelper.RoundVector3(newPosition, snapDistance);
+                            newPosition = (Vector3)MathHelper.RoundFixVector3((FixVector3)newPosition, (Fix64)snapDistance);
                         }
                     }
                     else
@@ -178,7 +178,7 @@ namespace Sabresaurus.SabreCSG
                         if (CurrentSettings.PositionSnappingEnabled)
                         {
                             float snapDistance = CurrentSettings.PositionSnapDistance;
-                            newPosition = MathHelper.RoundVector3(newPosition, snapDistance);
+                            newPosition = (Vector3)MathHelper.RoundFixVector3((FixVector3)newPosition, (Fix64)snapDistance);
                         }
                     }
 				}

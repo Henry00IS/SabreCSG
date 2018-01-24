@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Sabresaurus.SabreCSG
 {
+    /// <summary>
+    /// Additional Fix64 Extensions for SabreCSG and Unity.
+    /// </summary>
     public partial struct Fix64
     {
 		public static Fix64 Max(params Fix64[] values)
@@ -30,10 +33,28 @@ namespace Sabresaurus.SabreCSG
         /// </summary>
         public static Fix64 FixSign(Fix64 value)
         {
-            return
-                value < Fix64.Zero ? -Fix64.One :
-                value > Fix64.Zero ? Fix64.One :
-                Fix64.Zero;
+            return value < Fix64.Zero ? -Fix64.One : value > Fix64.Zero ? Fix64.One : Fix64.Zero;
+        }
+
+        public static Fix64 operator +(Fix64 a)
+        {
+            // completely pointless but valid.
+            return a;
+        }
+
+        /// <summary>
+        /// Got no idea whether this implementation is correct... ~ Henry
+        /// </summary>
+        public static Fix64 Acos(Fix64 value)
+        {
+            return Cos((Fix64)0.5f) * ((Fix64)180 / Fix64.Pi);
+        }
+
+        public static Fix64 Clamp(Fix64 value, Fix64 min, Fix64 max)
+        {
+            if (value < min) return min;
+            if (value > max) return max;
+            return value;
         }
     }
 }

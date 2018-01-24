@@ -7,10 +7,10 @@ namespace Sabresaurus.SabreCSG
 {
 	public static class Extensions
 	{
-        const float EPSILON = 1e-5f;
-        const float EPSILON_LOWER = 1e-4f;
-        const float EPSILON_LOWER_2 = 1e-3f;
-        const float EPSILON_LOWER_3 = 1e-2f;
+        static Fix64 EPSILON = (Fix64)1e-5f;
+        static Fix64 EPSILON_LOWER = (Fix64)1e-4f;
+        static Fix64 EPSILON_LOWER_2 = (Fix64)1e-3f;
+        static Fix64 EPSILON_LOWER_3 = (Fix64)1e-2f;
 
         public static FixVector3 Abs(this FixVector3 a)
 	    {
@@ -340,9 +340,9 @@ namespace Sabresaurus.SabreCSG
         }
 #endif
 
-        public static bool EqualsWithEpsilon(this float a, float b)
+        public static bool EqualsWithEpsilon(this Fix64 a, Fix64 b)
         {
-            return Mathf.Abs(a - b) < EPSILON;
+            return Fix64.Abs(a - b) < EPSILON;
         }
 
         /// <summary>
@@ -385,12 +385,12 @@ namespace Sabresaurus.SabreCSG
         internal static bool IntersectsApproximate(this Bounds bounds1, Bounds bounds2)
         {
             //		return bounds1.min.x-EPSILON <= bounds2.max.x && bounds1.max.x+EPSILON >= bounds2.min.x && bounds1.min.y-EPSILON <= bounds2.max.y && bounds1.max.y+EPSILON >= bounds2.min.y && bounds1.min.z-EPSILON <= bounds2.max.z && bounds1.max.z+EPSILON >= bounds2.min.z;
-            return bounds1.min.x - EPSILON_LOWER_2 <= bounds2.max.x
-                && bounds1.max.x + EPSILON_LOWER_2 >= bounds2.min.x
-                && bounds1.min.y - EPSILON_LOWER_2 <= bounds2.max.y
-                && bounds1.max.y + EPSILON_LOWER_2 >= bounds2.min.y
-                && bounds1.min.z - EPSILON_LOWER_2 <= bounds2.max.z
-                && bounds1.max.z + EPSILON_LOWER_2 >= bounds2.min.z;
+            return bounds1.min.x - (float)EPSILON_LOWER_2 <= bounds2.max.x
+                && bounds1.max.x + (float)EPSILON_LOWER_2 >= bounds2.min.x
+                && bounds1.min.y - (float)EPSILON_LOWER_2 <= bounds2.max.y
+                && bounds1.max.y + (float)EPSILON_LOWER_2 >= bounds2.min.y
+                && bounds1.min.z - (float)EPSILON_LOWER_2 <= bounds2.max.z
+                && bounds1.max.z + (float)EPSILON_LOWER_2 >= bounds2.min.z;
         }
 
         // If the second bounds has a coplanar side then it is considered not contained

@@ -340,8 +340,8 @@ namespace Sabresaurus.SabreCSG
 					if(chunkPolygons[i].ExcludeFromFinal == false)
 					{
 						FixVector3 polygonCenter = chunkPolygons[i].GetCenterPoint();
-						float distanceInside = GeometryHelper.PolyhedronContainsPointDistance(polygons, polygonCenter);
-						if(distanceInside > 1E-05)
+						Fix64 distanceInside = GeometryHelper.PolyhedronContainsPointDistance(polygons, polygonCenter);
+						if(distanceInside > (Fix64)1E-05)
 						{
 							int relativeIndex = chunkPolygons[i].UniqueIndex - firstPolygonUID;
 							MarkPolygonRemoved(relativeIndex, polygonsRemoved);
@@ -350,7 +350,7 @@ namespace Sabresaurus.SabreCSG
 							chunkPolygons[i].ExcludeFromFinal = true;
 							excludedPolygons.Add(chunkPolygons[i]);
 						}
-						else if(distanceInside >= -1E-05)
+						else if(distanceInside >= -(Fix64)1E-05)
 						{
 							// Edge case, make sure the face is towards the brush
 							if(FixVector3.Dot(brushCenter - polygonCenter, (FixVector3)chunkPolygons[i].Plane.normal) > Fix64.Zero)
@@ -384,8 +384,8 @@ namespace Sabresaurus.SabreCSG
                 }
 #endif
 
-				float distanceInside = GeometryHelper.PolyhedronContainsPointDistance(polygons, polygonCenter);
-				if(distanceInside > 1E-05)
+                Fix64 distanceInside = GeometryHelper.PolyhedronContainsPointDistance(polygons, polygonCenter);
+				if(distanceInside > (Fix64)1E-05)
 				{
 					int relativeIndex = excludedPolygons[i].UniqueIndex - firstPolygonUID;
 					MarkPolygonRestored(relativeIndex, polygonsRemoved);
@@ -395,7 +395,7 @@ namespace Sabresaurus.SabreCSG
 					excludedPolygons.Remove(excludedPolygons[i]);
 					i--;
 				}
-				else if(distanceInside >= -1e-5f)
+				else if(distanceInside >= -(Fix64)1e-5f)
 				{
 					// Edge case, make sure the face is towards the brush
 					if(FixVector3.Dot(brushCenter - polygonCenter, (FixVector3)excludedPolygons[i].Plane.normal) > Fix64.Zero)

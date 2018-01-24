@@ -1,4 +1,6 @@
-﻿Shader "SabreCSG/Diffuse (vertex colored) " {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "SabreCSG/Diffuse (vertex colored) " {
 Properties {
 }
 SubShader {
@@ -32,7 +34,7 @@ CGPROGRAM
 		half4 color = IN.color;
 		o.color = color;
 		// transform position
-		o.pos = mul(UNITY_MATRIX_MVP, float4(IN.pos,1));
+		o.pos = UnityObjectToClipPos(float4(IN.pos,1));
 		return o;
 	}
 

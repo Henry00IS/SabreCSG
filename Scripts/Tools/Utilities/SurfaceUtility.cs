@@ -10,11 +10,11 @@ namespace Sabresaurus.SabreCSG
 	/// </summary>
 	public class UVOrientation
 	{
-		public Vector3 NorthVector;
-		public Vector3 EastVector;
+		public FixVector3 NorthVector;
+		public FixVector3 EastVector;
 
-		public float NorthScale = 0.5f;
-		public float EastScale = 0.5f;
+		public Fix64 NorthScale = (Fix64)0.5f;
+		public Fix64 EastScale = (Fix64)0.5f;
 	}
 
 	/// <summary>
@@ -31,7 +31,7 @@ namespace Sabresaurus.SabreCSG
 			for (int i = 0; i < polygon.Vertices.Length; i++) 
 			{
 				Vertex vertex = polygon.Vertices[i];
-				vertex.Normal = polygon.Plane.normal;
+				vertex.Normal = (FixVector3)polygon.Plane.normal;
 			}
 		}
 
@@ -73,7 +73,7 @@ namespace Sabresaurus.SabreCSG
 					}
 				}
 
-				vertex.Normal = newNormal * (1f / totalNormalCount);
+				vertex.Normal = (FixVector3)newNormal * (Fix64.One / (Fix64)totalNormalCount);
 			} 
 		}
 
@@ -84,10 +84,10 @@ namespace Sabresaurus.SabreCSG
 		/// <param name="extrusionDistance">Extrusion distance, this is the height (or depth) of the created geometry perpendicular to the source polygon.</param>
 		/// <param name="outputPolygons">Output brush polygons.</param>
 		/// <param name="rotation">The rotation to be supplied to the new brush transform.</param>
-		public static void ExtrudePolygon(Polygon sourcePolygon, float extrusionDistance, out Polygon[] outputPolygons, out Quaternion rotation)
+		public static void ExtrudePolygon(Polygon sourcePolygon, Fix64 extrusionDistance, out Polygon[] outputPolygons, out Quaternion rotation)
 		{
 			bool flipped = false;
-			if(extrusionDistance < 0)
+			if(extrusionDistance < Fix64.Zero)
 			{
 				sourcePolygon.Flip();
 				extrusionDistance = -extrusionDistance;
@@ -105,15 +105,14 @@ namespace Sabresaurus.SabreCSG
 
 			for (int i = 0; i < vertices.Length; i++) 
 			{
-				vertices[i].Position = cancellingRotation * vertices[i].Position;
-
-				vertices[i].Normal = cancellingRotation * vertices[i].Normal;
-			}
+				vertices[i].Position = (FixVector3)(cancellingRotation * (Vector3)vertices[i].Position);
+				vertices[i].Normal = (FixVector3)(cancellingRotation * (Vector3)vertices[i].Normal);
+            }
 
 			basePolygon.SetVertices(vertices);
 
 			// Create the opposite polygon by duplicating the base polygon, offsetting and flipping
-			Vector3 normal = basePolygon.Plane.normal;
+			FixVector3 normal = (FixVector3)basePolygon.Plane.normal;
 			Polygon oppositePolygon = basePolygon.DeepCopy();
 			oppositePolygon.UniqueIndex = -1;
 
@@ -137,24 +136,24 @@ namespace Sabresaurus.SabreCSG
 
 				// Create new UVs for the sides, otherwise we'll get distortion
 
-				float sourceDistance = Vector3.Distance(vertex1.Position, vertex2.Position);
+				Fix64 sourceDistance = FixVector3.Distance(vertex1.Position, vertex2.Position);
 				float uvDistance = Vector2.Distance(vertex1.UV, vertex2.UV);
 
-				float uvScale = sourceDistance / uvDistance;
+				float uvScale = (float)sourceDistance / uvDistance;
 
 				vertex1.UV = Vector2.zero;
 				if(flipped)
 				{
-					vertex2.UV = new Vector2(-sourceDistance / uvScale,0);
+					vertex2.UV = new Vector2(-(float)sourceDistance / uvScale,0);
 				}
 				else
 				{
-					vertex2.UV = new Vector2(sourceDistance / uvScale,0);
+					vertex2.UV = new Vector2((float)sourceDistance / uvScale,0);
 				}
 
 				Vector2 uvDelta = vertex2.UV - vertex1.UV;
 
-				Vector2 rotatedUVDelta = uvDelta.Rotate(90) * (extrusionDistance / sourceDistance);
+				Vector2 rotatedUVDelta = uvDelta.Rotate(90) * ((float)extrusionDistance / (float)sourceDistance);
 
 				Vertex vertex3 = vertex1.DeepCopy();
 				vertex3.Position += normal * extrusionDistance;
@@ -193,11 +192,11 @@ namespace Sabresaurus.SabreCSG
 			int vertexIndex2 = 1;
 			int vertexIndex3 = 2;
 
-			Vector3 pos1 = polygon.Vertices[vertexIndex1].Position;
-			Vector3 pos2 = polygon.Vertices[vertexIndex2].Position;
-			Vector3 pos3 = polygon.Vertices[vertexIndex3].Position;
+			FixVector3 pos1 = polygon.Vertices[vertexIndex1].Position;
+            FixVector3 pos2 = polygon.Vertices[vertexIndex2].Position;
+            FixVector3 pos3 = polygon.Vertices[vertexIndex3].Position;
 
-			Plane testPlane = new Plane(pos1, pos2, pos3);
+			Plane testPlane = new Plane((Vector3)pos1, (Vector3)pos2, (Vector3)pos3);
 
 			// If we didn't find a good normal on the first attempt and there are more vertices to try
 			if(testPlane.normal == Vector3.zero && polygon.Vertices.Length > 3)
@@ -207,7 +206,7 @@ namespace Sabresaurus.SabreCSG
 				{
 					pos3 = polygon.Vertices[vertexIndex3].Position;
 
-					testPlane = new Plane(pos1, pos2, pos3);
+					testPlane = new Plane((Vector3)pos1, (Vector3)pos2, (Vector3)pos3);
 
 					if(testPlane.normal != Vector3.zero)
 					{
@@ -238,9 +237,9 @@ namespace Sabresaurus.SabreCSG
 			GetPrimaryPolygonDescribers(polygon, out vertex1, out vertex2, out vertex3);
 
 			// Take 3 positions and their corresponding UVs
-			Vector3 pos1 = brushTransform.TransformPoint(vertex1.Position);
-			Vector3 pos2 = brushTransform.TransformPoint(vertex2.Position);
-			Vector3 pos3 = brushTransform.TransformPoint(vertex3.Position);
+			FixVector3 pos1 = (FixVector3)brushTransform.TransformPoint((Vector3)vertex1.Position);
+            FixVector3 pos2 = (FixVector3)brushTransform.TransformPoint((Vector3)vertex2.Position);
+            FixVector3 pos3 = (FixVector3)brushTransform.TransformPoint((Vector3)vertex3.Position);
 
 			Vector2 uv1 = vertex1.UV;
 			Vector2 uv2 = vertex2.UV;
@@ -249,8 +248,8 @@ namespace Sabresaurus.SabreCSG
 			// Construct a matrix to map to the triangle's UV space
 			Matrix2x2 uvMatrix = new Matrix2x2()
 			{
-				m00 = uv2.x - uv1.x, m10 = uv3.x - uv1.x,
-				m01 = uv2.y - uv1.y, m11 = uv3.y - uv1.y,
+				m00 = (Fix64)uv2.x - (Fix64)uv1.x, m10 = (Fix64)uv3.x - (Fix64)uv1.x,
+				m01 = (Fix64)uv2.y - (Fix64)uv1.y, m11 = (Fix64)uv3.y - (Fix64)uv1.y,
 			};
 
 			// Invert the matrix to map from UV space
@@ -267,10 +266,10 @@ namespace Sabresaurus.SabreCSG
 			// Multiply the inverted UVs by the positional matrix to get the UV vectors in world space
 			Matrix3x2 multipliedMatrix = positionMatrix.Multiply(uvMatrixInverted);
 
-			// Extract the world vectors that correspond to UV north (0,1) and UV east (1,0). Note that these aren't
-			// normalized and their magnitude is the reciprocal of tiling
-			Vector3 eastVectorScaled = new Vector3(multipliedMatrix.m00, multipliedMatrix.m01, multipliedMatrix.m02);
-			Vector3 northVectorScaled = new Vector3(multipliedMatrix.m10, multipliedMatrix.m11, multipliedMatrix.m12);
+            // Extract the world vectors that correspond to UV north (0,1) and UV east (1,0). Note that these aren't
+            // normalized and their magnitude is the reciprocal of tiling
+            FixVector3 eastVectorScaled = new FixVector3(multipliedMatrix.m00, multipliedMatrix.m01, multipliedMatrix.m02);
+            FixVector3 northVectorScaled = new FixVector3(multipliedMatrix.m10, multipliedMatrix.m11, multipliedMatrix.m12);
 
 			return new UVOrientation()
 			{
@@ -328,12 +327,12 @@ namespace Sabresaurus.SabreCSG
 				}
 				else
 				{
-					if(!northOffset.HasValue || !northOffset.Value.EqualsWithEpsilon(uvOffset.y))
+					if(!northOffset.HasValue || !((Fix64)northOffset.Value).EqualsWithEpsilon((Fix64)uvOffset.y))
 					{
 						northOffset = null;
 					}
 
-					if(!eastOffset.HasValue || !eastOffset.Value.EqualsWithEpsilon(uvOffset.x))
+					if(!eastOffset.HasValue || !((Fix64)eastOffset.Value).EqualsWithEpsilon((Fix64)uvOffset.x))
 					{
 						eastOffset = null;
 					}

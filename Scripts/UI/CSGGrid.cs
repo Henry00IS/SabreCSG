@@ -198,7 +198,7 @@ namespace Sabresaurus.SabreCSG
 
 			Vector3 cameraPosition = transform.position;
 
-			Vector3 roundedCameraPosition = MathHelper.RoundVector3(cameraPosition, snapDistance);
+			Vector3 roundedCameraPosition = (Vector3)MathHelper.RoundFixVector3((FixVector3)cameraPosition, (Fix64)snapDistance);
 
 			// Calculate the world vectors to use for the X and Y grid axes
 			Vector3 xDirection = orthographicAxisAligned ? transform.right : Vector3.right;

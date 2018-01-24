@@ -4,10 +4,10 @@ namespace Sabresaurus.SabreCSG
 {
 	public struct Matrix2x2
 	{
-		public float m00;
-		public float m10;
-		public float m01;
-		public float m11;
+		public Fix64 m00;
+		public Fix64 m10;
+		public Fix64 m01;
+		public Fix64 m11;
 
 		public static Matrix2x2 Identity
 		{
@@ -15,10 +15,10 @@ namespace Sabresaurus.SabreCSG
 			{
 				return new Matrix2x2()
 				{
-					m00 = 1,
-					m10 = 0,
-					m01 = 0,
-					m11 = 1,
+					m00 = Fix64.One,
+					m10 = Fix64.Zero,
+					m01 = Fix64.Zero,
+					m11 = Fix64.One,
 				};
 			}
 		}
@@ -29,10 +29,10 @@ namespace Sabresaurus.SabreCSG
 			{
 				return new Matrix2x2()
 				{
-					m00 = 0,
-					m10 = 0,
-					m01 = 0,
-					m11 = 0,
+					m00 = Fix64.Zero,
+					m10 = Fix64.Zero,
+					m01 = Fix64.Zero,
+					m11 = Fix64.Zero,
 				};
 			}
 		}
@@ -41,7 +41,7 @@ namespace Sabresaurus.SabreCSG
 		{
 			get
 			{
-				float reciprocalDeterminant = 1f / Determinant;
+                Fix64 reciprocalDeterminant = Fix64.One / Determinant;
 
 				Matrix2x2 newMatrix = new Matrix2x2()
 				{
@@ -55,7 +55,7 @@ namespace Sabresaurus.SabreCSG
 			}
 		}
 
-		public float Determinant
+		public Fix64 Determinant
 		{
 			get
 			{

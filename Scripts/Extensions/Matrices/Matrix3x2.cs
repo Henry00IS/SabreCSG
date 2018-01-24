@@ -5,12 +5,12 @@ namespace Sabresaurus.SabreCSG
 {
 	public struct Matrix3x2
 	{
-		public float m00;
-		public float m10;
-		public float m01;
-		public float m11;
-		public float m02;
-		public float m12;
+		public Fix64 m00;
+		public Fix64 m10;
+		public Fix64 m01;
+		public Fix64 m11;
+		public Fix64 m02;
+		public Fix64 m12;
 
 		public Matrix3x2 Multiply(Matrix2x2 o)
 		{
@@ -27,12 +27,12 @@ namespace Sabresaurus.SabreCSG
 			};
 		}
 
-		public Vector2 Multiply(Vector3 o)
+		public Vector2 Multiply(FixVector3 o)
 		{
 			return new Vector2()
 			{
-				x = this.m00 * o.x + this.m01 * o.y + this.m02 * o.z,
-				y = this.m10 * o.x + this.m11 * o.y + this.m12 * o.z,
+				x = (float)(this.m00 * o.x + this.m01 * o.y + this.m02 * o.z),
+				y = (float)(this.m10 * o.x + this.m11 * o.y + this.m12 * o.z),
 			};
 		}
 

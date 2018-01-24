@@ -220,6 +220,14 @@ namespace Sabresaurus.SabreCSG
             }
         }
 
+        public void Normalize()
+        {
+            FixVector3 nor = normalized;
+            this.x = nor.x;
+            this.y = nor.y;
+            this.z = nor.z;
+        }
+
         public static FixVector3 Normalize(FixVector3 value)
         {
             return value.normalized;
@@ -243,6 +251,11 @@ namespace Sabresaurus.SabreCSG
         public static FixVector3 Cross(FixVector3 lhs, FixVector3 rhs)
         {
             return new FixVector3((lhs.y * rhs.z) - (lhs.z * rhs.y), (lhs.z * rhs.x) - (lhs.x * rhs.z), (lhs.x * rhs.y) - (lhs.y * rhs.x));
+        }
+
+        public static Fix64 Distance(FixVector3 lhs, FixVector3 rhs)
+        {
+            return (lhs - rhs).magnitude;
         }
 
         /// <summary>
@@ -314,6 +327,11 @@ namespace Sabresaurus.SabreCSG
         public static FixVector3 operator *(FixVector3 a, Fix64 d)
         {
             return new FixVector3(a.x * d, a.y * d, a.z * d);
+        }
+
+        public static FixVector3 operator *(FixVector3 a, FixVector3 b)
+        {
+            return new FixVector3(a.x * b.x, a.y * b.y, a.z * b.z);
         }
 
         public static FixVector3 operator /(FixVector3 a, Fix64 d)

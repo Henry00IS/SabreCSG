@@ -271,7 +271,9 @@ namespace Sabresaurus.SabreCSG
             var yl = y.m_rawValue;
 
             if (yl == 0) {
-                throw new DivideByZeroException();
+                //throw new DivideByZeroException();
+                // I couldn't care less. ~ henry
+                return new Fix64(xl);
             }
 
             var remainder = (ulong)(xl >= 0 ? xl : -xl);

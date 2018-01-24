@@ -94,7 +94,7 @@ namespace Sabresaurus.SabreCSG
 				int highlightIndex = GetIndex(centerPosition);
 				if(highlightIndex == 0)
 				{
-					EditorHelper.IsoAlignSceneView(Vector3.down);
+					EditorHelper.IsoAlignSceneView(FixVector3.down);
 				}
 				else if(highlightIndex == 1) // Align to nearest axis
 				{
@@ -102,15 +102,15 @@ namespace Sabresaurus.SabreCSG
 				}
 				else if(highlightIndex == 2)
 				{
-					EditorHelper.IsoAlignSceneView(Vector3.left);
+					EditorHelper.IsoAlignSceneView(FixVector3.left);
 				}
 				else if(highlightIndex == 3)
 				{
-					EditorHelper.IsoAlignSceneView(Vector3.back);
+					EditorHelper.IsoAlignSceneView(FixVector3.back);
 				}
 				else if(highlightIndex == 4)
 				{
-					EditorHelper.IsoAlignSceneView(Vector3.up);
+					EditorHelper.IsoAlignSceneView(FixVector3.up);
 				}
 				else if(highlightIndex == 5) // Iso/Perspective toggle
 				{
@@ -118,11 +118,11 @@ namespace Sabresaurus.SabreCSG
 				}
 				else if(highlightIndex == 6)
 				{
-					EditorHelper.IsoAlignSceneView(Vector3.right);
+					EditorHelper.IsoAlignSceneView(FixVector3.right);
 				}
 				else if(highlightIndex == 7)
 				{
-					EditorHelper.IsoAlignSceneView(Vector3.forward);
+					EditorHelper.IsoAlignSceneView(FixVector3.forward);
 				}
 
 				// Operation is complete, hide the radial

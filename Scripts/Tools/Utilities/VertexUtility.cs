@@ -32,7 +32,7 @@ namespace Sabresaurus.SabreCSG
 		/// <param name="tolerance">Maximum distance between two vertices that will allow welding.</param>
 		/// <param name="sourcePolygons">Source polygons, typically the brush polygons.</param>
 		/// <param name="sourceVertices">Source vertices to weld, typically this should all vertices that share the same position so that all the polygons are updated.</param>
-		public static Polygon[] WeldNearbyVertices(float tolerance, Polygon[] sourcePolygons, List<Vertex> sourceVertices)
+		public static Polygon[] WeldNearbyVertices(Fix64 tolerance, Polygon[] sourcePolygons, List<Vertex> sourceVertices)
 		{
 			// Takes the selected vertices and welds together any of them that are within the tolerance distance of 
 			// other vertices. Duplicate vertices and polygons are then removed.
@@ -114,10 +114,10 @@ namespace Sabresaurus.SabreCSG
 //					Vector3 normal = Vector3.Cross(vector1, vector2).normalized;
 //
 //					Vector3 thirdPoint = newPolygons[i].Vertices[matchedIndex1].Position + normal;
-					Vector3 thirdPoint = newPolygons[i].Vertices[matchedIndex1].Position + newPolygons[i].Plane.normal;
+					FixVector3 thirdPoint = newPolygons[i].Vertices[matchedIndex1].Position + (FixVector3)newPolygons[i].Plane.normal;
 
 					// First split the shared polygon
-					Plane splitPlane = new Plane(newPolygons[i].Vertices[matchedIndex1].Position, newPolygons[i].Vertices[matchedIndex2].Position, thirdPoint);
+					Plane splitPlane = new Plane((Vector3)newPolygons[i].Vertices[matchedIndex1].Position, (Vector3)newPolygons[i].Vertices[matchedIndex2].Position, (Vector3)thirdPoint);
 
 					Polygon splitPolygon1;
 					Polygon splitPolygon2;
@@ -209,7 +209,7 @@ namespace Sabresaurus.SabreCSG
 		/// </summary>
 		/// <param name="polygons">Polygons to displace in situ.</param>
 		/// <param name="distance">Distance to displace the polygons.</param>
-		public static void DisplacePolygons(Polygon[] polygons, float distance)
+		public static void DisplacePolygons(Polygon[] polygons, Fix64 distance)
 		{
 			// Used for determining if two vertices are the same
 			Polygon.VertexComparerEpsilon vertexComparer = new Polygon.VertexComparerEpsilon();
@@ -218,7 +218,7 @@ namespace Sabresaurus.SabreCSG
 
 			// Group overlapping positions and also track their normals
 			List<List<Vertex>> groupedVertices = new List<List<Vertex>>();
-			List<List<Vector3>> groupedNormals = new List<List<Vector3>>();
+			List<List<FixVector3>> groupedNormals = new List<List<FixVector3>>();
 
 			// Maps back from a vertex to the polygon it came from, used for UV calculation
 			Dictionary<Vertex, Polygon> vertexPolygonMappings = new Dictionary<Vertex, Polygon>();
@@ -242,9 +242,9 @@ namespace Sabresaurus.SabreCSG
 						{
 							groupedVertices[groupIndex].Add(sourceVertex);
 							// Add the normal of the polygon if it hasn't already been added (this prevents issues with two polygons that are coplanar)
-							if(!groupedNormals[groupIndex].Contains(polygons[polygonIndex].Plane.normal, vectorComparer))
+							if(!groupedNormals[groupIndex].Contains((FixVector3)polygons[polygonIndex].Plane.normal, vectorComparer))
 							{
-								groupedNormals[groupIndex].Add(polygons[polygonIndex].Plane.normal);
+								groupedNormals[groupIndex].Add((FixVector3)polygons[polygonIndex].Plane.normal);
 							}
 							added = true;
 							break;
@@ -254,23 +254,23 @@ namespace Sabresaurus.SabreCSG
 					if(!added)
 					{
 						groupedVertices.Add(new List<Vertex>() { sourceVertex } );
-						groupedNormals.Add(new List<Vector3>() { polygons[polygonIndex].Plane.normal } );
+						groupedNormals.Add(new List<FixVector3>() { (FixVector3)polygons[polygonIndex].Plane.normal } );
 					}
 				}
 			}
 
-			List<List<Vector3>> groupedPositions = new List<List<Vector3>>();
+			List<List<FixVector3>> groupedPositions = new List<List<FixVector3>>();
 			List<List<Vector2>> groupedUV = new List<List<Vector2>>();
 
 			// Calculate the new positions and UVs, but don't assign them as they must be calculated in one go
 			for (int i = 0; i < groupedVertices.Count; i++) 
 			{
-				groupedPositions.Add(new List<Vector3>());
+				groupedPositions.Add(new List<FixVector3>());
 				groupedUV.Add(new List<Vector2>());
 
 				for (int j = 0; j < groupedVertices[i].Count; j++) 
 				{
-					Vector3 position = groupedVertices[i][j].Position;
+                    FixVector3 position = groupedVertices[i][j].Position;
 					for (int k = 0; k < groupedNormals[i].Count; k++) 
 					{
 						position += groupedNormals[i][k] * distance;
@@ -307,12 +307,12 @@ namespace Sabresaurus.SabreCSG
 		/// <param name="brush">Brush from which the vertices belong.</param>
 		/// <param name="specifiedVertices">Specified vertices to be translated.</param>
 		/// <param name="localDelta">Local positional delta.</param>
-		public static void TranslateSpecifiedVertices(Brush brush, List<Vertex> specifiedVertices, Vector3 localDelta)
+		public static void TranslateSpecifiedVertices(Brush brush, List<Vertex> specifiedVertices, FixVector3 localDelta)
 		{
 			Polygon.FixVector3ComparerEpsilon positionComparer = new Polygon.FixVector3ComparerEpsilon();
 
 			// Cache the positions as the position of vertices will change while in the for loop
-			List<Vector3> specifiedPositions = specifiedVertices.Select(item => item.Position).ToList();
+			List<FixVector3> specifiedPositions = specifiedVertices.Select(item => item.Position).ToList();
 
 			// So we know which polygons need to have their normals recalculated
 			List<Polygon> affectedPolygons = new List<Polygon>();
@@ -325,7 +325,7 @@ namespace Sabresaurus.SabreCSG
 
 				int vertexCount = polygon.Vertices.Length;
 
-				Vector3[] newPositions = new Vector3[vertexCount];
+                FixVector3[] newPositions = new FixVector3[vertexCount];
 				Vector2[] newUV = new Vector2[vertexCount];
 
 				for (int j = 0; j < vertexCount; j++) 
@@ -341,7 +341,7 @@ namespace Sabresaurus.SabreCSG
 					Vertex vertex = polygon.Vertices[j];
 					if(specifiedPositions.Contains(vertex.Position, positionComparer))
 					{
-						Vector3 newPosition = vertex.Position + localDelta;
+                        FixVector3 newPosition = vertex.Position + localDelta;
 
 						newPositions[j] = newPosition;
 

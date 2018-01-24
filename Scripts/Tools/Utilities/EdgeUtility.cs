@@ -97,13 +97,13 @@ namespace Sabresaurus.SabreCSG
 					Edge edge1 = edgesOnPolygon[0];
 					Edge edge2 = edgesOnPolygon[1];
 
-					// First split the shared polygon
-					Vector3 edge1Center = edge1.GetCenterPoint();
-					Vector3 edge2Center = edge2.GetCenterPoint();
+                    // First split the shared polygon
+                    FixVector3 edge1Center = edge1.GetCenterPoint();
+                    FixVector3 edge2Center = edge2.GetCenterPoint();
 
-					Vector3 thirdPoint = edge1Center + polygon.Plane.normal;
+                    FixVector3 thirdPoint = edge1Center + (FixVector3)polygon.Plane.normal;
 
-					Plane splitPlane = new Plane(edge1Center, edge2Center, thirdPoint);
+					Plane splitPlane = new Plane((Vector3)edge1Center, (Vector3)edge2Center, (Vector3)thirdPoint);
 
 					Polygon splitPolygon1;
 					Polygon splitPolygon2;
@@ -136,13 +136,13 @@ namespace Sabresaurus.SabreCSG
 			List<Vertex> vertices = new List<Vertex>(polygon.Vertices);
 			for (int i = 0; i < polygon.Vertices.Length; i++) 
 			{
-				Vector3 position1 = polygon.Vertices[i].Position;
-				Vector3 position2 = polygon.Vertices[(i+1)%polygon.Vertices.Length].Position;
+                FixVector3 position1 = polygon.Vertices[i].Position;
+                FixVector3 position2 = polygon.Vertices[(i+1)%polygon.Vertices.Length].Position;
 
 				if((edge.Vertex1.Position.EqualsWithEpsilon(position1) && edge.Vertex2.Position.EqualsWithEpsilon(position2))
 					|| (edge.Vertex1.Position.EqualsWithEpsilon(position2) && edge.Vertex2.Position.EqualsWithEpsilon(position1)))
 				{
-					newVertex = Vertex.Lerp(polygon.Vertices[i], polygon.Vertices[(i+1) % polygon.Vertices.Length], 0.5f);
+					newVertex = Vertex.Lerp(polygon.Vertices[i], polygon.Vertices[(i+1) % polygon.Vertices.Length], (Fix64)0.5f);
 					vertices.Insert(i+1, newVertex);
 					break;
 				}
@@ -204,106 +204,106 @@ namespace Sabresaurus.SabreCSG
 		/// <param name="edge2">Edge2.</param>
 		public static bool EdgeMatches(Edge edge1, Edge edge2)
 		{
-			// First of all determine if the two lines are collinear
+            // First of all determine if the two lines are collinear
 
-			Vector3 direction1 = edge1.Vertex2.Position - edge1.Vertex1.Position;
-			Vector3 direction2 = edge2.Vertex2.Position - edge2.Vertex1.Position;
+            FixVector3 direction1 = edge1.Vertex2.Position - edge1.Vertex1.Position;
+            FixVector3 direction2 = edge2.Vertex2.Position - edge2.Vertex1.Position;
 
-			Vector3 direction1Normalized = direction1.normalized;
-			Vector3 direction2Normalized = direction2.normalized;
+            FixVector3 direction1Normalized = direction1.normalized;
+            FixVector3 direction2Normalized = direction2.normalized;
 
-			float dot = Vector3.Dot(direction1Normalized, direction2Normalized);
+			Fix64 dot = FixVector3.Dot(direction1Normalized, direction2Normalized);
 
 			// Are the lines parallel?
-			if(dot > 0.999f || dot < -0.999f)
+			if(dot > (Fix64)0.999f || dot < -(Fix64)0.999f)
 			{
-				// The lines are parallel, next calculate perpendicular distance between them
+                // The lines are parallel, next calculate perpendicular distance between them
 
-				// Calculate a normal vector perpendicular to the line
-				Vector3 normal;
+                // Calculate a normal vector perpendicular to the line
+                FixVector3 normal;
 
-				float upDot = Vector3.Dot(direction1Normalized, Vector3.up);
+                Fix64 upDot = FixVector3.Dot(direction1Normalized, FixVector3.up);
 
-				if(Mathf.Abs(upDot) > 0.9f)
+				if(Fix64.Abs(upDot) > (Fix64)0.9f)
 				{
-					normal = Vector3.Cross(Vector3.forward, direction1Normalized).normalized;
+					normal = FixVector3.Cross(FixVector3.forward, direction1Normalized).normalized;
 				}
 				else
 				{
-					normal = Vector3.Cross(Vector3.up, direction1Normalized).normalized;
+					normal = FixVector3.Cross(FixVector3.up, direction1Normalized).normalized;
 				}
 
-				// Calculate the tangent vector
-				Vector3 tangent = Vector3.Cross(normal, direction1);
+                // Calculate the tangent vector
+                FixVector3 tangent = FixVector3.Cross(normal, direction1);
 
-				// Take the offset from a point on each line
-				Vector3 offset = edge2.Vertex2.Position - edge1.Vertex1.Position;
+                // Take the offset from a point on each line
+                FixVector3 offset = edge2.Vertex2.Position - edge1.Vertex1.Position;
 
-				// Find the perpendicular distance between the lines along both normal and tangent directions
-				float normalDistance = Vector3.Dot(normal, offset);
-				float tangentDistance = Vector3.Dot(tangent, offset);
+                // Find the perpendicular distance between the lines along both normal and tangent directions
+                Fix64 normalDistance = FixVector3.Dot(normal, offset);
+                Fix64 tangentDistance = FixVector3.Dot(tangent, offset);
 
 				// If the perpendicular distance is very small
-				if(Mathf.Abs(normalDistance) < 0.0001f
-					&& Mathf.Abs(tangentDistance) < 0.0001f)
+				if(Fix64.Abs(normalDistance) < (Fix64)0.0001f
+					&& Fix64.Abs(tangentDistance) < (Fix64)0.0001f)
 				{
-					// Lines are colinear
-					// Check if either segment contains one of the points from the other segment
+                    // Lines are colinear
+                    // Check if either segment contains one of the points from the other segment
 
-					float signedDistance = 0;
+                    Fix64 signedDistance = Fix64.Zero;
 
-					Plane edge1Plane1 = new Plane(direction1Normalized, edge1.Vertex2.Position);
+					Plane edge1Plane1 = new Plane((Vector3)direction1Normalized, (Vector3)edge1.Vertex2.Position);
 
-					signedDistance = edge1Plane1.GetDistanceToPoint(edge2.Vertex1.Position);
-					if(signedDistance >= 0)
+					signedDistance = (Fix64)edge1Plane1.GetDistanceToPoint((Vector3)edge2.Vertex1.Position);
+					if(signedDistance >= Fix64.Zero)
 					{
 						return true;
 					}
 
-					signedDistance = edge1Plane1.GetDistanceToPoint(edge2.Vertex2.Position);
-					if(signedDistance >= 0)
+					signedDistance = (Fix64)edge1Plane1.GetDistanceToPoint((Vector3)edge2.Vertex2.Position);
+					if(signedDistance >= Fix64.Zero)
 					{
 						return true;
 					}
 
-					Plane edge1Plane2 = new Plane(-direction1Normalized, edge1.Vertex1.Position);
+					Plane edge1Plane2 = new Plane(-(Vector3)direction1Normalized, (Vector3)edge1.Vertex1.Position);
 
-					signedDistance = edge1Plane2.GetDistanceToPoint(edge2.Vertex1.Position);
-					if(signedDistance <= 0)
+					signedDistance = (Fix64)edge1Plane2.GetDistanceToPoint((Vector3)edge2.Vertex1.Position);
+					if(signedDistance <= Fix64.Zero)
 					{
 						return true;
 					}
 
-					signedDistance = edge1Plane2.GetDistanceToPoint(edge2.Vertex2.Position);
-					if(signedDistance <= 0)
+					signedDistance = (Fix64)edge1Plane2.GetDistanceToPoint((Vector3)edge2.Vertex2.Position);
+					if(signedDistance <= Fix64.Zero)
 					{
 						return true;
 					}
 
-					Plane edge2Plane1 = new Plane(direction2Normalized, edge2.Vertex2.Position);
+					Plane edge2Plane1 = new Plane((Vector3)direction2Normalized, (Vector3)edge2.Vertex2.Position);
 
-					signedDistance = edge2Plane1.GetDistanceToPoint(edge1.Vertex1.Position);
-					if(signedDistance <= 0)
+					signedDistance = (Fix64)edge2Plane1.GetDistanceToPoint((Vector3)edge1.Vertex1.Position);
+					if(signedDistance <= Fix64.Zero)
 					{
 						return true;
 					}
 
-					signedDistance = edge2Plane1.GetDistanceToPoint(edge1.Vertex2.Position);
-					if(signedDistance <= 0)
+					signedDistance = (Fix64)edge2Plane1.GetDistanceToPoint((Vector3)edge1.Vertex2.Position);
+					if(signedDistance <= Fix64.Zero)
 					{
 						return true;
 					}
 
-					Plane edge2Plane2 = new Plane(-direction2Normalized, edge2.Vertex1.Position);
+					Plane edge2Plane2 = new Plane(-(Vector3)direction2Normalized, (Vector3)edge2.Vertex1.Position);
 
-					signedDistance = edge2Plane2.GetDistanceToPoint(edge1.Vertex1.Position);
-					if(signedDistance >= 0)
+					signedDistance = (Fix64)edge2Plane2.GetDistanceToPoint((Vector3)edge1.Vertex1.Position);
+					if(signedDistance >= Fix64.Zero)
 					{
 						return true;
 					}
 
-					signedDistance = edge2Plane2.GetDistanceToPoint(edge1.Vertex2.Position);
-					if(signedDistance >= 0)
+					signedDistance = (Fix64)edge2Plane2.GetDistanceToPoint((Vector3)edge1.Vertex2.Position);
+					if(signedDistance >= Fix64.Zero)
 					{
 						return true;
 					}

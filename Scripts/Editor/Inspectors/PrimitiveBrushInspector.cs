@@ -50,7 +50,7 @@ namespace Sabresaurus.SabreCSG
 
 				if(localBounds.size != new Vector3(2, 2, 2))
 				{
-					BrushUtility.Resize(brush, localBounds.size);
+					BrushUtility.Resize(brush, (FixVector3)localBounds.size);
 				}
 				else
 				{
@@ -69,7 +69,7 @@ namespace Sabresaurus.SabreCSG
 
 				if(localBounds.size != new Vector3(2, 2, 2))
 				{
-					BrushUtility.Resize(brush, localBounds.size);
+					BrushUtility.Resize(brush, (FixVector3)localBounds.size);
 				}
 				else
 				{
@@ -85,7 +85,7 @@ namespace Sabresaurus.SabreCSG
 			PrimitiveBrush[] brushes = BrushTargets.Cast<PrimitiveBrush>().ToArray();
 			foreach (PrimitiveBrush brush in brushes) 
 			{
-				BrushUtility.Resize(brush, new Vector3(2, 2, 2));
+				BrushUtility.Resize(brush, new FixVector3(2, 2, 2));
 			}
 		}
 
@@ -231,7 +231,7 @@ namespace Sabresaurus.SabreCSG
                             Undo.RecordObjects(targets, "Scale Polygons");
                             foreach (var thisBrush in targets)
                             {
-                                BrushUtility.Scale((PrimitiveBrush)thisBrush, scaleVector3);
+                                BrushUtility.Scale((PrimitiveBrush)thisBrush, (FixVector3)scaleVector3);
                             }
                         }
                     }
@@ -264,7 +264,7 @@ namespace Sabresaurus.SabreCSG
                             PrimitiveBrush[] brushes = BrushTargets.Cast<PrimitiveBrush>().ToArray();
                             foreach (PrimitiveBrush brush in brushes)
                             {
-                                BrushUtility.Resize(brush, resizeVector3);
+                                BrushUtility.Resize(brush, (FixVector3)resizeVector3);
                             }
                         }
                     }
@@ -354,7 +354,7 @@ namespace Sabresaurus.SabreCSG
                     {
                         GameObject newObject = ((PrimitiveBrush)thisBrush).Duplicate();
                         Polygon[] polygons = newObject.GetComponent<PrimitiveBrush>().GetPolygons();
-                        VertexUtility.DisplacePolygons(polygons, -shellDistance);
+                        VertexUtility.DisplacePolygons(polygons, -(Fix64)shellDistance);
                         Bounds newBounds = newObject.GetComponent<PrimitiveBrush>().GetBounds();
                         // Verify the new geometry
                         if (GeometryHelper.IsBrushConvex(polygons)
@@ -443,8 +443,8 @@ namespace Sabresaurus.SabreCSG
 						// Rotate positions and vertices so they remain in their original place
 						for (int vertexIndex = 0; vertexIndex < vertices.Length; vertexIndex++) 
 						{
-							vertices[vertexIndex].Position = inverseRotation * vertices[vertexIndex].Position;
-							vertices[vertexIndex].Normal = inverseRotation * vertices[vertexIndex].Normal;
+							vertices[vertexIndex].Position = (FixVector3)(inverseRotation * (Vector3)vertices[vertexIndex].Position);
+							vertices[vertexIndex].Normal = (FixVector3)(inverseRotation * (Vector3)vertices[vertexIndex].Normal);
 						}
 					}
 

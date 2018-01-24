@@ -101,7 +101,7 @@ namespace Sabresaurus.SabreCSG
             ////////////////////////////////////////////////////////////////////
 
             // local variables
-            List<Vector3> vertexPositions = new List<Vector3>();
+            List<FixVector3> vertexPositions = new List<FixVector3>();
             Plane plane;
             Vector3 rotateStep = new Vector3();
             Vector3 vertex = new Vector3(), newVertex = new Vector3();
@@ -127,9 +127,9 @@ namespace Sabresaurus.SabreCSG
                     adjustment = 0;
 
                 newVertex = Quaternion.Euler(rotateStep * x) * vertex;
-                vertexPositions.Add(new Vector3(newVertex.x, vertex.z - adjustment, newVertex.y));
+                vertexPositions.Add(new FixVector3((Fix64)newVertex.x, (Fix64)vertex.z - (Fix64)adjustment, (Fix64)newVertex.y));
                 vertex.z += stepHeight;
-                vertexPositions.Add(new Vector3(newVertex.x, vertex.z, newVertex.y));
+                vertexPositions.Add(new FixVector3((Fix64)newVertex.x, (Fix64)vertex.z, (Fix64)newVertex.y));
             }
 
             // generate the outer curve points.
@@ -144,9 +144,9 @@ namespace Sabresaurus.SabreCSG
                     adjustment = 0;
 
                 newVertex = Quaternion.Euler(rotateStep * x) * vertex;
-                vertexPositions.Add(new Vector3(newVertex.x, vertex.z - adjustment, newVertex.y));
+                vertexPositions.Add(new FixVector3((Fix64)newVertex.x, (Fix64)vertex.z - (Fix64)adjustment, (Fix64)newVertex.y));
                 vertex.z += stepHeight;
-                vertexPositions.Add(new Vector3(newVertex.x, vertex.z, newVertex.y));
+                vertexPositions.Add(new FixVector3((Fix64)newVertex.x, (Fix64)vertex.z, (Fix64)newVertex.y));
             }
 
             // generate the bottom inner curve points.
@@ -156,7 +156,7 @@ namespace Sabresaurus.SabreCSG
             for (int x = 0; x < (numSteps + 1); x++)
             {
                 newVertex = Quaternion.Euler(rotateStep * x) * vertex;
-                vertexPositions.Add(new Vector3(newVertex.x, vertex.z - addToFirstStep, newVertex.y));
+                vertexPositions.Add(new FixVector3((Fix64)newVertex.x, (Fix64)vertex.z - (Fix64)addToFirstStep, (Fix64)newVertex.y));
             }
 
             // generate the bottom outer curve points.
@@ -165,7 +165,7 @@ namespace Sabresaurus.SabreCSG
             for (int x = 0; x < (numSteps + 1); x++)
             {
                 newVertex = Quaternion.Euler(rotateStep * x) * vertex;
-                vertexPositions.Add(new Vector3(newVertex.x, vertex.z - addToFirstStep, newVertex.y));
+                vertexPositions.Add(new FixVector3((Fix64)newVertex.x, (Fix64)vertex.z - (Fix64)addToFirstStep, (Fix64)newVertex.y));
             }
 
             // vertex indices to easily flip faces for the counter clockwise mode.
@@ -234,11 +234,11 @@ namespace Sabresaurus.SabreCSG
                 vertices[index3].Position = vertexPositions[innerStart + (i * 2) + 1];
 
                 // calculate a normal using a virtual plane.
-                plane = new Plane(vertices[index1].Position, vertices[index2].Position, vertices[index3].Position);
-                vertices[index0].Normal = plane.normal;
-                vertices[index1].Normal = plane.normal;
-                vertices[index2].Normal = plane.normal;
-                vertices[index3].Normal = plane.normal;
+                plane = new Plane((Vector3)vertices[index1].Position, (Vector3)vertices[index2].Position, (Vector3)vertices[index3].Position);
+                vertices[index0].Normal = (FixVector3)plane.normal;
+                vertices[index1].Normal = (FixVector3)plane.normal;
+                vertices[index2].Normal = (FixVector3)plane.normal;
+                vertices[index3].Normal = (FixVector3)plane.normal;
 
 
 
@@ -252,11 +252,11 @@ namespace Sabresaurus.SabreCSG
                 vertices[index3].Position = vertexPositions[bottomInnerStart + i];
 
                 // calculate a normal using a virtual plane.
-                plane = new Plane(vertices[index1].Position, vertices[index2].Position, vertices[index3].Position);
-                vertices[index0].Normal = plane.normal;
-                vertices[index1].Normal = plane.normal;
-                vertices[index2].Normal = plane.normal;
-                vertices[index3].Normal = plane.normal;
+                plane = new Plane((Vector3)vertices[index1].Position, (Vector3)vertices[index2].Position, (Vector3)vertices[index3].Position);
+                vertices[index0].Normal = (FixVector3)plane.normal;
+                vertices[index1].Normal = (FixVector3)plane.normal;
+                vertices[index2].Normal = (FixVector3)plane.normal;
+                vertices[index3].Normal = (FixVector3)plane.normal;
 
 
 
@@ -270,11 +270,11 @@ namespace Sabresaurus.SabreCSG
                 vertices[index3].Position = vertexPositions[outerStart + (i * 2) + 1];
 
                 // calculate a normal using a virtual plane.
-                plane = new Plane(vertices[index1].Position, vertices[index2].Position, vertices[index3].Position);
-                vertices[index0].Normal = plane.normal;
-                vertices[index1].Normal = plane.normal;
-                vertices[index2].Normal = plane.normal;
-                vertices[index3].Normal = plane.normal;
+                plane = new Plane((Vector3)vertices[index1].Position, (Vector3)vertices[index2].Position, (Vector3)vertices[index3].Position);
+                vertices[index0].Normal = (FixVector3)plane.normal;
+                vertices[index1].Normal = (FixVector3)plane.normal;
+                vertices[index2].Normal = (FixVector3)plane.normal;
+                vertices[index3].Normal = (FixVector3)plane.normal;
 
 
 
@@ -305,11 +305,11 @@ namespace Sabresaurus.SabreCSG
                 vertices[index3].Position = vertexPositions[bottomInnerStart + i + 1];
 
                 // calculate a normal using a virtual plane.
-                plane = new Plane(vertices[index1].Position, vertices[index2].Position, vertices[index3].Position);
-                vertices[index0].Normal = plane.normal;
-                vertices[index1].Normal = plane.normal;
-                vertices[index2].Normal = plane.normal;
-                vertices[index3].Normal = plane.normal;
+                plane = new Plane((Vector3)vertices[index1].Position, (Vector3)vertices[index2].Position, (Vector3)vertices[index3].Position);
+                vertices[index0].Normal = (FixVector3)plane.normal;
+                vertices[index1].Normal = (FixVector3)plane.normal;
+                vertices[index2].Normal = (FixVector3)plane.normal;
+                vertices[index3].Normal = (FixVector3)plane.normal;
 
                 generatedBrushes[i].Invalidate(true);
                 csgBounds.Encapsulate(generatedBrushes[i].GetBounds());

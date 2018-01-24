@@ -25,25 +25,25 @@ namespace Sabresaurus.SabreCSG
         ResizeHandlePair? hoveredResizeHandlePair = null;
         int hoveredResizePointIndex = -1; // -1 is unset, 0 is Point1, 1 is Point2
 
-        Vector3 dotOffset3;
+        FixVector3 dotOffset3;
 
-		float fullDeltaAngle = 0;
-		float unroundedDeltaAngle = 0;
+		Fix64 fullDeltaAngle = Fix64.Zero;
+		Fix64 unroundedDeltaAngle = Fix64.Zero;
 
-		Vector3 initialRotationDirection;
+		FixVector3 initialRotationDirection;
 
 		Plane translationPlane;
 
-		Vector3 originalPosition; // For duplicating when translating
+		FixVector3 originalPosition; // For duplicating when translating
 
 		bool moveCancelled = false;
 
 		bool duplicationOccured = false;
 
-		Vector3 translationUnrounded = Vector3.zero;
+		FixVector3 translationUnrounded = FixVector3.zero;
 
 		// WidgetMode - Translate
-		Vector3 startPosition;
+		FixVector3 startPosition;
 
 		string message; // The tip message being displayed e.g. the size or current delta angle
 
@@ -60,17 +60,17 @@ namespace Sabresaurus.SabreCSG
         ResizeHandlePair[] resizeHandlePairs = new ResizeHandlePair[]
 		{
 			// Edge Mid Points
-			new ResizeHandlePair(new Vector3(0,1,1)),
-			new ResizeHandlePair(new Vector3(0,-1,1)),
-			new ResizeHandlePair(new Vector3(1,0,1)),
-			new ResizeHandlePair(new Vector3(-1,0,1)),
-			new ResizeHandlePair(new Vector3(1,1,0)),
-			new ResizeHandlePair(new Vector3(-1,1,0)),
+			new ResizeHandlePair(new FixVector3(0,1,1)),
+			new ResizeHandlePair(new FixVector3(0,-1,1)),
+			new ResizeHandlePair(new FixVector3(1,0,1)),
+			new ResizeHandlePair(new FixVector3(-1,0,1)),
+			new ResizeHandlePair(new FixVector3(1,1,0)),
+			new ResizeHandlePair(new FixVector3(-1,1,0)),
 			
 			// Face Mid Points
-			new ResizeHandlePair(new Vector3(1,0,0)),
-			new ResizeHandlePair(new Vector3(0,1,0)),
-			new ResizeHandlePair(new Vector3(0,0,1)),
+			new ResizeHandlePair(new FixVector3(1,0,0)),
+			new ResizeHandlePair(new FixVector3(0,1,0)),
+			new ResizeHandlePair(new FixVector3(0,0,1)),
 		};
 
         public override void OnSceneGUI(SceneView sceneView, Event e)
@@ -136,34 +136,34 @@ namespace Sabresaurus.SabreCSG
 			}
 
 			// Grab a source point and convert from local space to world
-			Vector3 sourceWorldPosition = GetBrushesPivotPoint();//targetBrushTransform.position;
+			FixVector3 sourceWorldPosition = GetBrushesPivotPoint();//targetBrushTransform.position;
 
 			EditorGUI.BeginChangeCheck();
 			// Display a handle and allow the user to determine a new position in world space
-			Vector3 newWorldPosition = Handles.PositionHandle(sourceWorldPosition, handleDirection);
+			FixVector3 newWorldPosition = (FixVector3)Handles.PositionHandle((Vector3)sourceWorldPosition, handleDirection);
 
 			if(EditorGUI.EndChangeCheck())
 			{
-				Vector3 delta = newWorldPosition-sourceWorldPosition;
+				FixVector3 delta = newWorldPosition-sourceWorldPosition;
 
-				Vector3 newPosition = primaryTargetBrushTransform.position + delta;
+				FixVector3 newPosition = (FixVector3)primaryTargetBrushTransform.position + delta;
 
-				Vector3 accumulatedDelta = newPosition - startPosition;
+				FixVector3 accumulatedDelta = newPosition - startPosition;
 
 				if(CurrentSettings.PositionSnappingEnabled)
 				{
 					accumulatedDelta = InverseTransformDirection(accumulatedDelta);
 
-					float snapDistance = CurrentSettings.PositionSnapDistance;
+					Fix64 snapDistance = (Fix64)CurrentSettings.PositionSnapDistance;
 
-					accumulatedDelta = MathHelper.RoundVector3(accumulatedDelta, snapDistance);
+					accumulatedDelta = MathHelper.RoundFixVector3(accumulatedDelta, snapDistance);
 
 					accumulatedDelta = TransformDirection(accumulatedDelta);
 				}
 
 				newPosition = startPosition + accumulatedDelta;
 
-				Vector3 finalDelta = newPosition - primaryTargetBrushTransform.position;
+				FixVector3 finalDelta = newPosition - (FixVector3)primaryTargetBrushTransform.position;
 
 				TranslateBrushes(finalDelta);
 
@@ -171,7 +171,7 @@ namespace Sabresaurus.SabreCSG
 			}
 			else
 			{
-				startPosition = primaryTargetBrushTransform.position;
+				startPosition = (FixVector3)primaryTargetBrushTransform.position;
 			}
 		}
 
@@ -182,21 +182,21 @@ namespace Sabresaurus.SabreCSG
 				return;
 			}
 
-			Vector3 worldPosition = GetBrushesPivotPoint();
+			FixVector3 worldPosition = GetBrushesPivotPoint();
 
 			if (Event.current.type == EventType.MouseUp)
 			{
 				initialRotationOffset = null;
 			}
 
-			DrawRotationAxis(Color.red, Vector3.right, worldPosition);
-			DrawRotationAxis(Color.green, Vector3.up, worldPosition);
-			DrawRotationAxis(Color.blue, Vector3.forward, worldPosition);
+			DrawRotationAxis(Color.red, FixVector3.right, worldPosition);
+			DrawRotationAxis(Color.green, FixVector3.up, worldPosition);
+			DrawRotationAxis(Color.blue, FixVector3.forward, worldPosition);
 		}
 
 //		Quaternion compoundRotation = Quaternion.identity;
 
-		void DrawRotationAxis(Color color, Vector3 axis, Vector3 worldPosition)
+		void DrawRotationAxis(Color color, FixVector3 axis, FixVector3 worldPosition)
 		{
 //			EventType source = Event.current.rawType;
 			// Make the handle respect the Unity Editor's Local/World orientation mode
@@ -207,30 +207,30 @@ namespace Sabresaurus.SabreCSG
 //			}
 
 			// Grab a source point and convert from local space to world
-			Vector3 sourceWorldPosition = worldPosition;
+			FixVector3 sourceWorldPosition = worldPosition;
 
 			EditorGUI.BeginChangeCheck();
 			// Display a handle and allow the user to determine a new position in world space
 
-//			Vector3 lastEulerAngles = handleDirection.eulerAngles;
+//			FixVector3 lastEulerAngles = handleDirection.eulerAngles;
 
 			Handles.color = color;
 
-			float snapValue = 0;
+			Fix64 snapValue = (Fix64)0;
 			if(CurrentSettings.AngleSnappingEnabled)
 			{
-				snapValue = CurrentSettings.AngleSnapDistance;
+				snapValue = (Fix64)CurrentSettings.AngleSnapDistance;
 			}
 
 			Quaternion sourceRotation = Quaternion.identity;// targetBrushTransform.rotation;
 //			Quaternion sourceRotation = targetBrushTransform.rotation;
 
 			Quaternion newRotation = Handles.Disc(sourceRotation, 
-				sourceWorldPosition, 
-				axis, 
-				HandleUtility.GetHandleSize(sourceWorldPosition), 
+				(Vector3)sourceWorldPosition,
+                (Vector3)axis, 
+				HandleUtility.GetHandleSize((Vector3)sourceWorldPosition), 
 				true, 
-				snapValue);
+				(float)snapValue);
 			
 			if(EditorGUI.EndChangeCheck())
 			{
@@ -247,13 +247,13 @@ namespace Sabresaurus.SabreCSG
 //				Debug.Log(deltaRotation.eulerAngles);
 				if(CurrentSettings.AngleSnappingEnabled)
 				{
-					Quaternion plusSnap = Quaternion.AngleAxis(CurrentSettings.AngleSnapDistance, axis);// * baseRotation;
+					Quaternion plusSnap = Quaternion.AngleAxis(CurrentSettings.AngleSnapDistance, (Vector3)axis);// * baseRotation;
 					Quaternion zeroSnap = Quaternion.identity;// * baseRotation;
-					Quaternion negativeSnap = Quaternion.AngleAxis(-CurrentSettings.AngleSnapDistance, axis);// * baseRotation;
+					Quaternion negativeSnap = Quaternion.AngleAxis(-CurrentSettings.AngleSnapDistance, (Vector3)axis);// * baseRotation;
 
-					float angleZero = Quaternion.Angle(deltaRotation, zeroSnap);
-					float anglePlus = Quaternion.Angle(deltaRotation, plusSnap);
-					float angleNegative = Quaternion.Angle(deltaRotation, negativeSnap);
+					Fix64 angleZero = (Fix64)Quaternion.Angle(deltaRotation, zeroSnap);
+					Fix64 anglePlus = (Fix64)Quaternion.Angle(deltaRotation, plusSnap);
+					Fix64 angleNegative = (Fix64)Quaternion.Angle(deltaRotation, negativeSnap);
 
 //					Debug.Log("A0 " + angleZero + ", A+ " + anglePlus + ", A- " + angleNegative);
 
@@ -331,13 +331,13 @@ namespace Sabresaurus.SabreCSG
 			}
 
 			bool foundAny = false;
-			Vector3 worldPos1 = Vector3.zero;
-			Vector3 worldPos2 = Vector3.zero;
+			FixVector3 worldPos1 = FixVector3.zero;
+			FixVector3 worldPos2 = FixVector3.zero;
 
 			Vector2 mousePosition = e.mousePosition;
 				
 			bool isAxisAlignedCamera = (EditorHelper.GetSceneViewCamera(sceneView) != EditorHelper.SceneViewCamera.Other);
-			Vector3 cameraDirection = sceneView.camera.transform.forward;
+			FixVector3 cameraDirection = (FixVector3)sceneView.camera.transform.forward;
 			
 			Bounds bounds = GetBounds();
 
@@ -353,28 +353,28 @@ namespace Sabresaurus.SabreCSG
 				for (int i = 0; i < resizeHandlePairs.Length; i++)
 				{
 					// Skip any that shouldn't be seen from this camera angle (axis aligned only)
-					if (isAxisAlignedCamera && Mathf.Abs(Vector3.Dot(TransformDirection(resizeHandlePairs[i].point1), cameraDirection)) > 0.001f)
+					if (isAxisAlignedCamera && Fix64.Abs(FixVector3.Dot(TransformDirection((FixVector3)resizeHandlePairs[i].point1), cameraDirection)) > (Fix64)0.001f)
 					{
 						continue;
 					}
 					// Skip any corners
-					if(resizeHandlePairs[i].point1.sqrMagnitude != 1)
+					if(resizeHandlePairs[i].point1.sqrMagnitude != Fix64.One)
 					{
 						continue;
 					}
 
-					Vector3 normalVector3 = Vector3.Cross(InverseTransformDirection(cameraDirection), resizeHandlePairs[i].point1);
+					FixVector3 normalVector3 = FixVector3.Cross(InverseTransformDirection(cameraDirection), (FixVector3)resizeHandlePairs[i].point1);
 
-					Vector3 worldPosExtent1 = TransformPoint(bounds.center + normalVector3.Multiply(bounds.extents) + resizeHandlePairs[i].point1.Multiply(bounds.extents));
-					Vector3 worldPosExtent2 = TransformPoint(bounds.center - normalVector3.Multiply(bounds.extents) + resizeHandlePairs[i].point1.Multiply(bounds.extents));
+					FixVector3 worldPosExtent1 = TransformPoint((FixVector3)bounds.center + normalVector3.Multiply((FixVector3)bounds.extents) + ((FixVector3)resizeHandlePairs[i].point1).Multiply((FixVector3)bounds.extents));
+					FixVector3 worldPosExtent2 = TransformPoint((FixVector3)bounds.center - normalVector3.Multiply((FixVector3)bounds.extents) + ((FixVector3)resizeHandlePairs[i].point1).Multiply((FixVector3)bounds.extents));
 
-                    float range = resizeHandlePairs[i].CalculateScreenRange(TransformPoint, 0, bounds);
+                    Fix64 range = resizeHandlePairs[i].CalculateScreenRange(TransformPoint, 0, bounds);
 
                     if (EditorHelper.InClickRect(mousePosition, worldPosExtent1, worldPosExtent2, range))
 					{
 						foundAny = true;
-						worldPos1 = TransformPoint(bounds.center + resizeHandlePairs[i].point2.Multiply(bounds.extents));
-						worldPos2 = TransformPoint(bounds.center + resizeHandlePairs[i].point1.Multiply(bounds.extents));
+						worldPos1 = TransformPoint((FixVector3)bounds.center + resizeHandlePairs[i].point2.Multiply((FixVector3)bounds.extents));
+						worldPos2 = TransformPoint((FixVector3)bounds.center + resizeHandlePairs[i].point1.Multiply((FixVector3)bounds.extents));
 
                         hoveredResizeHandlePair = resizeHandlePairs[i];
                         hoveredResizePointIndex = 0;
@@ -382,16 +382,16 @@ namespace Sabresaurus.SabreCSG
                         e.Use();
 					}
 
-					worldPosExtent1 = TransformPoint(bounds.center + normalVector3.Multiply(bounds.extents) + resizeHandlePairs[i].point2.Multiply(bounds.extents));
-					worldPosExtent2 = TransformPoint(bounds.center - normalVector3.Multiply(bounds.extents) + resizeHandlePairs[i].point2.Multiply(bounds.extents));
+					worldPosExtent1 = TransformPoint((FixVector3)bounds.center + normalVector3.Multiply((FixVector3)bounds.extents) + resizeHandlePairs[i].point2.Multiply((FixVector3)bounds.extents));
+					worldPosExtent2 = TransformPoint((FixVector3)bounds.center - normalVector3.Multiply((FixVector3)bounds.extents) + resizeHandlePairs[i].point2.Multiply((FixVector3)bounds.extents));
 
                     range = resizeHandlePairs[i].CalculateScreenRange(TransformPoint, 1, bounds);
 
                     if (EditorHelper.InClickRect(mousePosition, worldPosExtent1, worldPosExtent2, range))
 					{
 						foundAny = true;
-						worldPos1 = TransformPoint(bounds.center + resizeHandlePairs[i].point1.Multiply(bounds.extents));
-						worldPos2 = TransformPoint(bounds.center + resizeHandlePairs[i].point2.Multiply(bounds.extents));
+						worldPos1 = TransformPoint((FixVector3)bounds.center + resizeHandlePairs[i].point1.Multiply((FixVector3)bounds.extents));
+						worldPos2 = TransformPoint((FixVector3)bounds.center + resizeHandlePairs[i].point2.Multiply((FixVector3)bounds.extents));
 
                         hoveredResizeHandlePair = resizeHandlePairs[i];
                         hoveredResizePointIndex = 1;
@@ -405,7 +405,7 @@ namespace Sabresaurus.SabreCSG
 			for (int i = 0; i < resizeHandlePairs.Length; i++)
 			{
 				// Skip any that shouldn't be seen from this camera angle (axis aligned only)
-				if (isAxisAlignedCamera && Mathf.Abs(Vector3.Dot(TransformDirection(resizeHandlePairs[i].point1), cameraDirection)) > 0.001f)
+				if (isAxisAlignedCamera && Fix64.Abs(FixVector3.Dot(TransformDirection(resizeHandlePairs[i].point1), cameraDirection)) > (Fix64)0.001f)
 				{
 					continue;
 				}
@@ -413,8 +413,8 @@ namespace Sabresaurus.SabreCSG
                 if (resizeHandlePairs[i].InClickZone(TransformPoint, mousePosition, 0, bounds))
 				{
 					foundAny = true;
-					worldPos1 = TransformPoint(bounds.center + resizeHandlePairs[i].point2.Multiply(bounds.extents));
-					worldPos2 = TransformPoint(bounds.center + resizeHandlePairs[i].point1.Multiply(bounds.extents));
+					worldPos1 = TransformPoint((FixVector3)bounds.center + resizeHandlePairs[i].point2.Multiply((FixVector3)bounds.extents));
+					worldPos2 = TransformPoint((FixVector3)bounds.center + resizeHandlePairs[i].point1.Multiply((FixVector3)bounds.extents));
 
                     hoveredResizeHandlePair = resizeHandlePairs[i];
                     hoveredResizePointIndex = 0;
@@ -424,8 +424,8 @@ namespace Sabresaurus.SabreCSG
                 if (resizeHandlePairs[i].InClickZone(TransformPoint, mousePosition, 1, bounds))
                 {
 					foundAny = true;
-					worldPos1 = TransformPoint(bounds.center + resizeHandlePairs[i].point1.Multiply(bounds.extents));
-					worldPos2 = TransformPoint(bounds.center + resizeHandlePairs[i].point2.Multiply(bounds.extents));
+					worldPos1 = TransformPoint((FixVector3)bounds.center + resizeHandlePairs[i].point1.Multiply((FixVector3)bounds.extents));
+					worldPos2 = TransformPoint((FixVector3)bounds.center + resizeHandlePairs[i].point2.Multiply((FixVector3)bounds.extents));
 
                     hoveredResizeHandlePair = resizeHandlePairs[i];
                     hoveredResizePointIndex = 1;
@@ -441,8 +441,8 @@ namespace Sabresaurus.SabreCSG
 				}
 				else
 				{
-					Vector2 screenPoint1 = Camera.current.WorldToScreenPoint(worldPos1);
-					Vector2 screenPoint2 = Camera.current.WorldToScreenPoint(worldPos2);
+					Vector2 screenPoint1 = Camera.current.WorldToScreenPoint((Vector3)worldPos1);
+					Vector2 screenPoint2 = Camera.current.WorldToScreenPoint((Vector3)worldPos2);
 					
 					SabreMouse.SetCursorFromVector3(screenPoint2, screenPoint1);
 				}
@@ -468,8 +468,8 @@ namespace Sabresaurus.SabreCSG
 			{
 				for (int j = 0; j < translationBoxCollider[i].Vertices.Length; j++) 
 				{
-					Vector3 position = translationBoxCollider[i].Vertices[j].Position;
-					position = position.Multiply(bounds.extents) + bounds.center;
+					FixVector3 position = translationBoxCollider[i].Vertices[j].Position;
+					position = position.Multiply((FixVector3)bounds.extents) + (FixVector3)bounds.center;
 
 					position = TransformPoint(position); // Also transform the positions if in local mode
 					translationBoxCollider[i].Vertices[j].Position = position;
@@ -482,8 +482,8 @@ namespace Sabresaurus.SabreCSG
 			Ray currentRay = Camera.current.ScreenPointToRay(EditorHelper.ConvertMousePointPosition(currentPosition));
 
 			// Raycast against the ray against the bounds polygons we just created
-			float hitDistance;
-			Polygon hitPolygon = GeometryHelper.RaycastPolygons(translationBoxCollider.ToList(), currentRay, out hitDistance, 0);
+			Fix64 hitDistance;
+			Polygon hitPolygon = GeometryHelper.RaycastPolygons(translationBoxCollider.ToList(), currentRay, out hitDistance, Fix64.Zero);
 
 			if(hitPolygon != null) // We hit a polygon
 			{
@@ -503,8 +503,8 @@ namespace Sabresaurus.SabreCSG
 			{
 				duplicationOccured = false;
 				moveCancelled = false;
-				originalPosition = primaryTargetBrushTransform.position;
-				fullDeltaAngle = 0;
+				originalPosition = (FixVector3)primaryTargetBrushTransform.position;
+				fullDeltaAngle = Fix64.Zero;
 
 	            if (CameraPanInProgress)
 	            {
@@ -513,7 +513,7 @@ namespace Sabresaurus.SabreCSG
 	            else
 	            {
 	                // Resize
-	                dotOffset3 = Vector3.zero;
+	                dotOffset3 = FixVector3.zero;
 
 	                Vector2 mousePosition = e.mousePosition;
 
@@ -521,7 +521,7 @@ namespace Sabresaurus.SabreCSG
 	                selectedResizeHandlePair = null;
 
 	                bool isAxisAlignedCamera = (EditorHelper.GetSceneViewCamera(sceneView) != EditorHelper.SceneViewCamera.Other);
-	                Vector3 cameraDirection = sceneView.camera.transform.forward;
+	                FixVector3 cameraDirection = (FixVector3)sceneView.camera.transform.forward;
 
 	                Bounds bounds = GetBounds();
 
@@ -533,24 +533,24 @@ namespace Sabresaurus.SabreCSG
 						for (int i = 0; i < resizeHandlePairs.Length; i++)
 						{
 							// Skip any that shouldn't be seen from this camera angle (axis aligned only)
-							if (isAxisAlignedCamera && Mathf.Abs(Vector3.Dot(TransformDirection(resizeHandlePairs[i].point1), cameraDirection)) > 0.001f)
+							if (isAxisAlignedCamera && Fix64.Abs(FixVector3.Dot(TransformDirection(resizeHandlePairs[i].point1), cameraDirection)) > (Fix64)0.001f)
 							{
 								continue;
 							}
 							// Skip any corners
-							if(resizeHandlePairs[i].point1.sqrMagnitude != 1)
+							if(resizeHandlePairs[i].point1.sqrMagnitude != Fix64.One)
 							{
 								continue;
 							}
 
 
 
-							Vector3 normalVector3 = Vector3.Cross(InverseTransformDirection(cameraDirection), resizeHandlePairs[i].point1);
+							FixVector3 normalVector3 = FixVector3.Cross(InverseTransformDirection(cameraDirection), resizeHandlePairs[i].point1);
 
-							Vector3 worldPosExtent1 = TransformPoint(bounds.center + normalVector3.Multiply(bounds.extents) + resizeHandlePairs[i].point1.Multiply(bounds.extents));
-							Vector3 worldPosExtent2 = TransformPoint(bounds.center - normalVector3.Multiply(bounds.extents) + resizeHandlePairs[i].point1.Multiply(bounds.extents));
+							FixVector3 worldPosExtent1 = TransformPoint((FixVector3)bounds.center + normalVector3.Multiply((FixVector3)bounds.extents) + resizeHandlePairs[i].point1.Multiply((FixVector3)bounds.extents));
+							FixVector3 worldPosExtent2 = TransformPoint((FixVector3)bounds.center - normalVector3.Multiply((FixVector3)bounds.extents) + resizeHandlePairs[i].point1.Multiply((FixVector3)bounds.extents));
 
-                            float range = resizeHandlePairs[i].CalculateScreenRange(TransformPoint, 0, bounds);
+                            Fix64 range = resizeHandlePairs[i].CalculateScreenRange(TransformPoint, 0, bounds);
 
                             if (EditorHelper.InClickRect(mousePosition, worldPosExtent1, worldPosExtent2, range))
 							{
@@ -561,8 +561,8 @@ namespace Sabresaurus.SabreCSG
 								e.Use();
 							}
 
-							worldPosExtent1 = TransformPoint(bounds.center + normalVector3.Multiply(bounds.extents) + resizeHandlePairs[i].point2.Multiply(bounds.extents));
-							worldPosExtent2 = TransformPoint(bounds.center - normalVector3.Multiply(bounds.extents) + resizeHandlePairs[i].point2.Multiply(bounds.extents));
+							worldPosExtent1 = TransformPoint((FixVector3)bounds.center + normalVector3.Multiply((FixVector3)bounds.extents) + resizeHandlePairs[i].point2.Multiply((FixVector3)bounds.extents));
+							worldPosExtent2 = TransformPoint((FixVector3)bounds.center - normalVector3.Multiply((FixVector3)bounds.extents) + resizeHandlePairs[i].point2.Multiply((FixVector3)bounds.extents));
 
                             range = resizeHandlePairs[i].CalculateScreenRange(TransformPoint, 0, bounds);
 
@@ -580,7 +580,7 @@ namespace Sabresaurus.SabreCSG
 	                for (int i = 0; i < resizeHandlePairs.Length; i++)
 	                {
 	                    // Skip any that shouldn't be seen from this camera angle (axis aligned only)
-	                    if (isAxisAlignedCamera && Mathf.Abs(Vector3.Dot(TransformDirection(resizeHandlePairs[i].point1), cameraDirection)) > 0.001f)
+	                    if (isAxisAlignedCamera && Fix64.Abs(FixVector3.Dot(TransformDirection(resizeHandlePairs[i].point1), cameraDirection)) > (Fix64)0.001f)
 	                    {
 	                        continue;
 	                    }
@@ -606,21 +606,21 @@ namespace Sabresaurus.SabreCSG
 
 					if (handleClicked && selectedResizeHandlePair.HasValue)
 	                {
-	                    Vector3 worldPosition1;
-	                    Vector3 worldPosition2;
+	                    FixVector3 worldPosition1;
+	                    FixVector3 worldPosition2;
 
 	                    if (selectedResizePointIndex == 1)
 	                    {
-	                        worldPosition1 = TransformPoint(bounds.center + selectedResizeHandlePair.Value.point1.Multiply(bounds.extents));
-	                        worldPosition2 = TransformPoint(bounds.center + selectedResizeHandlePair.Value.point2.Multiply(bounds.extents));
+	                        worldPosition1 = TransformPoint((FixVector3)bounds.center + selectedResizeHandlePair.Value.point1.Multiply((FixVector3)bounds.extents));
+	                        worldPosition2 = TransformPoint((FixVector3)bounds.center + selectedResizeHandlePair.Value.point2.Multiply((FixVector3)bounds.extents));
 	                    }
 	                    else
 	                    {
-	                        worldPosition1 = TransformPoint(bounds.center + selectedResizeHandlePair.Value.point2.Multiply(bounds.extents));
-	                        worldPosition2 = TransformPoint(bounds.center + selectedResizeHandlePair.Value.point1.Multiply(bounds.extents));
+	                        worldPosition1 = TransformPoint((FixVector3)bounds.center + selectedResizeHandlePair.Value.point2.Multiply((FixVector3)bounds.extents));
+	                        worldPosition2 = TransformPoint((FixVector3)bounds.center + selectedResizeHandlePair.Value.point1.Multiply((FixVector3)bounds.extents));
 	                    }
-	                    Vector2 screenPoint1 = Camera.current.WorldToScreenPoint(worldPosition1);
-	                    Vector2 screenPoint2 = Camera.current.WorldToScreenPoint(worldPosition2);
+	                    Vector2 screenPoint1 = Camera.current.WorldToScreenPoint((Vector3)worldPosition1);
+	                    Vector2 screenPoint2 = Camera.current.WorldToScreenPoint((Vector3)worldPosition2);
 
 	                    SabreMouse.SetCursorFromVector3(screenPoint2, screenPoint1);
 
@@ -628,7 +628,7 @@ namespace Sabresaurus.SabreCSG
 							&& selectedResizeHandlePair.Value.ResizeType == ResizeType.EdgeMid)
 						{
 							currentMode = ActiveMode.Rotate;
-							Vector3 activeDirection;
+							FixVector3 activeDirection;
 							if (selectedResizePointIndex == 0)
 							{
 								activeDirection = selectedResizeHandlePair.Value.point1;
@@ -640,7 +640,7 @@ namespace Sabresaurus.SabreCSG
 
 							message = "0";
 
-							initialRotationDirection = TransformDirection(activeDirection.Multiply(GetBounds().extents));
+							initialRotationDirection = TransformDirection(activeDirection.Multiply((FixVector3)GetBounds().extents));
 						}
 						else
 						{
@@ -722,19 +722,19 @@ namespace Sabresaurus.SabreCSG
 
 //			Bounds bounds = GetBounds();
 			
-			Vector3 offset = primaryTargetBrushTransform.position;
+			FixVector3 offset = (FixVector3)primaryTargetBrushTransform.position;
 //			if(Tools.pivotMode == PivotMode.Center && Tools.pivotRotation == PivotRotation.Global)
 //			{
 //				offset = GetBounds().center;
 //			}
 
-			Vector3 lineStart = offset + TransformDirection(selectedResizeHandlePair.Value.point1);
-			Vector3 lineEnd = offset + TransformDirection(selectedResizeHandlePair.Value.point2);
+			FixVector3 lineStart = offset + TransformDirection(selectedResizeHandlePair.Value.point1);
+			FixVector3 lineEnd = offset + TransformDirection(selectedResizeHandlePair.Value.point2);
 
-			Vector3 lastPositionWorld = MathHelper.ClosestPointOnLine(lastRay, lineStart, lineEnd);
-			Vector3 currentPositionWorld = MathHelper.ClosestPointOnLine(currentRay, lineStart, lineEnd);
+			FixVector3 lastPositionWorld = MathHelper.ClosestPointOnLine(lastRay, lineStart, lineEnd);
+			FixVector3 currentPositionWorld = MathHelper.ClosestPointOnLine(currentRay, lineStart, lineEnd);
 			
-			Vector3 direction;
+			FixVector3 direction;
 			if (selectedResizePointIndex == 0)
 			{
 				direction = selectedResizeHandlePair.Value.point1;
@@ -750,32 +750,32 @@ namespace Sabresaurus.SabreCSG
 				direction = -direction;
 			}
 			
-			Vector3 deltaWorld = (currentPositionWorld - lastPositionWorld);
+			FixVector3 deltaWorld = (currentPositionWorld - lastPositionWorld);
 			// Rescaling logic deals with local space changes, convert to that space
-			Vector3 deltaLocal = InverseTransformDirection(deltaWorld);
+			FixVector3 deltaLocal = InverseTransformDirection(deltaWorld);
 			
-			Vector3 dot3 = Vector3.zero;
-			if (direction.x != 0)
+			FixVector3 dot3 = FixVector3.zero;
+			if (direction.x != Fix64.Zero)
 			{
-				dot3.x = Vector3.Dot(deltaLocal, new Vector3(Mathf.Sign(direction.x), 0, 0));
+				dot3.x = FixVector3.Dot(deltaLocal, new FixVector3(Fix64.FixSign(direction.x), Fix64.Zero, Fix64.Zero));
 			}
-			if (direction.y != 0)
+			if (direction.y != Fix64.Zero)
 			{
-				dot3.y = Vector3.Dot(deltaLocal, new Vector3(0, Mathf.Sign(direction.y), 0));
+				dot3.y = FixVector3.Dot(deltaLocal, new FixVector3(Fix64.Zero, Fix64.FixSign(direction.y), Fix64.Zero));
 			}
-			if (direction.z != 0)
+			if (direction.z != Fix64.Zero)
 			{
-				dot3.z = Vector3.Dot(deltaLocal, new Vector3(0, 0, Mathf.Sign(direction.z)));
+				dot3.z = FixVector3.Dot(deltaLocal, new FixVector3(Fix64.Zero, Fix64.Zero, Fix64.FixSign(direction.z)));
 			}
 
-			float snapDistance = CurrentSettings.PositionSnapDistance;
+			Fix64 snapDistance = (Fix64)CurrentSettings.PositionSnapDistance;
 			
 			if (CurrentSettings.PositionSnappingEnabled)
 			{
 				// Snapping's dot uses an offset to track deltas that would be lost otherwise due to snapping
 				dot3 += dotOffset3;
 
-				Vector3 roundedDot3 = MathHelper.RoundVector3(dot3, snapDistance);
+				FixVector3 roundedDot3 = MathHelper.RoundFixVector3(dot3, snapDistance);
 				dotOffset3 = dot3 - roundedDot3;
 				dot3 = roundedDot3;
 			}
@@ -804,8 +804,8 @@ namespace Sabresaurus.SabreCSG
 		{
 			if(!duplicationOccured && EnumHelper.IsFlagSet(e.modifiers, EventModifiers.Control))
 			{
-//				Vector3 newPosition = targetBrushTransform.position;
-				primaryTargetBrushTransform.position = originalPosition;
+//				FixVector3 newPosition = targetBrushTransform.position;
+				primaryTargetBrushTransform.position = (Vector3)originalPosition;
 				
 				duplicationOccured = true;
 
@@ -824,27 +824,27 @@ namespace Sabresaurus.SabreCSG
 				Ray currentRay = Camera.current.ScreenPointToRay(EditorHelper.ConvertMousePointPosition(currentPosition));
 
 				float lastRayHit;
-				float currentRayHit;
+                float currentRayHit;
 				if(translationPlane.Raycast(lastRay, out lastRayHit))
 				{
 					if(translationPlane.Raycast(currentRay, out currentRayHit))
 					{
 						// Find the world points where the rays hit the rotation plane
-						Vector3 lastPositionWorld = lastRay.GetPoint(lastRayHit);
-						Vector3 currentPositionWorld = currentRay.GetPoint(currentRayHit);
+						FixVector3 lastPositionWorld = (FixVector3)lastRay.GetPoint(lastRayHit);
+						FixVector3 currentPositionWorld = (FixVector3)currentRay.GetPoint(currentRayHit);
 
-						Vector3 delta = (currentPositionWorld - lastPositionWorld);
+						FixVector3 delta = (currentPositionWorld - lastPositionWorld);
 
-						float snapDistance = CurrentSettings.PositionSnapDistance;
+						Fix64 snapDistance = (Fix64)CurrentSettings.PositionSnapDistance;
 						
-						Vector3 finalDelta;
+						FixVector3 finalDelta;
 						
 						if (CurrentSettings.PositionSnappingEnabled)
 						{
 							delta += translationUnrounded;
 
 							// Round the delta according to the pivot rotation mode
-							Vector3 roundedDelta = TransformDirection(MathHelper.RoundVector3(InverseTransformDirection(delta), snapDistance));
+							FixVector3 roundedDelta = TransformDirection(MathHelper.RoundFixVector3(InverseTransformDirection(delta), snapDistance));
 
 							translationUnrounded = delta - roundedDelta;
 							finalDelta = roundedDelta;
@@ -867,32 +867,32 @@ namespace Sabresaurus.SabreCSG
 			}
 		}
 
-		Vector3 GetRotationAxis()
+		FixVector3 GetRotationAxis()
 		{
-			Vector3 rotationAxis;
+			FixVector3 rotationAxis;
 			
-			if(selectedResizeHandlePair.Value.point1.x == 0)
+			if(selectedResizeHandlePair.Value.point1.x == Fix64.Zero)
 			{
-				rotationAxis = new Vector3(1,0,0);
+				rotationAxis = new FixVector3(1,0,0);
 			}
-			else if(selectedResizeHandlePair.Value.point1.y == 0)
+			else if(selectedResizeHandlePair.Value.point1.y == Fix64.Zero)
 			{
-				rotationAxis = new Vector3(0,1,0);
+				rotationAxis = new FixVector3(0,1,0);
 			}
 			else
 			{
-				rotationAxis = new Vector3(0,0,1);
+				rotationAxis = new FixVector3(0,0,1);
 			}
 			
 			return rotationAxis;
 		}
 
-		Vector3 GetRotationAxisTransformed()
+		FixVector3 GetRotationAxisTransformed()
 		{
 			return TransformDirection(GetRotationAxis());
 		}
 
-		Vector3 GetBrushesPivotPoint()
+		FixVector3 GetBrushesPivotPoint()
 		{
 			if(primaryTargetBrushTransform != null)
 			{
@@ -901,22 +901,22 @@ namespace Sabresaurus.SabreCSG
                     Bounds bounds = GetBounds();
                     if (Tools.pivotRotation == PivotRotation.Global)
                     {
-                        return bounds.center;
+                        return (FixVector3)bounds.center;
                     }
                     else
                     {
-                        return primaryTargetBrushTransform.TransformPoint(bounds.center);
+                        return (FixVector3)primaryTargetBrushTransform.TransformPoint(bounds.center);
                     }
 				}
 				else // Local mode
 				{
 					// Just return the position of the primary selected brush
-					return primaryTargetBrushTransform.position;
+					return (FixVector3)primaryTargetBrushTransform.position;
 				}
 			}
 			else
 			{
-				return Vector3.zero;
+				return FixVector3.zero;
 			}
 		}
 
@@ -924,9 +924,9 @@ namespace Sabresaurus.SabreCSG
 		{
 			Bounds bounds = GetBounds();
 			// Rotation
-			Vector3 rotationAxis = GetRotationAxisTransformed();
+			FixVector3 rotationAxis = GetRotationAxisTransformed();
 			// Brush center point
-			Vector3 centerWorld = TransformPoint(bounds.center);
+			FixVector3 centerWorld = TransformPoint((FixVector3)bounds.center);
 
 			Vector2 lastPosition = e.mousePosition - e.delta;
 			Vector2 currentPosition = e.mousePosition;
@@ -936,7 +936,7 @@ namespace Sabresaurus.SabreCSG
 
 			// Calculate the plane rotation is occuring on (this plane shares the rotation axis normal and is coplanar
 			// with the center point of the brush)
-			Plane plane = new Plane(rotationAxis, centerWorld);
+			Plane plane = new Plane((Vector3)rotationAxis, (Vector3)centerWorld);
 
 			float lastRayHit;
 			float currentRayHit;
@@ -945,32 +945,32 @@ namespace Sabresaurus.SabreCSG
 				if(plane.Raycast(currentRay, out currentRayHit))
 				{
 					// Find the world points where the rays hit the rotation plane
-					Vector3 lastRayWorld = lastRay.GetPoint(lastRayHit);
-					Vector3 currentRayWorld = currentRay.GetPoint(currentRayHit);
+					FixVector3 lastRayWorld = (FixVector3)lastRay.GetPoint(lastRayHit);
+					FixVector3 currentRayWorld = (FixVector3)currentRay.GetPoint(currentRayHit);
 
 					// Find the rotation needed to transform the points on the plane into XY aligned plane
-					Quaternion cancellingRotation = Quaternion.Inverse(Quaternion.LookRotation(rotationAxis));
+					Quaternion cancellingRotation = Quaternion.Inverse(Quaternion.LookRotation((Vector3)rotationAxis));
 
 					// Subtract the brush's center point so the points are relative to the center of the brush
 					currentRayWorld -= centerWorld;
 					lastRayWorld -= centerWorld;
 
 					// Rotate the world points by the cancelling rotation to put them on XY plane
-					currentRayWorld = cancellingRotation * currentRayWorld;
-					lastRayWorld = cancellingRotation * lastRayWorld;
+					currentRayWorld = (FixVector3)(cancellingRotation * (Vector3)currentRayWorld);
+					lastRayWorld = (FixVector3)(cancellingRotation * (Vector3)lastRayWorld);
 
 					// Because the points have been transformed into XY plane, we can just use atan2 to find the angles
-					float angle1 = Mathf.Rad2Deg * Mathf.Atan2(currentRayWorld.x, currentRayWorld.y);
-					float angle2 = Mathf.Rad2Deg * Mathf.Atan2(lastRayWorld.x, lastRayWorld.y);
+					Fix64 angle1 = (Fix64)Mathf.Rad2Deg * Fix64.Atan2(currentRayWorld.x, currentRayWorld.y);
+					Fix64 angle2 = (Fix64)Mathf.Rad2Deg * Fix64.Atan2(lastRayWorld.x, lastRayWorld.y);
 					// Change in angle is simply the new angle minus the last
-					float deltaAngle = angle2 - angle1;
+					Fix64 deltaAngle = angle2 - angle1;
 
 
 					if(CurrentSettings.AngleSnappingEnabled)
 					{
 						deltaAngle += unroundedDeltaAngle;
 
-						float roundedAngle = MathHelper.RoundFloat(deltaAngle, CurrentSettings.AngleSnapDistance);
+						Fix64 roundedAngle = MathHelper.RoundFix64(deltaAngle, (Fix64)CurrentSettings.AngleSnapDistance);
 						unroundedDeltaAngle = deltaAngle - roundedAngle;
 						deltaAngle = roundedAngle;
 					}
@@ -979,9 +979,9 @@ namespace Sabresaurus.SabreCSG
 
 					Undo.RecordObjects(targetBrushTransforms, "Rotate brush(es)");
 
-					for (int i = 0; i < targetBrushTransforms.Length; i++) 
+					for (int i = 0; i < targetBrushTransforms.Length; i++)
 					{
-						targetBrushTransforms[i].RotateAround(centerWorld, rotationAxis, deltaAngle);
+						targetBrushTransforms[i].RotateAround((Vector3)centerWorld, (Vector3)rotationAxis, (float)deltaAngle);
 					}
 
 					for (int brushIndex = 0; brushIndex < targetBrushBases.Length; brushIndex++) 
@@ -1029,10 +1029,10 @@ namespace Sabresaurus.SabreCSG
 					{
 						if(brushes[brushIndex] != null)
 						{
-							Vector3 brushWorldPivot = brushes[brushIndex].transform.position;
-							Vector3 screenPoint = sceneView.camera.WorldToScreenPoint(brushWorldPivot);
+							FixVector3 brushWorldPivot = (FixVector3)brushes[brushIndex].transform.position;
+							FixVector3 screenPoint = (FixVector3)sceneView.camera.WorldToScreenPoint((Vector3)brushWorldPivot);
 
-							if(SabreMouse.MarqueeContainsPoint(marqueeStart, marqueeEnd, screenPoint))
+							if(SabreMouse.MarqueeContainsPoint(marqueeStart, marqueeEnd, (Vector3)screenPoint))
 							{
 								bool brushInsideMarquee = true;
 
@@ -1043,8 +1043,8 @@ namespace Sabresaurus.SabreCSG
 									Vertex[] vertices = transformedPolygons[polygonIndex].Vertices;
 									for (int vertexIndex = 0; vertexIndex < vertices.Length && brushInsideMarquee; vertexIndex++) 
 									{
-										screenPoint = sceneView.camera.WorldToScreenPoint(vertices[vertexIndex].Position);
-										if(!SabreMouse.MarqueeContainsPoint(marqueeStart, marqueeEnd, screenPoint))
+										screenPoint = (FixVector3)sceneView.camera.WorldToScreenPoint((Vector3)vertices[vertexIndex].Position);
+										if(!SabreMouse.MarqueeContainsPoint(marqueeStart, marqueeEnd, (Vector3)screenPoint))
 										{
 											brushInsideMarquee = false;
 										}
@@ -1103,7 +1103,7 @@ namespace Sabresaurus.SabreCSG
         void CancelMove()
 		{
 			moveCancelled = true;
-			primaryTargetBrushTransform.position = originalPosition;
+			primaryTargetBrushTransform.position = (Vector3)originalPosition;
 			SabreMouse.ResetCursor();
 		}
 		
@@ -1142,15 +1142,15 @@ namespace Sabresaurus.SabreCSG
 					SabreCSGResources.GetSelectedBrushMaterial().SetPass(0);
 
 
-					Vector3 extents = bounds.extents;
+					FixVector3 extents = (FixVector3)bounds.extents;
 
 					// If rotation axis is (0,1,0) or (0,1,0), this produces (1,0,1)
-					Vector3 mask = Vector3.one - MathHelper.VectorAbs(GetRotationAxis());
+					FixVector3 mask = FixVector3.one - MathHelper.VectorAbs(GetRotationAxis());
 
 					// Discount any extents in the rotation axis and find the magnitude
-					float largestExtent = extents.Multiply(mask).magnitude;// bounds.GetLargestExtent();
-					Vector3 worldCenter = TransformPoint(bounds.center);
-					SabreGraphics.DrawRotationCircle(worldCenter, GetRotationAxisTransformed(), largestExtent, initialRotationDirection);
+					Fix64 largestExtent = extents.Multiply(mask).magnitude;// bounds.GetLargestExtent();
+					FixVector3 worldCenter = TransformPoint((FixVector3)bounds.center);
+					SabreGraphics.DrawRotationCircle((Vector3)worldCenter, (Vector3)GetRotationAxisTransformed(), (float)largestExtent, (Vector3)initialRotationDirection);
 				}
 				DrawResizeHandles(sceneView, e);
 			}
@@ -1175,11 +1175,11 @@ namespace Sabresaurus.SabreCSG
 					Undo.RecordObject(targetBrushBases[i].transform, "Snap Center");
 					Undo.RecordObject(targetBrushBases[i], "Snap Center");
 
-					Vector3 newPosition = targetBrushBases[i].transform.position;
+					FixVector3 newPosition = (FixVector3)targetBrushBases[i].transform.position;
 
-					float snapDistance = CurrentSettings.PositionSnapDistance;
-					newPosition = MathHelper.RoundVector3(newPosition, snapDistance);
-					targetBrushBases[i].transform.position = newPosition;
+					Fix64 snapDistance = (Fix64)CurrentSettings.PositionSnapDistance;
+					newPosition = MathHelper.RoundFixVector3(newPosition, snapDistance);
+					targetBrushBases[i].transform.position = (Vector3)newPosition;
 					targetBrushBases[i].Invalidate(true);
 				}
 			}
@@ -1211,9 +1211,9 @@ namespace Sabresaurus.SabreCSG
             GUILayout.EndHorizontal();
 		}
 
-		public void RescaleBrush(Vector3 direction, Vector3 translation)
+		public void RescaleBrush(FixVector3 direction, FixVector3 translation)
         {			
-			if(translation == Vector3.zero)
+			if(translation == FixVector3.zero)
 			{
 				return;
 			}
@@ -1226,37 +1226,37 @@ namespace Sabresaurus.SabreCSG
 
             Bounds bounds = GetBounds();
 
-			Vector3 negativeDirection = -1 * direction;
-			Vector3 localPivotPoint = bounds.extents.Multiply(negativeDirection) + bounds.center;
+			FixVector3 negativeDirection = -FixVector3.one * direction;
+			FixVector3 localPivotPoint = ((FixVector3)bounds.extents).Multiply(negativeDirection) + (FixVector3)bounds.center;
 
-			Vector3 size = bounds.size;
+			FixVector3 size = (FixVector3)bounds.size;
 
-            Vector3 scaleFactor = new Vector3(1 + translation.x / size.x, 1 + translation.y / size.y, 1 + translation.z / size.z);
+            FixVector3 scaleFactor = new FixVector3(Fix64.One + translation.x / size.x, Fix64.One + translation.y / size.y, Fix64.One + translation.z / size.z);
 
-			Vector3 newDirection = direction.Multiply(scaleFactor);
+			FixVector3 newDirection = direction.Multiply(scaleFactor);
 
-			Vector3 scaleVector3 = MathHelper.VectorAbs(newDirection);
+			FixVector3 scaleVector3 = MathHelper.VectorAbs(newDirection);
 
-			if (Mathf.Abs(scaleVector3.x) <= 0.01f)
+			if (Fix64.Abs(scaleVector3.x) <= (Fix64)0.01f)
 			{
-				scaleVector3.x = 1;
+				scaleVector3.x = Fix64.One;
 			}
-            if (Mathf.Abs(scaleVector3.y) <= 0.01f)
+            if (Fix64.Abs(scaleVector3.y) <= (Fix64)0.01f)
             {
-				scaleVector3.y = 1;
+				scaleVector3.y = Fix64.One;
 			}
-            if (Mathf.Abs(scaleVector3.z) <= 0.01f)
+            if (Fix64.Abs(scaleVector3.z) <= (Fix64)0.01f)
             {
-				scaleVector3.z = 1;
+				scaleVector3.z = Fix64.One;
 			}
 
-            if(scaleVector3 == Vector3.one)
+            if(scaleVector3 == FixVector3.one)
             {
                 // No scale to apply, so early out
                 return;
             }
 
-            Vector3 primaryPivot = primaryTargetBrushTransform.TransformPoint(bounds.center);
+            FixVector3 primaryPivot = (FixVector3)primaryTargetBrushTransform.TransformPoint(bounds.center);
 
             for (int brushIndex = 0; brushIndex < targetBrushBases.Length; brushIndex++) 
 			{
@@ -1272,11 +1272,11 @@ namespace Sabresaurus.SabreCSG
 		                Polygon polygon = polygons[i];
 
 						polygon.CalculatePlane();
-						Vector3 previousPlaneNormal = polygons[i].Plane.normal;
+						FixVector3 previousPlaneNormal = (FixVector3)polygons[i].Plane.normal;
 
 		                int vertexCount = polygon.Vertices.Length;
 
-		                Vector3[] newPositions = new Vector3[vertexCount];
+		                FixVector3[] newPositions = new FixVector3[vertexCount];
 		                Vector2[] newUV = new Vector2[vertexCount];
 
 		                for (int j = 0; j < vertexCount; j++)
@@ -1289,14 +1289,14 @@ namespace Sabresaurus.SabreCSG
 		                {
 		                    Vertex vertex = polygon.Vertices[j];
 
-		                    Vector3 newPosition = vertex.Position;
+		                    FixVector3 newPosition = vertex.Position;
 
 							// Start transform
-							newPosition = targetBrushes[brushIndex].transform.TransformPoint(newPosition);
+							newPosition = (FixVector3)targetBrushes[brushIndex].transform.TransformPoint((Vector3)newPosition);
 
 							if(Tools.pivotRotation == PivotRotation.Local)
 							{
-								newPosition = primaryTargetBrushTransform.InverseTransformPoint(newPosition);
+								newPosition = (FixVector3)primaryTargetBrushTransform.InverseTransformPoint((Vector3)newPosition);
 							}
 
 							newPosition -= localPivotPoint;
@@ -1308,45 +1308,45 @@ namespace Sabresaurus.SabreCSG
 
 							if(Tools.pivotRotation == PivotRotation.Local)
 							{
-								newPosition = primaryTargetBrushTransform.TransformPoint(newPosition);
+								newPosition = (FixVector3)primaryTargetBrushTransform.TransformPoint((Vector3)newPosition);
 							}
 
-							newPosition = targetBrushes[brushIndex].transform.InverseTransformPoint(newPosition);
+							newPosition = (FixVector3)targetBrushes[brushIndex].transform.InverseTransformPoint((Vector3)newPosition);
 
 		                    newPositions[j] = newPosition;
 
 		                    // Update UVs
-		                    Vector3 p1 = polygon.Vertices[0].Position;
-		                    Vector3 p2 = polygon.Vertices[1].Position;
-		                    Vector3 p3 = polygon.Vertices[2].Position;
+		                    FixVector3 p1 = polygon.Vertices[0].Position;
+		                    FixVector3 p2 = polygon.Vertices[1].Position;
+		                    FixVector3 p3 = polygon.Vertices[2].Position;
 
-		                    UnityEngine.Plane plane = new UnityEngine.Plane(p1, p2, p3);
-		                    Vector3 f = MathHelper.ClosestPointOnPlane(newPosition, plane);
+		                    UnityEngine.Plane plane = new UnityEngine.Plane((Vector3)p1, (Vector3)p2, (Vector3)p3);
+		                    FixVector3 f = MathHelper.ClosestPointOnPlane(newPosition, plane);
 
 		                    Vector2 uv1 = polygon.Vertices[0].UV;
 		                    Vector2 uv2 = polygon.Vertices[1].UV;
 		                    Vector2 uv3 = polygon.Vertices[2].UV;
 
 		                    // calculate vectors from point f to vertices p1, p2 and p3:
-		                    Vector3 f1 = p1 - f;
-		                    Vector3 f2 = p2 - f;
-		                    Vector3 f3 = p3 - f;
+		                    FixVector3 f1 = p1 - f;
+		                    FixVector3 f2 = p2 - f;
+		                    FixVector3 f3 = p3 - f;
 
 		                    // calculate the areas (parameters order is essential in this case):
-		                    Vector3 va = Vector3.Cross(p1 - p2, p1 - p3); // main triangle cross product
-		                    Vector3 va1 = Vector3.Cross(f2, f3); // p1's triangle cross product
-		                    Vector3 va2 = Vector3.Cross(f3, f1); // p2's triangle cross product
-		                    Vector3 va3 = Vector3.Cross(f1, f2); // p3's triangle cross product
+		                    FixVector3 va = FixVector3.Cross(p1 - p2, p1 - p3); // main triangle cross product
+		                    FixVector3 va1 = FixVector3.Cross(f2, f3); // p1's triangle cross product
+		                    FixVector3 va2 = FixVector3.Cross(f3, f1); // p2's triangle cross product
+		                    FixVector3 va3 = FixVector3.Cross(f1, f2); // p3's triangle cross product
 
-		                    float a = va.magnitude; // main triangle area
+		                    Fix64 a = va.magnitude; // main triangle area
 
 		                    // calculate barycentric coordinates with sign:
-		                    float a1 = va1.magnitude / a * Mathf.Sign(Vector3.Dot(va, va1));
-		                    float a2 = va2.magnitude / a * Mathf.Sign(Vector3.Dot(va, va2));
-		                    float a3 = va3.magnitude / a * Mathf.Sign(Vector3.Dot(va, va3));
+		                    Fix64 a1 = va1.magnitude / a * Fix64.FixSign(FixVector3.Dot(va, va1));
+		                    Fix64 a2 = va2.magnitude / a * Fix64.FixSign(FixVector3.Dot(va, va2));
+		                    Fix64 a3 = va3.magnitude / a * Fix64.FixSign(FixVector3.Dot(va, va3));
 
 		                    // find the uv corresponding to point f (uv1/uv2/uv3 are associated to p1/p2/p3):
-		                    Vector2 uv = uv1 * a1 + uv2 * a2 + uv3 * a3;
+		                    Vector2 uv = uv1 * (float)a1 + uv2 * (float)a2 + uv3 * (float)a3;
 
 		                    newUV[j] = uv;
 		                }
@@ -1362,16 +1362,16 @@ namespace Sabresaurus.SabreCSG
 						// Polygon geometry has changed, inform the polygon that it needs to recalculate its cached plane
 						polygons[i].CalculatePlane();
 
-						Vector3 newPlaneNormal = polygons[i].Plane.normal;
+						FixVector3 newPlaneNormal = (FixVector3)polygons[i].Plane.normal;
 
 						// Find the rotation from the original polygon plane to the new polygon plane
-						Quaternion normalRotation = Quaternion.FromToRotation(previousPlaneNormal, newPlaneNormal);
+						Quaternion normalRotation = Quaternion.FromToRotation((Vector3)previousPlaneNormal, (Vector3)newPlaneNormal);
 
 						// Rotate all the vertex normals by the new rotation
-						for (int j = 0; j < vertexCount; j++) 
+						for (int j = 0; j < vertexCount; j++)
 						{
 							Vertex vertex = polygon.Vertices[j];
-							vertex.Normal = normalRotation * vertex.Normal;
+							vertex.Normal = (FixVector3)(normalRotation * (Vector3)vertex.Normal);
 						}
 		            }
 				}
@@ -1379,8 +1379,8 @@ namespace Sabresaurus.SabreCSG
 				{
 					if(Tools.pivotRotation == PivotRotation.Global)
 					{
-						if(targetBrushTransforms[brushIndex].forward.GetSetAxisCount() != 1
-							|| targetBrushTransforms[brushIndex].up.GetSetAxisCount() != 1)
+						if(((FixVector3)targetBrushTransforms[brushIndex].forward).GetSetAxisCount() != 1
+							|| ((FixVector3)targetBrushTransforms[brushIndex].up).GetSetAxisCount() != 1)
 						{
 							// Skip any brushes that are not axis aligned
 							continue;
@@ -1396,12 +1396,12 @@ namespace Sabresaurus.SabreCSG
 
 						for (int i = 0; i < 3; i++) 
 						{
-							if(!direction[i].EqualsWithEpsilon(0))
+							if(!direction[i].EqualsWithEpsilon(Fix64.Zero))
 							{
 								if(found == 0)
 								{
 									globalAxis1 = i;
-									if(direction[i] < 0)
+									if(direction[i] < Fix64.Zero)
 									{
 										flipped1 = true;
 									}
@@ -1409,7 +1409,7 @@ namespace Sabresaurus.SabreCSG
 								else if(found == 1)
 								{
 									globalAxis2 = i;
-									if(direction[i] < 0)
+									if(direction[i] < Fix64.Zero)
 									{
 										flipped2 = true;
 									}
@@ -1442,13 +1442,13 @@ namespace Sabresaurus.SabreCSG
 								flippedSign = flipped2 ? -1 : 1;
 							}
 
-							Vector3 globalTempDirection = Vector3.zero.SetAxis(globalAxis, 1);
-							Vector3 transformedDirection = targetBrushTransforms[brushIndex].TransformDirection(globalTempDirection);
+							FixVector3 globalTempDirection = FixVector3.zero.SetAxis(globalAxis, Fix64.One);
+							FixVector3 transformedDirection = (FixVector3)targetBrushTransforms[brushIndex].TransformDirection((Vector3)globalTempDirection);
 
 							int localAxis = 0;
 							for (int i = 0; i < 3; i++) 
 							{
-								if(!transformedDirection[i].EqualsWithEpsilon(0))
+								if(!transformedDirection[i].EqualsWithEpsilon(Fix64.Zero))
 								{
 									localAxis = i;
 									break;
@@ -1457,7 +1457,7 @@ namespace Sabresaurus.SabreCSG
 
 							Bounds newBounds = targetBrushBases[brushIndex].GetBounds();
 
-							float offset = 0.5f * translation[globalAxis] * (newBounds.extents[localAxis] / bounds.extents[globalAxis]);
+							Fix64 offset = (Fix64)0.5f * translation[globalAxis] * ((Fix64)newBounds.extents[localAxis] / (Fix64)bounds.extents[globalAxis]);
 							if(flipped)
 							{
 								offset = -offset;
@@ -1465,27 +1465,27 @@ namespace Sabresaurus.SabreCSG
 
 
 
-							Vector3 globalPivot = bounds.center;
-							Vector3 globalPivotOffset = Vector3.zero.SetAxis(globalAxis, -flippedSign * bounds.extents[globalAxis]);
+							FixVector3 globalPivot = (FixVector3)bounds.center;
+							FixVector3 globalPivotOffset = FixVector3.zero.SetAxis(globalAxis, -(Fix64)flippedSign * (Fix64)bounds.extents[globalAxis]);
 							globalPivot += globalPivotOffset;
 							//						VisualDebug.AddPoint(globalPivot, Color.red);
 
-							Vector3 localPivot = newBounds.center + targetBrushTransforms[brushIndex].position;
-							Vector3 localPivotOffset = Vector3.zero.SetAxis(globalAxis, -flippedSign * newBounds.extents[localAxis]);
+							FixVector3 localPivot = (FixVector3)newBounds.center + (FixVector3)targetBrushTransforms[brushIndex].position;
+							FixVector3 localPivotOffset = FixVector3.zero.SetAxis(globalAxis, -(Fix64)flippedSign * (Fix64)newBounds.extents[localAxis]);
 							localPivot += localPivotOffset;
 							//						VisualDebug.AddPoint(localPivot);
 
-							offset += 0.5f * translation[globalAxis] * (localPivot[globalAxis] - globalPivot[globalAxis]) / bounds.extents[globalAxis];
+							offset += (Fix64)0.5f * translation[globalAxis] * (localPivot[globalAxis] - globalPivot[globalAxis]) / (Fix64)bounds.extents[globalAxis];
 
 
 
-							Vector3 offset3 = Vector3.zero.SetAxis(globalAxis, offset);
-							targetBrushTransforms[brushIndex].position += offset3;
+							FixVector3 offset3 = FixVector3.zero.SetAxis(globalAxis, offset);
+							targetBrushTransforms[brushIndex].position += (Vector3)offset3;
 
 							// Apply new bounds size
-							Vector3 extents = newBounds.extents;
+							FixVector3 extents = (FixVector3)newBounds.extents;
 							extents[localAxis] *= scaleVector3[globalAxis];
-							newBounds.extents = extents;
+							newBounds.extents = (Vector3)extents;
 
 							targetBrushBases[brushIndex].SetBounds(newBounds);
 						}
@@ -1507,12 +1507,12 @@ namespace Sabresaurus.SabreCSG
 
                         for (int i = 0; i < 3; i++)
                         {
-                            if (!direction[i].EqualsWithEpsilon(0))
+                            if (!direction[i].EqualsWithEpsilon(Fix64.Zero))
                             {
                                 if (found == 0)
                                 {
                                     primaryAxis1 = i;
-                                    if (direction[i] < 0)
+                                    if (direction[i] < Fix64.Zero)
                                     {
                                         flipped1 = true;
                                     }
@@ -1520,7 +1520,7 @@ namespace Sabresaurus.SabreCSG
                                 else if (found == 1)
                                 {
                                     primaryAxis2 = i;
-                                    if (direction[i] < 0)
+                                    if (direction[i] < Fix64.Zero)
                                     {
                                         flipped2 = true;
                                     }
@@ -1544,14 +1544,14 @@ namespace Sabresaurus.SabreCSG
                         else
                         {
                             // Determine local axis
-                            Vector3 primaryAxis1World = primaryTargetBrushTransform.TransformDirection(Vector3.zero.SetAxis(primaryAxis1, 1));
-                            Vector3 primaryAxis1Local = targetBrushTransforms[brushIndex].InverseTransformDirection(primaryAxis1World);
+                            FixVector3 primaryAxis1World = (FixVector3)primaryTargetBrushTransform.TransformDirection((Vector3)FixVector3.zero.SetAxis(primaryAxis1, Fix64.One));
+                            FixVector3 primaryAxis1Local = (FixVector3)targetBrushTransforms[brushIndex].InverseTransformDirection((Vector3)primaryAxis1World);
 
                             for (int i = 0; i < 3; i++)
                             {
-                                if(!primaryAxis1Local[i].EqualsWithEpsilon(0))
+                                if(!primaryAxis1Local[i].EqualsWithEpsilon(Fix64.Zero))
                                 {
-                                    if(primaryAxis1Local[i] < 0)
+                                    if(primaryAxis1Local[i] < Fix64.Zero)
                                     {
                                         flippedB1 = true;
                                     }
@@ -1562,14 +1562,14 @@ namespace Sabresaurus.SabreCSG
 
                             if(found > 1)
                             {
-                                Vector3 primaryAxis2World = primaryTargetBrushTransform.TransformDirection(Vector3.zero.SetAxis(primaryAxis2, 1));
-                                Vector3 primaryAxis2Local = targetBrushTransforms[brushIndex].InverseTransformDirection(primaryAxis2World);
+                                FixVector3 primaryAxis2World = (FixVector3)primaryTargetBrushTransform.TransformDirection((Vector3)FixVector3.zero.SetAxis(primaryAxis2, Fix64.One));
+                                FixVector3 primaryAxis2Local = (FixVector3)targetBrushTransforms[brushIndex].InverseTransformDirection((Vector3)primaryAxis2World);
 
                                 for (int i = 0; i < 3; i++)
                                 {
-                                    if (!primaryAxis2Local[i].EqualsWithEpsilon(0))
+                                    if (!primaryAxis2Local[i].EqualsWithEpsilon(Fix64.Zero))
                                     {
-                                        if (primaryAxis1Local[i] < 0)
+                                        if (primaryAxis1Local[i] < Fix64.Zero)
                                         {
                                             flippedB2 = true;
                                         }
@@ -1608,28 +1608,28 @@ namespace Sabresaurus.SabreCSG
                             Bounds newBounds = targetBrushBases[brushIndex].GetBounds();
 
                             // Offset from resizing
-                            Vector3 translationInAxis = Vector3.zero.SetAxis(primaryAxis, translation[primaryAxis]);
-                            Vector3 worldOffset = primaryTargetBrushTransform.TransformDirection(translationInAxis);
-                            float sizeInBounds = newBounds.extents[localAxis] / bounds.extents[primaryAxis];
+                            FixVector3 translationInAxis = FixVector3.zero.SetAxis(primaryAxis, translation[primaryAxis]);
+                            FixVector3 worldOffset = (FixVector3)primaryTargetBrushTransform.TransformDirection((Vector3)translationInAxis);
+                            Fix64 sizeInBounds = (Fix64)newBounds.extents[localAxis] / (Fix64)bounds.extents[primaryAxis];
                             //Debug.Log(sizeInBounds);
 
-                            Vector3 positionOffset;
+                            FixVector3 positionOffset;
                             if(flipped)
                             {
-                                positionOffset = -sizeInBounds * 0.5f * worldOffset;
+                                positionOffset = -sizeInBounds * (Fix64)0.5f * worldOffset;
                             }
                             else
                             {
-                                positionOffset = sizeInBounds * 0.5f * worldOffset;
+                                positionOffset = sizeInBounds * (Fix64)0.5f * worldOffset;
                             }
                             
 
                             // Second offset
-                            Vector3 primaryPivotCopy = primaryPivot;
+                            FixVector3 primaryPivotCopy = primaryPivot;
                             //VisualDebug.AddPoint(primaryPivotCopy, Color.white, 0.1f);
 
-                            Vector3 primaryPivotOffset = Vector3.zero.SetAxis(primaryAxis, bounds.extents[primaryAxis]);
-                            primaryPivotOffset = primaryTargetBrushTransform.TransformDirection(primaryPivotOffset);
+                            FixVector3 primaryPivotOffset = FixVector3.zero.SetAxis(primaryAxis, (Fix64)bounds.extents[primaryAxis]);
+                            primaryPivotOffset = (FixVector3)primaryTargetBrushTransform.TransformDirection((Vector3)primaryPivotOffset);
                             if (flipped)
                             {
                                 primaryPivotCopy += primaryPivotOffset;
@@ -1644,13 +1644,13 @@ namespace Sabresaurus.SabreCSG
 
 
 
-                            Vector3 localPivot = targetBrushTransforms[brushIndex].TransformPoint(newBounds.center);
+                            FixVector3 localPivot = (FixVector3)targetBrushTransforms[brushIndex].TransformPoint(newBounds.center);
 
                             //VisualDebug.AddPoint(localPivot, Color.yellow, 0.1f);
 
 
-                            Vector3 localPivotOffset = Vector3.zero.SetAxis(localAxis, newBounds.extents[localAxis]);
-                            localPivotOffset = targetBrushTransforms[brushIndex].TransformDirection(localPivotOffset);
+                            FixVector3 localPivotOffset = FixVector3.zero.SetAxis(localAxis, (Fix64)newBounds.extents[localAxis]);
+                            localPivotOffset = (FixVector3)targetBrushTransforms[brushIndex].TransformDirection((Vector3)localPivotOffset);
                             if (flipped ^ flippedB)
                             {
                                 localPivot += localPivotOffset;
@@ -1664,21 +1664,21 @@ namespace Sabresaurus.SabreCSG
 
                             if(!localPivot.EqualsWithEpsilonLower(primaryPivotCopy))
                             {
-                                Vector3 directionInAxis = Vector3.zero.SetAxis(primaryAxis, direction[primaryAxis]);
-                                Vector3 worldDirection = primaryTargetBrushTransform.TransformDirection(directionInAxis);
-                                Vector3 worldPositionOffset = scaleVector3[primaryAxis] * (localPivot - primaryPivotCopy) - (localPivot - primaryPivotCopy);
-                                worldPositionOffset = worldDirection * Vector3.Dot(worldDirection, worldPositionOffset);
+                                FixVector3 directionInAxis = FixVector3.zero.SetAxis(primaryAxis, direction[primaryAxis]);
+                                FixVector3 worldDirection = (FixVector3)primaryTargetBrushTransform.TransformDirection((Vector3)directionInAxis);
+                                FixVector3 worldPositionOffset = scaleVector3[primaryAxis] * (localPivot - primaryPivotCopy) - (localPivot - primaryPivotCopy);
+                                worldPositionOffset = worldDirection * FixVector3.Dot(worldDirection, worldPositionOffset);
                                 positionOffset += worldPositionOffset;
 
                             }
 
                             // Apply the position offsets after they've been calculated
-                            targetBrushTransforms[brushIndex].position += positionOffset;
+                            targetBrushTransforms[brushIndex].position += (Vector3)positionOffset;
 
                             // Apply new bounds size
-                            Vector3 extents = newBounds.extents;
+                            FixVector3 extents = (FixVector3)newBounds.extents;
                             extents[localAxis] *= scaleVector3[primaryAxis];
-                            newBounds.extents = extents;
+                            newBounds.extents = (Vector3)extents;
 
                             targetBrushBases[brushIndex].SetBounds(newBounds);
                         }
@@ -1697,8 +1697,8 @@ namespace Sabresaurus.SabreCSG
 			{
 				if(targetBrushes[brushIndex] == null) // CompoundBrush
 				{
-                    Vector3 forward = targetBrushTransforms[brushIndex].forward;
-                    Vector3 up = targetBrushTransforms[brushIndex].up;
+                    FixVector3 forward = (FixVector3)targetBrushTransforms[brushIndex].forward;
+                    FixVector3 up = (FixVector3)targetBrushTransforms[brushIndex].up;
                     
                     // Transform to local to the primary brush if necessary (local pivot mode)
                     forward = InverseTransformDirection(forward);
@@ -1731,13 +1731,13 @@ namespace Sabresaurus.SabreCSG
             GL.Begin(GL.QUADS);
 
             bool isAxisAlignedCamera = (EditorHelper.GetSceneViewCamera(sceneView) != EditorHelper.SceneViewCamera.Other);
-            Vector3 cameraDirection = sceneViewCamera.transform.forward;
+            FixVector3 cameraDirection = (FixVector3)sceneViewCamera.transform.forward;
 
             // Draw all the handles
             for (int i = 0; i < resizeHandlePairs.Length; i++)
             {
                 // Skip any that shouldn't be seen from this camera angle (axis aligned only)
-                if (isAxisAlignedCamera && Mathf.Abs(Vector3.Dot(TransformDirection(resizeHandlePairs[i].point1), cameraDirection)) > 0.001f)
+                if (isAxisAlignedCamera && Fix64.Abs(FixVector3.Dot(TransformDirection(resizeHandlePairs[i].point1), cameraDirection)) > (Fix64)0.001f)
                 {
                     continue;
                 }
@@ -1776,13 +1776,13 @@ namespace Sabresaurus.SabreCSG
 				// If this point faces away from the camera, then it should reduce the alpha
 				color.a = 0.5f;
 				
-				Vector3 direction;
-				Vector3 target;
+				FixVector3 direction;
+				FixVector3 target;
 
 				direction = TransformDirection(resizeHandlePairs[i].point1);
 
 				int handleSize = 8;	
-				if(isAxisAlignedCamera || Vector3.Dot(sceneViewCamera.transform.forward, direction) < 0)
+				if(isAxisAlignedCamera || FixVector3.Dot((FixVector3)sceneViewCamera.transform.forward, direction) < Fix64.Zero)
 				{
 					color.a = 1f;
 					handleSize = 8;
@@ -1794,18 +1794,18 @@ namespace Sabresaurus.SabreCSG
 				}
 				GL.Color(color);
 
-				target = sceneViewCamera.WorldToScreenPoint(TransformPoint(bounds.center + resizeHandlePairs[i].point1.Multiply(bounds.extents)));
+				target = (FixVector3)sceneViewCamera.WorldToScreenPoint((Vector3)TransformPoint((FixVector3)bounds.center + resizeHandlePairs[i].point1.Multiply((FixVector3)bounds.extents)));
 
-				if (target.z > 0)
+				if (target.z > Fix64.Zero)
                 {
                     // Make it pixel perfect
-                    target = MathHelper.RoundVector3(target);
-					SabreGraphics.DrawBillboardQuad(target, handleSize, handleSize);
+                    target = MathHelper.RoundFixVector3(target);
+					SabreGraphics.DrawBillboardQuad((Vector3)target, handleSize, handleSize);
 				}
 
 				direction = TransformDirection(resizeHandlePairs[i].point2);
 
-				if(isAxisAlignedCamera || Vector3.Dot(sceneViewCamera.transform.forward, direction) < 0)
+				if(isAxisAlignedCamera || FixVector3.Dot((FixVector3)sceneViewCamera.transform.forward, direction) < Fix64.Zero)
 				{
 					color.a = 1f;
 					handleSize = 8;
@@ -1817,13 +1817,13 @@ namespace Sabresaurus.SabreCSG
 				}
 				GL.Color(color);
 
-				target = sceneViewCamera.WorldToScreenPoint(TransformPoint(bounds.center + resizeHandlePairs[i].point2.Multiply(bounds.extents)));
+				target = (FixVector3)sceneViewCamera.WorldToScreenPoint((Vector3)TransformPoint((FixVector3)bounds.center + resizeHandlePairs[i].point2.Multiply((FixVector3)bounds.extents)));
 
-                if (target.z > 0)
+                if (target.z > Fix64.Zero)
                 {
                     // Make it pixel perfect
-                    target = MathHelper.RoundVector3(target);
-					SabreGraphics.DrawBillboardQuad(target, handleSize, handleSize);
+                    target = MathHelper.RoundFixVector3(target);
+					SabreGraphics.DrawBillboardQuad((Vector3)target, handleSize, handleSize);
 				}
 			}
 
@@ -1839,9 +1839,9 @@ namespace Sabresaurus.SabreCSG
                 GL.Begin(GL.LINES);
                 GL.Color(Color.green);
 
-                Vector3 screenPosition1 = sceneViewCamera.WorldToScreenPoint(TransformPoint(bounds.center + selectedResizeHandlePair.Value.point1.Multiply(bounds.extents)));
-                Vector3 screenPosition2 = sceneViewCamera.WorldToScreenPoint(TransformPoint(bounds.center + selectedResizeHandlePair.Value.point2.Multiply(bounds.extents)));
-				SabreGraphics.DrawScreenLine(screenPosition1, screenPosition2);
+                FixVector3 screenPosition1 = (FixVector3)sceneViewCamera.WorldToScreenPoint((Vector3)TransformPoint((FixVector3)bounds.center + selectedResizeHandlePair.Value.point1.Multiply((FixVector3)bounds.extents)));
+                FixVector3 screenPosition2 = (FixVector3)sceneViewCamera.WorldToScreenPoint((Vector3)TransformPoint((FixVector3)bounds.center + selectedResizeHandlePair.Value.point2.Multiply((FixVector3)bounds.extents)));
+				SabreGraphics.DrawScreenLine((Vector3)screenPosition1, (Vector3)screenPosition2);
 
                 GL.End();
 
@@ -1849,23 +1849,25 @@ namespace Sabresaurus.SabreCSG
                 GL.Begin(GL.QUADS);
                 GL.Color(Color.green);
 
-                Vector3 target;
+                FixVector3 target;
                 int size = (selectedResizePointIndex == 0) ? 8 : 6;
                 target = screenPosition1;
                 // Make it pixel perfect
-                target = MathHelper.RoundVector3(target);
-                SabreGraphics.DrawBillboardQuad(target, size, size);
+                target = MathHelper.RoundFixVector3(target);
+                SabreGraphics.DrawBillboardQuad((Vector3)target, size, size);
 
 
                 size = (selectedResizePointIndex == 1) ? 8 : 6;
                 target = screenPosition2;
                 // Make it pixel perfect
-                target = MathHelper.RoundVector3(target);
-                SabreGraphics.DrawBillboardQuad(target, size, size);
+                target = MathHelper.RoundFixVector3(target);
+                SabreGraphics.DrawBillboardQuad((Vector3)target, size, size);
                
                 GL.End();
 
-                screenPosition = Vector3.Lerp(screenPosition1, screenPosition2, 0.5f);
+                FixVector3 sp = FixVector3.Lerp(screenPosition1, screenPosition2, (Fix64)0.5f);
+                screenPosition.x = (float)sp.x;
+                screenPosition.y = (float)sp.y;
             }
             else if (hoveredResizeHandlePair.HasValue)
             {
@@ -1878,9 +1880,9 @@ namespace Sabresaurus.SabreCSG
                 color.a = 0.5f;
                 GL.Color(color);
 
-                Vector3 screenPosition1 = sceneViewCamera.WorldToScreenPoint(TransformPoint(bounds.center + hoveredResizeHandlePair.Value.point1.Multiply(bounds.extents)));
-                Vector3 screenPosition2 = sceneViewCamera.WorldToScreenPoint(TransformPoint(bounds.center + hoveredResizeHandlePair.Value.point2.Multiply(bounds.extents)));
-                SabreGraphics.DrawScreenLineDashed(screenPosition1, screenPosition2);
+                FixVector3 screenPosition1 = (FixVector3)sceneViewCamera.WorldToScreenPoint((Vector3)TransformPoint((FixVector3)bounds.center + hoveredResizeHandlePair.Value.point1.Multiply((FixVector3)bounds.extents)));
+                FixVector3 screenPosition2 = (FixVector3)sceneViewCamera.WorldToScreenPoint((Vector3)TransformPoint((FixVector3)bounds.center + hoveredResizeHandlePair.Value.point2.Multiply((FixVector3)bounds.extents)));
+                SabreGraphics.DrawScreenLineDashed((Vector3)screenPosition1, (Vector3)screenPosition2);
 
                 GL.End();
 
@@ -1899,23 +1901,25 @@ namespace Sabresaurus.SabreCSG
                 color = Color.Lerp(color, Color.green, 0.7f);
                 GL.Color(color);
 
-                Vector3 target;
+                FixVector3 target;
                 int size = (hoveredResizePointIndex == 0) ? 8 : 6;
                 target = screenPosition1;
                 // Make it pixel perfect
-                target = MathHelper.RoundVector3(target);
-                SabreGraphics.DrawBillboardQuad(target, size, size);
+                target = MathHelper.RoundFixVector3(target);
+                SabreGraphics.DrawBillboardQuad((Vector3)target, size, size);
 
 
                 size = (hoveredResizePointIndex == 1) ? 8 : 6;
                 target = screenPosition2;
                 // Make it pixel perfect
-                target = MathHelper.RoundVector3(target);
-                SabreGraphics.DrawBillboardQuad(target, size, size);
+                target = MathHelper.RoundFixVector3(target);
+                SabreGraphics.DrawBillboardQuad((Vector3)target, size, size);
 
                 GL.End();
 
-                screenPosition = Vector3.Lerp(screenPosition1, screenPosition2, 0.5f);
+                FixVector3 sp = FixVector3.Lerp(screenPosition1, screenPosition2, (Fix64)0.5f);
+                screenPosition.x = (float)sp.x;
+                screenPosition.y = (float)sp.y;
             }
 
             GL.PopMatrix();
@@ -1942,7 +1946,7 @@ namespace Sabresaurus.SabreCSG
 				{
                     messageToMeasure = "";
                     
-                    Vector3 resizeDirection = selectedResizeHandlePair.Value.point1;
+                    FixVector3 resizeDirection = selectedResizeHandlePair.Value.point1;
                     message = "";
                     // Construct the rich text message, tagging axes that are being edited as bold
                     for (int i = 0; i < 3; i++)
@@ -1953,13 +1957,13 @@ namespace Sabresaurus.SabreCSG
                             messageToMeasure += "\n";
                         }
 
-                        float sizeComponent = bounds.size[i];
-                        sizeComponent = MathHelper.RoundFloat(sizeComponent, 0.0001f);
-                        string formattedComponent = sizeComponent.ToString(CultureInfo.InvariantCulture);
+                        Fix64 sizeComponent = (Fix64)bounds.size[i];
+                        sizeComponent = MathHelper.RoundFix64(sizeComponent, (Fix64)0.0001f);
+                        string formattedComponent = ((float)sizeComponent).ToString(CultureInfo.InvariantCulture);
 
                         messageToMeasure += formattedComponent;
 
-                        if (resizeDirection[i] != 0)
+                        if (resizeDirection[i] != Fix64.Zero)
                         {
                             message += "<b>" + formattedComponent + "</b>";
                         }
@@ -1979,32 +1983,32 @@ namespace Sabresaurus.SabreCSG
                 screenPosition = EditorHelper.ConvertMousePixelPosition(screenPosition, true);
 
                 Vector2 calculatedSize = style.CalcSize(new GUIContent(messageToMeasure));
-                float width = calculatedSize.x + 30;
-                float height = calculatedSize.y;
+                Fix64 width = (Fix64)calculatedSize.x + (Fix64)30;
+                Fix64 height = (Fix64)calculatedSize.y;
 
                 // Make the message centered around the position
                 if (currentMode != ActiveMode.Rotate)
                 {
-                    screenPosition -= new Vector2(Mathf.Round(width / 2), Mathf.Round(height / 2) - 24);
+                    screenPosition -= new Vector2(Mathf.Round((float)width / 2), Mathf.Round((float)height / 2) - 24);
                 }
                 else
                 {
-                    screenPosition -= new Vector2(Mathf.Round(width / 2), Mathf.Round(height / 2) - 16);
+                    screenPosition -= new Vector2(Mathf.Round((float)width / 2), Mathf.Round((float)height / 2) - 16);
                 }
-                Rect rect = new Rect(screenPosition.x, screenPosition.y, width, height);
+                Rect rect = new Rect(screenPosition.x, screenPosition.y, (float)width, (float)height);
                 // Draw the message
                 GUILayout.Window(140008, rect, OnMessageWindow, "", style);
             }
         }
 
-		void TranslateBrushes(Vector3 worldDelta)
+		void TranslateBrushes(FixVector3 worldDelta)
 		{
 			List<Transform> rootTransforms = TransformHelper.GetRootSelectionOnly(targetBrushTransforms);
 			Undo.RecordObjects(rootTransforms.ToArray(), "Move brush(es)");
 
 			for (int i = 0; i < rootTransforms.Count; i++) 
 			{
-				targetBrushTransforms[i].position += worldDelta;
+				targetBrushTransforms[i].position += (Vector3)worldDelta;
 			}
 
 			for (int brushIndex = 0; brushIndex < targetBrushBases.Length; brushIndex++) 
@@ -2015,7 +2019,7 @@ namespace Sabresaurus.SabreCSG
 			}
 		}
 
-		void RotateBrushes(Quaternion rotationDelta, Vector3 sourceWorldPosition)
+		void RotateBrushes(Quaternion rotationDelta, FixVector3 sourceWorldPosition)
 		{
 			List<Transform> rootTransforms = TransformHelper.GetRootSelectionOnly(targetBrushTransforms);
 			Undo.RecordObjects(rootTransforms.ToArray(), "Rotate brush(es)");
@@ -2024,9 +2028,9 @@ namespace Sabresaurus.SabreCSG
 			{
 				targetBrushTransforms[i].rotation = rotationDelta * rootTransforms[i].rotation;
 
-				Vector3 localPosition = rootTransforms[i].position - sourceWorldPosition;
-				localPosition = rotationDelta * localPosition;
-				targetBrushTransforms[i].position = localPosition + sourceWorldPosition;
+				FixVector3 localPosition = (FixVector3)rootTransforms[i].position - sourceWorldPosition;
+				localPosition = (FixVector3)(rotationDelta * (Vector3)localPosition);
+				targetBrushTransforms[i].position = (Vector3)localPosition + (Vector3)sourceWorldPosition;
 			}	
 
 			for (int brushIndex = 0; brushIndex < targetBrushes.Length; brushIndex++) 
@@ -2090,7 +2094,7 @@ namespace Sabresaurus.SabreCSG
 
 			if(primaryTargetBrushTransform != null)
 			{
-				startPosition = primaryTargetBrushTransform.position;
+				startPosition = (FixVector3)primaryTargetBrushTransform.position;
 			}
 		}
 

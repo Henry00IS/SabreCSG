@@ -12,8 +12,8 @@ namespace Sabresaurus.SabreCSG
 		Polygon activePolygon = null; // The polygon currently overriding the grid plane
 		PrimitiveBrush activeBrush = null; // The polygon currently overriding the grid plane
 
-		Vector3 downPoint; // The 3D point the mouse was over at the start of the mouse click
-		Vector3 hoverPoint; // The 3D point the mouse is hovering over
+		FixVector3 downPoint; // The 3D point the mouse was over at the start of the mouse click
+        FixVector3 hoverPoint; // The 3D point the mouse is hovering over
 
 		// Whether a drawing operation is taking place and what it is
 		enum DrawMode 
@@ -29,12 +29,12 @@ namespace Sabresaurus.SabreCSG
 		CSGMode csgMode = CSGMode.Add; // What sort of brush is currently being created
 
 		bool selectingHeight = false; // In 3D views after drawing the prism base the height maps to the mouse
-		float prismHeight = 0; // The height (or depth) of the prism being created
+		Fix64 prismHeight = (Fix64)0; // The height (or depth) of the prism being created
 
-		float unroundedPrismHeight = 0; // Used to preserve height changes that have been snapped
+        Fix64 unroundedPrismHeight = (Fix64)0; // Used to preserve height changes that have been snapped
 
 		// The 3D points that they have clicked, in rectangle mode this is just the start and end point
-		List<Vector3> hitPoints = new List<Vector3>();
+		List<FixVector3> hitPoints = new List<FixVector3>();
 
 		bool startedSubtract = false;
 		bool ignoreNextMouseUp = false; // Double clicks occur in the down event, so we need to then ignore next mouse up
@@ -62,8 +62,8 @@ namespace Sabresaurus.SabreCSG
 			hitPoints.Clear();
 			activePolygon = null;
 			selectingHeight = false;
-			prismHeight = 0;
-            unroundedPrismHeight = 0;
+			prismHeight = (Fix64)0;
+            unroundedPrismHeight = (Fix64)0;
         }
 
         public override void OnSceneGUI(SceneView sceneView, Event e)
@@ -163,7 +163,7 @@ namespace Sabresaurus.SabreCSG
 			}
 		}
 
-        bool IsPrismBaseValid(List<Vector3> points)
+        bool IsPrismBaseValid(List<FixVector3> points)
         {
             Vector2 hitPointsSize = CalculateHitPointsSize(points);
             
@@ -177,57 +177,57 @@ namespace Sabresaurus.SabreCSG
             }
         }
 
-        Vector2 CalculateHitPointsSize(List<Vector3> points)
+        Vector2 CalculateHitPointsSize(List<FixVector3> points)
         {
-            Vector3 normal = GetActivePlane().normal;
-            Vector3 tangent = Vector3.zero;
+            FixVector3 normal = (FixVector3)GetActivePlane().normal;
+            FixVector3 tangent = FixVector3.zero;
 
             for (int i = 0; i < points.Count; i++)
             {
-                Vector3 delta = points[(i + 1) % points.Count] - points[i];
-                if(delta.magnitude > 0.01f)
+                FixVector3 delta = points[(i + 1) % points.Count] - points[i];
+                if(delta.magnitude > (Fix64)0.01f)
                 {
                     tangent = delta.normalized;
                     break;
                 }
             }
 
-            if(tangent == Vector3.zero)
+            if(tangent == FixVector3.zero)
             {
-                if (Vector3.Dot(normal.Abs(), Vector3.up) > 0.9f)
+                if (FixVector3.Dot(normal.Abs(), FixVector3.up) > (Fix64)0.9f)
                 {
-                    tangent = Vector3.Cross(normal, Vector3.forward).normalized;
+                    tangent = FixVector3.Cross(normal, FixVector3.forward).normalized;
                 }
                 else
                 {
-                    tangent = Vector3.Cross(normal, Vector3.up).normalized;
+                    tangent = FixVector3.Cross(normal, FixVector3.up).normalized;
                 }
             }
 
-            Vector3 binormal = Vector3.Cross(normal, tangent);
+            FixVector3 binormal = FixVector3.Cross(normal, tangent);
 
-            float minX = Vector3.Dot(tangent, points[0]);
-            float maxX = minX;
+            Fix64 minX = FixVector3.Dot(tangent, points[0]);
+            Fix64 maxX = minX;
 
-            float minY = Vector3.Dot(binormal, points[0]);
-            float maxY = minY;
+            Fix64 minY = FixVector3.Dot(binormal, points[0]);
+            Fix64 maxY = minY;
 
             for (int i = 1; i < points.Count; i++)
             {
-                float testX = Vector3.Dot(tangent, points[i]);
-                float testY = Vector3.Dot(binormal, points[i]);
+                Fix64 testX = FixVector3.Dot(tangent, points[i]);
+                Fix64 testY = FixVector3.Dot(binormal, points[i]);
 
-                minX = Mathf.Min(minX, testX);
-                maxX = Mathf.Max(maxX, testX);
+                minX = Fix64.Min(minX, testX);
+                maxX = Fix64.Max(maxX, testX);
 
-                minY = Mathf.Min(minY, testY);
-                maxY = Mathf.Max(maxY, testY);
+                minY = Fix64.Min(minY, testY);
+                maxY = Fix64.Max(maxY, testY);
             }
 
-            return new Vector2(maxX - minX, maxY - minY);
+            return new Vector2((float)(maxX - minX), (float)(maxY - minY));
         }
 
-		Vector3? GetHitPoint(Vector2 currentPosition)
+		FixVector3? GetHitPoint(Vector2 currentPosition)
 		{
 			// Conver the mouse position into a ray to intersect with a plane in the world
 			Ray currentRay = Camera.current.ScreenPointToRay(EditorHelper.ConvertMousePointPosition(currentPosition));
@@ -239,7 +239,7 @@ namespace Sabresaurus.SabreCSG
 			float distance;
 			if(plane.Raycast(currentRay, out distance))
 			{
-				Vector3 hitPoint = currentRay.GetPoint(distance);
+				FixVector3 hitPoint = (FixVector3)currentRay.GetPoint(distance);
 
 				if(CurrentSettings.PositionSnappingEnabled)
 				{
@@ -251,16 +251,16 @@ namespace Sabresaurus.SabreCSG
                         Quaternion cancellingRotation = Quaternion.Inverse(Quaternion.LookRotation(plane.normal));
                         Quaternion restoringRotation = Quaternion.LookRotation(plane.normal);
                         hitPoint -= activePolygon.GetCenterPoint();
-                        Vector3 localHitPoint = cancellingRotation * hitPoint;
+                        FixVector3 localHitPoint = (FixVector3)(cancellingRotation * (Vector3)hitPoint);
                         // Round in local space
-                        localHitPoint = MathHelper.RoundVector3(localHitPoint, CurrentSettings.PositionSnapDistance);
+                        localHitPoint = MathHelper.RoundFixVector3(localHitPoint, (Fix64)CurrentSettings.PositionSnapDistance);
                         // Convert back to correct space
-                        hitPoint = restoringRotation * localHitPoint;
+                        hitPoint = (FixVector3)(restoringRotation * (Vector3)localHitPoint);
                         hitPoint += activePolygon.GetCenterPoint();
                     }
                     else
                     {
-					    hitPoint = MathHelper.RoundVector3(hitPoint, CurrentSettings.PositionSnapDistance);
+					    hitPoint = MathHelper.RoundFixVector3(hitPoint, (Fix64)CurrentSettings.PositionSnapDistance);
                     }
 				}
 				return hitPoint;
@@ -296,7 +296,7 @@ namespace Sabresaurus.SabreCSG
 					if(Is3DView && !startedSubtract)
 					{
 						selectingHeight = true;
-						prismHeight = 0;
+						prismHeight = (Fix64)0;
 						ignoreNextMouseUp = true;
 						SceneView.RepaintAll();
 					}
@@ -327,7 +327,7 @@ namespace Sabresaurus.SabreCSG
 					}
 
 
-					Vector3? hitPoint = GetHitPoint(e.mousePosition);
+					FixVector3? hitPoint = GetHitPoint(e.mousePosition);
 					if(hitPoint.HasValue)
 					{
 						downPoint = hitPoint.Value;
@@ -343,7 +343,7 @@ namespace Sabresaurus.SabreCSG
 				}
 				else
 				{
-					Vector3? hitPoint = GetHitPoint(e.mousePosition);
+					FixVector3? hitPoint = GetHitPoint(e.mousePosition);
 					if(hitPoint.HasValue)
 					{
 						downPoint = hitPoint.Value;
@@ -356,7 +356,7 @@ namespace Sabresaurus.SabreCSG
 		void OnMouseDrag(SceneView sceneView, Event e)
 		{
 			UpdateCSGMode(e);
-			Vector3? hitPoint = GetHitPoint(e.mousePosition);
+			FixVector3? hitPoint = GetHitPoint(e.mousePosition);
 
 			if(hitPoint.HasValue)
 			{
@@ -418,23 +418,23 @@ namespace Sabresaurus.SabreCSG
 			Ray lastRay = Camera.current.ScreenPointToRay(EditorHelper.ConvertMousePointPosition(lastPosition));
 
 			Ray currentRay = Camera.current.ScreenPointToRay(EditorHelper.ConvertMousePointPosition(currentPosition));
-			Vector3 direction = GetActivePlane().normal;
+			FixVector3 direction = (FixVector3)GetActivePlane().normal;
 
-			Vector3 lineStart = hitPoints[0];
-			Vector3 lineEnd = hitPoints[0] + direction;
+			FixVector3 lineStart = hitPoints[0];
+			FixVector3 lineEnd = hitPoints[0] + direction;
 
-			Vector3 lastPositionWorld = MathHelper.ClosestPointOnLine(lastRay, lineStart, lineEnd);
-			Vector3 currentPositionWorld = MathHelper.ClosestPointOnLine(currentRay, lineStart, lineEnd);
+			FixVector3 lastPositionWorld = MathHelper.ClosestPointOnLine(lastRay, lineStart, lineEnd);
+			FixVector3 currentPositionWorld = MathHelper.ClosestPointOnLine(currentRay, lineStart, lineEnd);
 
-			Vector3 deltaWorld = (currentPositionWorld - lastPositionWorld);
+			FixVector3 deltaWorld = (currentPositionWorld - lastPositionWorld);
 
-			float deltaScale = Vector3.Dot(direction, deltaWorld);
-			float snapDistance = CurrentSettings.PositionSnapDistance;
+			Fix64 deltaScale = FixVector3.Dot(direction, deltaWorld);
+            Fix64 snapDistance = (Fix64)CurrentSettings.PositionSnapDistance;
 
 			if (CurrentSettings.PositionSnappingEnabled)
 			{
 				deltaScale += unroundedPrismHeight;
-				float roundedDeltaScale = MathHelper.RoundFloat(deltaScale, snapDistance);
+                Fix64 roundedDeltaScale = MathHelper.RoundFix64(deltaScale, snapDistance);
 
 				unroundedPrismHeight = deltaScale- roundedDeltaScale;
 				deltaScale = roundedDeltaScale;
@@ -473,7 +473,7 @@ namespace Sabresaurus.SabreCSG
 				}
 
 				// Find the snapped hover point based on any active polygon or the grid
-				Vector3? hitPoint = GetHitPoint(e.mousePosition);
+				FixVector3? hitPoint = GetHitPoint(e.mousePosition);
 				if(hitPoint.HasValue)
 				{
 					hoverPoint = hitPoint.Value;
@@ -518,7 +518,7 @@ namespace Sabresaurus.SabreCSG
                         if(IsPrismBaseValid(GetRectanglePoints()))
                         {
 						    selectingHeight = true;
-						    prismHeight = 0;
+						    prismHeight = (Fix64)0;
                         }
                         else
                         {
@@ -539,7 +539,7 @@ namespace Sabresaurus.SabreCSG
 				}
 				else if(drawMode == DrawMode.Ambiguous || drawMode == DrawMode.PolygonBase)
 				{
-					Vector3? hitPoint = GetHitPoint(e.mousePosition);
+					FixVector3? hitPoint = GetHitPoint(e.mousePosition);
 
 					if(hitPoint.HasValue)
 					{
@@ -555,7 +555,7 @@ namespace Sabresaurus.SabreCSG
                                 if (IsPrismBaseValid(hitPoints))
                                 {
                                     selectingHeight = true;
-                                    prismHeight = 0;
+                                    prismHeight = (Fix64)0;
                                 }
                                 else
                                 {
@@ -579,7 +579,7 @@ namespace Sabresaurus.SabreCSG
 			}
 		}
 
-		void CreateBrush(List<Vector3> positions)
+		void CreateBrush(List<FixVector3> positions)
 		{
 			Polygon sourcePolygon = PolygonFactory.ConstructPolygon(positions, true);
 
@@ -598,12 +598,12 @@ namespace Sabresaurus.SabreCSG
                 }
             }
 
-			Vector3 planeNormal = GetActivePlane().normal;
+			FixVector3 planeNormal = (FixVector3)GetActivePlane().normal;
 
-//			Debug.Log(Vector3.Dot(sourcePolygon.Plane.normal, planeNormal));
+//			Debug.Log(FixVector3.Dot(sourcePolygon.Plane.normal, planeNormal));
 
 			// Flip the polygon if the winding order is wrong
-			if(Vector3.Dot(sourcePolygon.Plane.normal, planeNormal) < 0)
+			if(FixVector3.Dot((FixVector3)sourcePolygon.Plane.normal, planeNormal) < (Fix64)0)
 			{
 				sourcePolygon.Flip();
 
@@ -616,8 +616,8 @@ namespace Sabresaurus.SabreCSG
 				}
 			}
 
-			float extrusionDistance = 1;
-			Vector3 positionOffset = Vector3.zero;
+            Fix64 extrusionDistance = (Fix64)1;
+			FixVector3 positionOffset = FixVector3.zero;
 
 			if(selectingHeight)
 			{
@@ -638,19 +638,19 @@ namespace Sabresaurus.SabreCSG
 
 						for (int i = 0; i < 3; i++) 
 						{
-							if(!planeNormal[i].EqualsWithEpsilon(0))
+							if(!planeNormal[i].EqualsWithEpsilon((Fix64)0))
 							{
 								if(lastSelectedBrushBounds.size[i] != 0)
 								{
-									extrusionDistance = lastSelectedBrushBounds.size[i];
+									extrusionDistance = (Fix64)lastSelectedBrushBounds.size[i];
 
-									if(planeNormal[i] > 0)
+									if(planeNormal[i] > (Fix64)0)
 									{
-										positionOffset[i] = lastSelectedBrushBounds.center[i] - lastSelectedBrushBounds.extents[i]; 
+										positionOffset[i] = (Fix64)(lastSelectedBrushBounds.center[i] - lastSelectedBrushBounds.extents[i]); 
 									}
 									else
 									{
-										positionOffset[i] = lastSelectedBrushBounds.center[i] + lastSelectedBrushBounds.extents[i]; 
+										positionOffset[i] = (Fix64)(lastSelectedBrushBounds.center[i] + lastSelectedBrushBounds.extents[i]); 
 									}
 								}
 							}
@@ -674,7 +674,7 @@ namespace Sabresaurus.SabreCSG
 			PrimitiveBrush newBrush = newObject.GetComponent<PrimitiveBrush>();
 
 			newObject.transform.rotation = rotation;
-			newObject.transform.position += positionOffset;
+			newObject.transform.position += (Vector3)positionOffset;
 
             if(activePolygon != null
                 && activePolygon.Material != csgModel.GetDefaultMaterial())
@@ -742,35 +742,35 @@ namespace Sabresaurus.SabreCSG
 			}
 		}
 
-		List<Vector3> GetRectanglePoints()
+		List<FixVector3> GetRectanglePoints()
 		{
 			Plane plane = GetActivePlane();
-            Vector3 planeNormal = plane.normal; //MathHelper.VectorAbs(plane.normal);
+            FixVector3 planeNormal = (FixVector3)plane.normal; //MathHelper.VectorAbs(plane.normal);
 
-			Vector3 axis1;
-			Vector3 axis2;
+			FixVector3 axis1;
+			FixVector3 axis2;
 
-			if(Vector3.Dot(planeNormal.Abs(), Vector3.up) > 0.99f)
+			if(FixVector3.Dot(planeNormal.Abs(), FixVector3.up) > (Fix64)0.99f)
 			{
-				axis1 = Vector3.forward;
-				axis2 = Vector3.right;
+				axis1 = FixVector3.forward;
+				axis2 = FixVector3.right;
 			}
 			else
 			{
-				axis1 = Vector3.up;
-				axis2 = Vector3.Cross(Vector3.up, planeNormal).normalized;
+				axis1 = FixVector3.up;
+				axis2 = FixVector3.Cross(FixVector3.up, planeNormal).normalized;
 			}
 
 
-			Vector3 startPoint = hitPoints[0];
-			Vector3 endPoint = hitPoints[1];
+			FixVector3 startPoint = hitPoints[0];
+			FixVector3 endPoint = hitPoints[1];
 
-			List<Vector3> points = new List<Vector3>(4);
+			List<FixVector3> points = new List<FixVector3>(4);
 
-			Vector3 delta = endPoint - startPoint;
+			FixVector3 delta = endPoint - startPoint;
 
-			Vector3 deltaAxis1 = Vector3.Dot(delta, axis1) * axis1;
-			Vector3 deltaAxis2 = Vector3.Dot(delta, axis2) * axis2;
+			FixVector3 deltaAxis1 = FixVector3.Dot(delta, axis1) * axis1;
+			FixVector3 deltaAxis2 = FixVector3.Dot(delta, axis2) * axis2;
 
 			points.Add(startPoint);
 			points.Add(startPoint + deltaAxis1);
@@ -811,24 +811,24 @@ namespace Sabresaurus.SabreCSG
 				}
 
 
-				Vector3 target = sceneViewCamera.WorldToScreenPoint(hoverPoint);
+				FixVector3 target = (FixVector3)sceneViewCamera.WorldToScreenPoint((Vector3)hoverPoint);
 
-				if(target.z > 0)
+				if(target.z > (Fix64)0)
 				{
 					// Make it pixel perfect
-					target = MathHelper.RoundVector3(target);
-					SabreGraphics.DrawBillboardQuad(target, 8, 8);
+					target = MathHelper.RoundFixVector3(target);
+					SabreGraphics.DrawBillboardQuad((Vector3)target, 8, 8);
 				}
 
 
 				for (int i = 0; i < hitPoints.Count; i++) {
-					target = sceneViewCamera.WorldToScreenPoint(hitPoints[i]);
+					target = (FixVector3)sceneViewCamera.WorldToScreenPoint((Vector3)hitPoints[i]);
 					GL.Color(Color.blue);
-					if(target.z > 0)
+					if(target.z > (Fix64)0)
 					{
 						// Make it pixel perfect
-						target = MathHelper.RoundVector3(target);
-						SabreGraphics.DrawBillboardQuad(target, 8, 8);
+						target = MathHelper.RoundFixVector3(target);
+						SabreGraphics.DrawBillboardQuad((Vector3)target, 8, 8);
 					}
 				}
 
@@ -838,7 +838,7 @@ namespace Sabresaurus.SabreCSG
 
 			if(drawMode == DrawMode.RectangleBase || drawMode == DrawMode.PolygonBase)
 			{
-				List<Vector3> pointsToDraw = new List<Vector3>();
+				List<FixVector3> pointsToDraw = new List<FixVector3>();
 				if(drawMode == DrawMode.RectangleBase)
 				{
 					pointsToDraw.AddRange(GetRectanglePoints());
@@ -886,31 +886,31 @@ namespace Sabresaurus.SabreCSG
 						GL.Color(Color.grey);
 					}
 					// Draw a line from one point to the next
-					GL.Vertex(pointsToDraw[i]);
-					GL.Vertex(pointsToDraw[(i+1) % pointsToDraw.Count]);
+					GL.Vertex((Vector3)pointsToDraw[i]);
+					GL.Vertex((Vector3)pointsToDraw[(i+1) % pointsToDraw.Count]);
 				}
 
 				if(selectingHeight)
 				{
-					Vector3 offset = GetActivePlane().normal * prismHeight;
+					FixVector3 offset = (FixVector3)GetActivePlane().normal * prismHeight;
 
 					for (int i = 0; i < pointsToDraw.Count; i++) 
 					{
 						// Draw a line from one point to the next
-						GL.Vertex(pointsToDraw[i]);
-						GL.Vertex(pointsToDraw[i] + offset);
+						GL.Vertex((Vector3)pointsToDraw[i]);
+						GL.Vertex((Vector3)(pointsToDraw[i] + offset));
 					}
 
 					GL.Color(Color.grey);
 					// Draw grid lines along the prism to indicate size
-					for (int heightLine = 1; heightLine < Mathf.Abs(prismHeight); heightLine++) 
+					for (int heightLine = 1; (Fix64)heightLine < Fix64.Abs(prismHeight); heightLine++) 
 					{
 						for (int i = 0; i < pointsToDraw.Count; i++) 
 						{
-							Vector3 gridOffset = GetActivePlane().normal * heightLine * Mathf.Sign(prismHeight);
+							FixVector3 gridOffset = (FixVector3)GetActivePlane().normal * (Fix64)heightLine * Fix64.FixSign(prismHeight);
 							// Draw a line from one point to the next
-							GL.Vertex(pointsToDraw[i] + gridOffset);
-							GL.Vertex(pointsToDraw[(i+1) % pointsToDraw.Count] + gridOffset);
+							GL.Vertex((Vector3)(pointsToDraw[i] + gridOffset));
+							GL.Vertex((Vector3)(pointsToDraw[(i+1) % pointsToDraw.Count] + gridOffset));
 						}
 					}
 
@@ -918,8 +918,8 @@ namespace Sabresaurus.SabreCSG
 					for (int i = 0; i < pointsToDraw.Count; i++) 
 					{
 						// Draw a line from one point to the next
-						GL.Vertex(pointsToDraw[i] + offset);
-						GL.Vertex(pointsToDraw[(i+1) % pointsToDraw.Count] + offset);
+						GL.Vertex((Vector3)(pointsToDraw[i] + offset));
+						GL.Vertex((Vector3)(pointsToDraw[(i+1) % pointsToDraw.Count] + offset));
 					}
 				}
 

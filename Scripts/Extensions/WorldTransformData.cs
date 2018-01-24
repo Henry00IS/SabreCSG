@@ -11,17 +11,17 @@ namespace Sabresaurus.SabreCSG
 	[Serializable]
 	public class WorldTransformData
 	{
-		public Vector3 Position = Vector3.zero;
+		public FixVector3 Position = FixVector3.zero;
 		public Quaternion Rotation = Quaternion.identity;
-		public Vector3 LossyScale = Vector3.one;
+		public FixVector3 LossyScale = FixVector3.one;
 		public Transform Parent;
 		public int SiblingIndex;
 
 		public WorldTransformData (Transform sourceTransform)
 		{
-			this.Position = sourceTransform.position;
+			this.Position = (FixVector3)sourceTransform.position;
 			this.Rotation = sourceTransform.rotation;
-			this.LossyScale = sourceTransform.lossyScale;
+			this.LossyScale = (FixVector3)sourceTransform.lossyScale;
 			this.Parent = sourceTransform.parent;
 			this.SiblingIndex = sourceTransform.GetSiblingIndex();
 		}
@@ -30,9 +30,9 @@ namespace Sabresaurus.SabreCSG
 		{
 			bool changed = false;
 
-			if(this.Position != sourceTransform.position)
+			if(this.Position != (FixVector3)sourceTransform.position)
 			{
-				this.Position = sourceTransform.position;
+				this.Position = (FixVector3)sourceTransform.position;
 				changed = true;
 			}
 
@@ -42,9 +42,9 @@ namespace Sabresaurus.SabreCSG
 				changed = true;
 			}
 
-			if(this.LossyScale != sourceTransform.lossyScale)
+			if(this.LossyScale != (FixVector3)sourceTransform.lossyScale)
 			{
-				this.LossyScale = sourceTransform.lossyScale;
+				this.LossyScale = (FixVector3)sourceTransform.lossyScale;
 				changed = true;
 			}
 

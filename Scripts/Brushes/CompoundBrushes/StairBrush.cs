@@ -91,7 +91,7 @@ namespace Sabresaurus.SabreCSG
 				generatedBrushes[i].IsNoCSG = this.IsNoCSG;
 				generatedBrushes[i].IsVisible = this.IsVisible;
 				generatedBrushes[i].HasCollision = this.HasCollision;
-				BrushUtility.Resize(generatedBrushes[i], stepSize);
+				BrushUtility.Resize(generatedBrushes[i], (FixVector3)stepSize);
 
                 if (fillToBottom)
                     stepSize.y += (activeHeight) + stepHeightSpacing;

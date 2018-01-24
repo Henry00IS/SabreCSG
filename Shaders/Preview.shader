@@ -1,4 +1,6 @@
-﻿Shader "SabreCSG/Preview" {
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+Shader "SabreCSG/Preview" {
 Properties{
 		_MainTex("Base (RGB)", 2D) = "white" { }
 		_IsLinear ("Is Linear (1 = true)", Float) = 0
@@ -42,7 +44,7 @@ Properties{
 		// compute texture coordinates
 		o.uv0 = IN.uv0.xy * _MainTex_ST.xy + _MainTex_ST.zw;
 		// transform position
-		o.pos = mul(UNITY_MATRIX_MVP, float4(IN.pos,1));
+		o.pos = UnityObjectToClipPos(float4(IN.pos,1));
 		return o;
 	}
 

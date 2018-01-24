@@ -17,7 +17,7 @@ namespace Sabresaurus.SabreCSG
 	public static class EditorHelper
 	{
 	    // Threshold for raycasting vertex clicks, in screen space (should match half the icon dimensions)
-	    const float CLICK_THRESHOLD = 15;
+	    static Fix64 CLICK_THRESHOLD = (Fix64)15;
 
 	    // Used for offseting mouse position
 	    const int TOOLBAR_HEIGHT = 37;
@@ -54,29 +54,29 @@ namespace Sabresaurus.SabreCSG
 		}
 		public static SceneViewCamera GetSceneViewCamera(Camera camera)
 	    {
-	        Vector3 cameraForward = camera.transform.forward;
+	        FixVector3 cameraForward = (FixVector3)camera.transform.forward;
 
-	        if (cameraForward == new Vector3(0, -1, 0))
+	        if (cameraForward == new FixVector3(0, -1, 0))
 	        {
 	            return SceneViewCamera.Top;
 	        }
-	        else if (cameraForward == new Vector3(0, 1, 0))
+	        else if (cameraForward == new FixVector3(0, 1, 0))
 	        {
 	            return SceneViewCamera.Bottom;
 	        }
-	        else if (cameraForward == new Vector3(1, 0, 0))
+	        else if (cameraForward == new FixVector3(1, 0, 0))
 	        {
 	            return SceneViewCamera.Left;
 	        }
-	        else if (cameraForward == new Vector3(-1, 0, 0))
+	        else if (cameraForward == new FixVector3(-1, 0, 0))
 	        {
 	            return SceneViewCamera.Right;
 	        }
-	        else if (cameraForward == new Vector3(0, 0, -1))
+	        else if (cameraForward == new FixVector3(0, 0, -1))
 	        {
 	            return SceneViewCamera.Front;
 	        }
-	        else if (cameraForward == new Vector3(0, 0, 1))
+	        else if (cameraForward == new FixVector3(0, 0, 1))
 	        {
 	            return SceneViewCamera.Back;
 	        }
@@ -91,22 +91,22 @@ namespace Sabresaurus.SabreCSG
 	    /// </summary>
 	    public static bool IsMousePositionInInvalidRects(Vector2 mousePosition)
 	    {
-			float scale = 1;
+			Fix64 scale = (Fix64)1;
 
 #if UNITY_5_4_OR_NEWER
 			mousePosition = EditorGUIUtility.PointsToPixels(mousePosition);
-			scale = EditorGUIUtility.pixelsPerPoint;
+			scale = (Fix64)EditorGUIUtility.pixelsPerPoint;
 #endif
 
-			if (mousePosition.x < Screen.width - 14 * scale 
-				&& mousePosition.x > Screen.width - 89 * scale 
-				&& mousePosition.y > 14 * scale 
-				&& mousePosition.y < 105 * scale)
+			if ((Fix64)mousePosition.x < (Fix64)Screen.width - (Fix64)14 * scale 
+				&& (Fix64)mousePosition.x > (Fix64)Screen.width - (Fix64)89 * scale 
+				&& (Fix64)mousePosition.y > (Fix64)14 * scale 
+				&& (Fix64)mousePosition.y < (Fix64)105 * scale)
 	        {
                 // Mouse is near the scene alignment gizmo
 	            return true;
 	        }
-            else if (mousePosition.y > Screen.height - Toolbar.BOTTOM_TOOLBAR_HEIGHT * scale - TOOLBAR_HEIGHT * scale)
+            else if ((Fix64)mousePosition.y > (Fix64)Screen.height - (Fix64)Toolbar.BOTTOM_TOOLBAR_HEIGHT * scale - (Fix64)TOOLBAR_HEIGHT * scale)
             {
                 // Mouse is over the bottom toolbar
                 return true;
@@ -129,8 +129,8 @@ namespace Sabresaurus.SabreCSG
             else
             {
                 // Flip the direction of Y and remove the Scene View top toolbar's height
-				float screenHeightPoints = (Screen.height / EditorGUIUtility.pixelsPerPoint);
-				sourceMousePosition.y = screenHeightPoints - sourceMousePosition.y - (TOOLBAR_HEIGHT);
+				Fix64 screenHeightPoints = ((Fix64)Screen.height / (Fix64)EditorGUIUtility.pixelsPerPoint);
+				sourceMousePosition.y = (float)(screenHeightPoints - (Fix64)sourceMousePosition.y - (Fix64)(TOOLBAR_HEIGHT));
             }
 			
 #else
@@ -157,10 +157,10 @@ namespace Sabresaurus.SabreCSG
 			return sourceMousePosition;
 		}
 
-        public static float ConvertScreenPixelsToPoints(float screenPixels)
+        public static Fix64 ConvertScreenPixelsToPoints(Fix64 screenPixels)
         {
 #if UNITY_5_4_OR_NEWER
-            return screenPixels / EditorGUIUtility.pixelsPerPoint;
+            return (Fix64)screenPixels / (Fix64)EditorGUIUtility.pixelsPerPoint;
 #else
 			// Pre 5.4 assume that 1 pixel = 1 point
 			return screenPixels;
@@ -192,14 +192,14 @@ namespace Sabresaurus.SabreCSG
         /// <param name="targetScreenPosition">As provided by Camera.WorldToScreenPoint() (in pixels)</param>
         /// <param name="screenDistancePoints">Screen distance (in points)</param>
         /// <returns>True if within the specified distance, False otherwise</returns>
-        public static bool InClickZone(Vector2 mousePosition, Vector2 targetScreenPosition, float screenDistancePoints)
+        public static bool InClickZone(Vector2 mousePosition, Vector2 targetScreenPosition, Fix64 screenDistancePoints)
         {
             // Convert the mouse position to screen space, but leave in points
             mousePosition = ConvertMousePointPosition(mousePosition, false);
             // Convert screen position from pixels to points
             targetScreenPosition = EditorHelper.ConvertScreenPixelsToPoints(targetScreenPosition);
 
-            float distance = Vector2.Distance(mousePosition, targetScreenPosition);
+            Fix64 distance = (Fix64)Vector2.Distance(mousePosition, targetScreenPosition);
 
             if (distance <= screenDistancePoints)
             {
@@ -211,43 +211,48 @@ namespace Sabresaurus.SabreCSG
             }
         }
 
-        public static bool InClickZone(Vector2 mousePosition, Vector3 worldPosition)
+        public static bool InClickZone(Vector2 mousePosition, FixVector3 worldPosition)
 	    {
-	        Vector3 targetScreenPosition = Camera.current.WorldToScreenPoint(worldPosition);
+	        FixVector3 targetScreenPosition = (FixVector3)Camera.current.WorldToScreenPoint((Vector3)worldPosition);
 
-	        if (targetScreenPosition.z < 0)
+	        if (targetScreenPosition.z < (Fix64)0)
 	        {
 	            return false;
 	        }
 
-			float depthDistance = targetScreenPosition.z;
+			Fix64 depthDistance = targetScreenPosition.z;
 
 			// When z is 6 then click threshold is 15
 			// when z is 20 then click threshold is 5
-			float threshold = Mathf.Lerp(15, 5, Mathf.InverseLerp(6, 20, depthDistance));
+			Fix64 threshold = (Fix64)Mathf.Lerp(15, 5, Mathf.InverseLerp(6, 20, (float)depthDistance));
 
-            return InClickZone(mousePosition, targetScreenPosition, threshold);
+            return InClickZone(mousePosition, new Vector2((float)targetScreenPosition.x, (float)targetScreenPosition.y), threshold);
         }
 
-		public static bool InClickRect(Vector2 mousePosition, Vector3 worldPosition1, Vector3 worldPosition2, float range)
+		public static bool InClickRect(Vector2 mousePosition, FixVector3 worldPosition1, FixVector3 worldPosition2, Fix64 range)
 		{
 			mousePosition = ConvertMousePointPosition(mousePosition, false);
-			Vector3 targetScreenPosition1 = Camera.current.WorldToScreenPoint(worldPosition1);
-			Vector3 targetScreenPosition2 = Camera.current.WorldToScreenPoint(worldPosition2);
+			FixVector3 targetScreenPosition1 = (FixVector3)Camera.current.WorldToScreenPoint((Vector3)worldPosition1);
+			FixVector3 targetScreenPosition2 = (FixVector3)Camera.current.WorldToScreenPoint((Vector3)worldPosition2);
 
-			// Convert screen position from pixels to points
-			targetScreenPosition1 = EditorHelper.ConvertScreenPixelsToPoints(targetScreenPosition1);
-			targetScreenPosition2 = EditorHelper.ConvertScreenPixelsToPoints(targetScreenPosition2);
+            // Convert screen position from pixels to points
+            Vector2 tsp1 = EditorHelper.ConvertScreenPixelsToPoints(new Vector2((float)targetScreenPosition1.x, (float)targetScreenPosition1.y));
+            Vector2 tsp2 = EditorHelper.ConvertScreenPixelsToPoints(new Vector2((float)targetScreenPosition2.x, (float)targetScreenPosition2.y));
 
-			if (targetScreenPosition1.z < 0)
+            targetScreenPosition1.x = (Fix64)tsp1.x;
+            targetScreenPosition1.y = (Fix64)tsp1.y;
+            targetScreenPosition2.x = (Fix64)tsp2.x;
+            targetScreenPosition2.y = (Fix64)tsp2.y;
+
+            if (targetScreenPosition1.z < Fix64.Zero)
 			{
 				return false;
 			}
 
-			Vector3 closestPoint = MathHelper.ProjectPointOnLineSegment(targetScreenPosition1, targetScreenPosition2, mousePosition);
-			closestPoint.z = 0;
+			FixVector3 closestPoint = MathHelper.ProjectPointOnLineSegment((FixVector3)targetScreenPosition1, (FixVector3)targetScreenPosition2, new FixVector3((Fix64)mousePosition.x, (Fix64)mousePosition.y));
+			closestPoint.z = Fix64.Zero;
 
-			if(Vector3.Distance(closestPoint, mousePosition) < range)
+			if(FixVector3.Distance(closestPoint, new FixVector3((Fix64)mousePosition.x, (Fix64)mousePosition.y)) < (Fix64)range)
 			{
 				return true;
 			}
@@ -257,11 +262,13 @@ namespace Sabresaurus.SabreCSG
 			}
 		}
 
-	    public static Vector3 CalculateWorldPoint(SceneView sceneView, Vector3 screenPoint)
+	    public static FixVector3 CalculateWorldPoint(SceneView sceneView, FixVector3 screenPoint)
 	    {
-	        screenPoint = ConvertMousePointPosition(screenPoint);
+            Vector2 sp = ConvertMousePointPosition(new Vector2((float)screenPoint.x, (float)screenPoint.y));
+            screenPoint.x = (Fix64)sp.x;
+            screenPoint.y = (Fix64)sp.y;
 
-	        return sceneView.camera.ScreenToWorldPoint(screenPoint);
+	        return (FixVector3)sceneView.camera.ScreenToWorldPoint((Vector3)screenPoint);
 	    }
 
 //		public static string GetCurrentSceneGUID()
@@ -294,11 +301,11 @@ namespace Sabresaurus.SabreCSG
 			}
 		}
 
-		public static void IsoAlignSceneView(Vector3 direction)
+		public static void IsoAlignSceneView(FixVector3 direction)
 		{
 			SceneView sceneView = SceneView.lastActiveSceneView;
 
-			SceneView.lastActiveSceneView.LookAt(sceneView.pivot, Quaternion.LookRotation(direction));
+			SceneView.lastActiveSceneView.LookAt(sceneView.pivot, Quaternion.LookRotation((Vector3)direction));
 
 			// Mark the camera as iso (orthographic)
 			sceneView.orthographic = true;
@@ -307,26 +314,26 @@ namespace Sabresaurus.SabreCSG
 		public static void IsoAlignSceneViewToNearest()
 		{
 			SceneView sceneView = SceneView.lastActiveSceneView;
-			Vector3 cameraForward = sceneView.camera.transform.forward;
-			Vector3 newForward = Vector3.up;
-			float bestDot = -1;
+			FixVector3 cameraForward = (FixVector3)sceneView.camera.transform.forward;
+			FixVector3 newForward = FixVector3.up;
+			Fix64 bestDot = -Fix64.One;
 
-			Vector3 testDirection;
-			float dot;
+			FixVector3 testDirection;
+			Fix64 dot;
 			// Find out of the six axis directions the closest direction to the camera
 			for (int i = 0; i < 3; i++) 
 			{
-				testDirection = Vector3.zero;
-				testDirection[i] = 1;
-				dot = Vector3.Dot(testDirection, cameraForward);
+				testDirection = FixVector3.zero;
+				testDirection[i] = Fix64.One;
+				dot = FixVector3.Dot(testDirection, cameraForward);
 				if(dot > bestDot)
 				{
 					bestDot = dot;
 					newForward = testDirection;
 				}
 
-				testDirection[i] = -1;
-				dot = Vector3.Dot(testDirection, cameraForward);
+				testDirection[i] = -Fix64.One;
+				dot = FixVector3.Dot(testDirection, cameraForward);
 				if(dot > bestDot)
 				{
 					bestDot = dot;

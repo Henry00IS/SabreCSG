@@ -1,4 +1,6 @@
-﻿// Derived from an original shader by Robert Yang, used with permission
+﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Derived from an original shader by Robert Yang, used with permission
 Shader "SabreCSG/SeeExcluded" {
   Properties {
 		_MainTex("Side", 2D) = "white" {}
@@ -35,7 +37,7 @@ Shader "SabreCSG/SeeExcluded" {
 		o.worldPos = IN.pos;
 		o.worldNormal = IN.normal;
 		// transform position
-		o.pos = mul(UNITY_MATRIX_MVP, float4(IN.pos,1));
+		o.pos = UnityObjectToClipPos(float4(IN.pos,1));
 		return o;
 	}
 

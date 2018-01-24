@@ -299,8 +299,8 @@ namespace Sabresaurus.SabreCSG
 		{
 			if(BuildContext.VisualPolygons != null)
 			{
-				float distance = 0;
-				return GeometryHelper.RaycastPolygons(BuildContext.VisualPolygons, ray, out distance);
+				Fix64 distance = Fix64.Zero;
+				return GeometryHelper.RaycastPolygons(BuildContext.VisualPolygons, ray, out distance, Fix64.Zero);
 			}
 			else
 			{
@@ -312,7 +312,7 @@ namespace Sabresaurus.SabreCSG
         {
             if (BuildContext.VisualPolygons != null)
             {                
-                return GeometryHelper.RaycastPolygonsAll(BuildContext.VisualPolygons, ray);
+                return GeometryHelper.RaycastPolygonsAll(BuildContext.VisualPolygons, ray, Fix64.Zero);
             }
             else
             {
@@ -457,15 +457,15 @@ namespace Sabresaurus.SabreCSG
 //				if(bounds.IntersectRay(ray))
 				{
 					Polygon[] polygons = brushesToTest[i].GenerateTransformedPolygons();
-					float hitDistance;
-					Polygon hitPolygon = GeometryHelper.RaycastPolygons(new List<Polygon>(polygons), ray, out hitDistance);
+                    Fix64 hitDistance;
+					Polygon hitPolygon = GeometryHelper.RaycastPolygons(new List<Polygon>(polygons), ray, out hitDistance, Fix64.Zero);
 					if(hitPolygon != null)
 					{
 						hits.Add(new PolygonRaycastHit() 
 							{ 
 								Distance = hitDistance,
-								Point = ray.GetPoint(hitDistance),
-								Normal = hitPolygon.Plane.normal,
+								Point = (FixVector3)ray.GetPoint((float)hitDistance),
+								Normal = (FixVector3)hitPolygon.Plane.normal,
 								GameObject = brushesToTest[i].gameObject,
 								Polygon = hitPolygon,
 							}
@@ -553,7 +553,7 @@ namespace Sabresaurus.SabreCSG
 			if(localSize != default(Vector3) 
 				&& localSize != new Vector3(2,2,2))
 			{
-				BrushUtility.Resize(primitiveBrush, localSize);
+				BrushUtility.Resize(primitiveBrush, (FixVector3)localSize);
 			}
             else
             {

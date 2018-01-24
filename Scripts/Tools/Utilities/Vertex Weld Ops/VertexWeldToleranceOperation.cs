@@ -8,11 +8,11 @@ namespace Sabresaurus.SabreCSG
 {
 	public class VertexWeldToleranceOperation : VertexWeldOperation
 	{
-		protected float tolerance;
+		protected Fix64 tolerance;
 
 		// Takes the selected vertices and welds together any of them that are within the tolerance distance of 
 		// other vertices. Duplicate vertices and polygons are then removed.
-		public VertexWeldToleranceOperation (Polygon[] sourcePolygons, List<Vertex> sourceVertices, float tolerance)
+		public VertexWeldToleranceOperation (Polygon[] sourcePolygons, List<Vertex> sourceVertices, Fix64 tolerance)
 			: base(sourcePolygons, sourceVertices)
 		{
 			this.tolerance = tolerance;
@@ -55,13 +55,13 @@ namespace Sabresaurus.SabreCSG
 				// Ignoring any groups that only contain one vertex
 				if(vertices.Count > 1)
 				{
-					// New position for the vertices is their center
-					Vector3 newPosition = Vector3.zero;
+                    // New position for the vertices is their center
+                    FixVector3 newPosition = FixVector3.zero;
 					for (int vertexIndex = 0; vertexIndex < vertices.Count; vertexIndex++) 
 					{
 						newPosition += vertices[vertexIndex].Position;
 					}
-					newPosition /= vertices.Count;
+					newPosition /= (Fix64)vertices.Count;
 
 					// Update all the selected vertices UVs
 					for (int vertexIndex = 0; vertexIndex < vertices.Count; vertexIndex++) 
@@ -81,16 +81,16 @@ namespace Sabresaurus.SabreCSG
 
 		private class VertexComparerTolerance : IEqualityComparer<Vertex>
 		{
-			float squareTolerance; // Using square distance for comparisons is quicker
+            Fix64 squareTolerance; // Using square distance for comparisons is quicker
 
-			public VertexComparerTolerance (float tolerance)
+			public VertexComparerTolerance (Fix64 tolerance)
 			{
 				this.squareTolerance = tolerance * tolerance;
 			}
 
 			public bool Equals (Vertex x, Vertex y)
 			{
-				float squareMagnitude = (x.Position - y.Position).sqrMagnitude;
+				Fix64 squareMagnitude = (x.Position - y.Position).sqrMagnitude;
 				return (squareMagnitude <= squareTolerance);
 			}
 

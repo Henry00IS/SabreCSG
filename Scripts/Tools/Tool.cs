@@ -141,11 +141,11 @@ namespace Sabresaurus.SabreCSG
 		}
 
 		// Takes into account pivotRotation and the way Tool.GetBounds() works with absolute vs local modes
-		public Vector3 TransformPoint(Vector3 point)
+		public FixVector3 TransformPoint(FixVector3 point)
 		{
 			if(Tools.pivotRotation == PivotRotation.Local)
 			{
-				return primaryTargetBrushTransform.TransformPoint(point);	
+				return (FixVector3)primaryTargetBrushTransform.TransformPoint((Vector3)point);	
 			}
 			else
 			{
@@ -154,11 +154,11 @@ namespace Sabresaurus.SabreCSG
 		}
 
 		// Takes into account pivotRotation and the way Tool.GetBounds() works with absolute vs local modes
-		public Vector3 InverseTransformDirection(Vector3 direction)
+		public FixVector3 InverseTransformDirection(FixVector3 direction)
 		{
 			if(Tools.pivotRotation == PivotRotation.Local)
 			{
-				return primaryTargetBrushTransform.InverseTransformDirection(direction);	
+				return (FixVector3)primaryTargetBrushTransform.InverseTransformDirection((Vector3)direction);	
 			}
 			else
 			{
@@ -167,11 +167,11 @@ namespace Sabresaurus.SabreCSG
 		}
 
 		// Takes into account pivotRotation and the way Tool.GetBounds() works with absolute vs local modes
-		public Vector3 TransformDirection(Vector3 direction)
+		public FixVector3 TransformDirection(FixVector3 direction)
 		{
 			if(Tools.pivotRotation == PivotRotation.Local)
 			{
-				return primaryTargetBrushTransform.TransformDirection(direction);	
+				return (FixVector3)primaryTargetBrushTransform.TransformDirection((Vector3)direction);	
 			}
 			else
 			{

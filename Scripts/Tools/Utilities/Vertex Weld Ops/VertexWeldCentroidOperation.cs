@@ -18,13 +18,13 @@ namespace Sabresaurus.SabreCSG
 
 		public override void PerformWeld ()
 		{
-			// New position for the vertices is their center
-			Vector3 newPosition = Vector3.zero;
+            // New position for the vertices is their center
+            FixVector3 newPosition = FixVector3.zero;
 			for (int i = 0; i < sourceVertices.Count; i++) 
 			{
 				newPosition += sourceVertices[i].Position;
 			}
-			newPosition /= sourceVertices.Count;
+			newPosition /= (Fix64)sourceVertices.Count;
 
 			// Update all the selected vertices UVs
 			for (int i = 0; i < sourceVertices.Count; i++) 

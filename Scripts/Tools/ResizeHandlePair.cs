@@ -13,10 +13,10 @@ namespace Sabresaurus.SabreCSG
     // Used by ResizeEditor to describe two handles (e.g. X axis resize handles)
     public struct ResizeHandlePair
     {
-        public delegate Vector3 PointTransformer(Vector3 sourcePoint);
+        public delegate FixVector3 PointTransformer(FixVector3 sourcePoint);
 
-        public Vector3 point1;
-        public Vector3 point2;
+        public FixVector3 point1;
+        public FixVector3 point2;
         ResizeType resizeType;
 
         public ResizeType ResizeType
@@ -27,16 +27,16 @@ namespace Sabresaurus.SabreCSG
             }
         }
 
-        public ResizeHandlePair(Vector3 point1)
+        public ResizeHandlePair(FixVector3 point1)
         {
             this.point1 = point1;
-            this.point2 = -1 * point1;
+            this.point2 = -Fix64.One * point1;
 
-            if (point1.sqrMagnitude == 1)
+            if (point1.sqrMagnitude == Fix64.One)
             {
                 resizeType = ResizeType.FaceMid;
             }
-            else if (point1.sqrMagnitude == 2)
+            else if (point1.sqrMagnitude == (Fix64)2)
             {
                 resizeType = ResizeType.EdgeMid;
             }
@@ -46,7 +46,7 @@ namespace Sabresaurus.SabreCSG
             }
         }
 
-        public Vector3 GetPoint(int pointIndex)
+        public FixVector3 GetPoint(int pointIndex)
         {
             if (pointIndex == 0)
                 return point1;
@@ -85,12 +85,12 @@ namespace Sabresaurus.SabreCSG
 
         public bool InClickZone(PointTransformer TransformPoint, Vector2 mousePosition, int pointIndex, Bounds bounds)
         {
-            Vector3 worldPosition = TransformPoint(bounds.center + GetPoint(pointIndex).Multiply(bounds.extents));
-            Vector3 targetScreenPosition = Camera.current.WorldToScreenPoint(worldPosition);
+            FixVector3 worldPosition = TransformPoint((FixVector3)bounds.center + GetPoint(pointIndex).Multiply((FixVector3)bounds.extents));
+            FixVector3 targetScreenPosition = (FixVector3)Camera.current.WorldToScreenPoint((Vector3)worldPosition);
 
-            float screenDistancePoints = CalculateScreenRange(TransformPoint, pointIndex, bounds);
+            Fix64 screenDistancePoints = CalculateScreenRange(TransformPoint, pointIndex, bounds);
 
-            if (EditorHelper.InClickZone(mousePosition, targetScreenPosition, screenDistancePoints))
+            if (EditorHelper.InClickZone(mousePosition, new Vector2((float)targetScreenPosition.x, (float)targetScreenPosition.y), screenDistancePoints))
             {
                 //Debug.Log(Mathf.Round(screenDistancePoints) + " " + Mathf.Round(screenBoundsSizePoints));
 
@@ -102,76 +102,76 @@ namespace Sabresaurus.SabreCSG
             }
         }
 
-        public float CalculateScreenRange(PointTransformer TransformPoint, int pointIndex, Bounds bounds)
+        public Fix64 CalculateScreenRange(PointTransformer TransformPoint, int pointIndex, Bounds bounds)
         {
-            float screenBoundsSizePoints = CalculateScreenSize(TransformPoint, pointIndex, bounds);
+            Fix64 screenBoundsSizePoints = CalculateScreenSize(TransformPoint, pointIndex, bounds);
 
             // tolerance = (screenSize ^ 1.2) / 20, meaning 50 => 5.5, 80 => 9.6
-            float screenDistancePoints = Mathf.Pow(screenBoundsSizePoints, 1.2f) / 20f;
+            Fix64 screenDistancePoints = (Fix64)Mathf.Pow((float)screenBoundsSizePoints, 1.2f) / (Fix64)20f;
             // Clamp to the 5 to 15 points range
-            screenDistancePoints = Mathf.Clamp(screenDistancePoints, 5, 12);
+            screenDistancePoints = Fix64.Clamp(screenDistancePoints, (Fix64)5, (Fix64)12);
 
             return screenDistancePoints;
         }
 
-        float CalculateScreenSize(PointTransformer TransformPoint, int pointIndex, Bounds bounds)
+        Fix64 CalculateScreenSize(PointTransformer TransformPoint, int pointIndex, Bounds bounds)
         {
-            float minDistancPoints = float.PositiveInfinity;
+            Fix64 minDistancPoints = Fix64.MaxValue; // positive infinity.
 
-            Vector3 pairPoint = GetPoint(pointIndex);
+            FixVector3 pairPoint = GetPoint(pointIndex);
 
             // Process each set component separately, this way we can calculate the min screen size of each active face
             for (int i = 0; i < 3; i++)
             {
-                if (pairPoint[i] != 0)
+                if (pairPoint[i] != Fix64.Zero)
                 {
-                    Vector3 sourceDirection = Vector3.zero;
+                    FixVector3 sourceDirection = FixVector3.zero;
                     sourceDirection[i] = pairPoint[i];
 
-                    Vector3 extent1Positive = sourceDirection;
-                    Vector3 extent1Negative = sourceDirection;
-                    Vector3 extent2Positive = sourceDirection;
-                    Vector3 extent2Negative = sourceDirection;
+                    FixVector3 extent1Positive = sourceDirection;
+                    FixVector3 extent1Negative = sourceDirection;
+                    FixVector3 extent2Positive = sourceDirection;
+                    FixVector3 extent2Negative = sourceDirection;
 
                     if (i == 0) // X already set, so set Y and Z
                     {
-                        extent1Positive.y = 1;
-                        extent1Negative.y = -1;
-                        extent2Positive.z = 1;
-                        extent2Negative.z = -1;
+                        extent1Positive.y = Fix64.One;
+                        extent1Negative.y = -Fix64.One;
+                        extent2Positive.z = Fix64.One;
+                        extent2Negative.z = -Fix64.One;
                     }
                     else if (i == 1) // Y already set, so set X and Z
                     {
-                        extent1Positive.x = 1;
-                        extent1Negative.x = -1;
-                        extent2Positive.z = 1;
-                        extent2Negative.z = -1;
+                        extent1Positive.x = Fix64.One;
+                        extent1Negative.x = -Fix64.One;
+                        extent2Positive.z = Fix64.One;
+                        extent2Negative.z = -Fix64.One;
                     }
                     else // Z already set, so set X and Y
                     {
-                        extent1Positive.x = 1;
-                        extent1Negative.x = -1;
-                        extent2Positive.y = 1;
-                        extent2Negative.y = -1;
+                        extent1Positive.x = Fix64.One;
+                        extent1Negative.x = -Fix64.One;
+                        extent2Positive.y = Fix64.One;
+                        extent2Negative.y = -Fix64.One;
                     }
 
-                    Vector3 worldPosition1Positive = TransformPoint(bounds.center + extent1Positive.Multiply(bounds.extents));
-                    Vector3 worldPosition1Negative = TransformPoint(bounds.center + extent1Negative.Multiply(bounds.extents));
-                    Vector3 worldPosition2Positive = TransformPoint(bounds.center + extent2Positive.Multiply(bounds.extents));
-                    Vector3 worldPosition2Negative = TransformPoint(bounds.center + extent2Negative.Multiply(bounds.extents));
+                    FixVector3 worldPosition1Positive = TransformPoint((FixVector3)bounds.center + extent1Positive.Multiply((FixVector3)bounds.extents));
+                    FixVector3 worldPosition1Negative = TransformPoint((FixVector3)bounds.center + extent1Negative.Multiply((FixVector3)bounds.extents));
+                    FixVector3 worldPosition2Positive = TransformPoint((FixVector3)bounds.center + extent2Positive.Multiply((FixVector3)bounds.extents));
+                    FixVector3 worldPosition2Negative = TransformPoint((FixVector3)bounds.center + extent2Negative.Multiply((FixVector3)bounds.extents));
 
                     //VisualDebug.AddPoints(worldPosition1Positive, worldPosition1Negative, worldPosition2Positive, worldPosition2Negative);
 
-                    Vector3 screenPosition1Positive = Camera.current.WorldToScreenPoint(worldPosition1Positive);
-                    Vector3 screenPosition1Negative = Camera.current.WorldToScreenPoint(worldPosition1Negative);
-                    Vector3 screenPosition2Positive = Camera.current.WorldToScreenPoint(worldPosition2Positive);
-                    Vector3 screenPosition2Negative = Camera.current.WorldToScreenPoint(worldPosition2Negative);
+                    FixVector3 screenPosition1Positive = (FixVector3)Camera.current.WorldToScreenPoint((Vector3)worldPosition1Positive);
+                    FixVector3 screenPosition1Negative = (FixVector3)Camera.current.WorldToScreenPoint((Vector3)worldPosition1Negative);
+                    FixVector3 screenPosition2Positive = (FixVector3)Camera.current.WorldToScreenPoint((Vector3)worldPosition2Positive);
+                    FixVector3 screenPosition2Negative = (FixVector3)Camera.current.WorldToScreenPoint((Vector3)worldPosition2Negative);
 
-                    float distance1Points = EditorHelper.ConvertScreenPixelsToPoints(Vector2.Distance(screenPosition1Positive, screenPosition1Negative));
-                    float distance2Points = EditorHelper.ConvertScreenPixelsToPoints(Vector2.Distance(screenPosition2Positive, screenPosition2Negative));
+                    Fix64 distance1Points = (Fix64)EditorHelper.ConvertScreenPixelsToPoints((Fix64)Vector2.Distance(new Vector2((float)screenPosition1Positive.x, (float)screenPosition1Positive.y), new Vector2((float)screenPosition1Negative.x, (float)screenPosition1Negative.y)));
+                    Fix64 distance2Points = (Fix64)EditorHelper.ConvertScreenPixelsToPoints((Fix64)Vector2.Distance(new Vector2((float)screenPosition2Positive.x, (float)screenPosition2Positive.y), new Vector2((float)screenPosition2Negative.x, (float)screenPosition2Negative.y)));
 
-                    minDistancPoints = Mathf.Min(minDistancPoints, distance1Points);
-                    minDistancPoints = Mathf.Min(minDistancPoints, distance2Points);
+                    minDistancPoints = Fix64.Min(minDistancPoints, distance1Points);
+                    minDistancPoints = Fix64.Min(minDistancPoints, distance2Points);
                 }
             }
             return minDistancPoints;

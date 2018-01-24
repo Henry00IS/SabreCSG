@@ -15,11 +15,11 @@ namespace Sabresaurus.SabreCSG
 
 	public class OBJVertexList
 	{
-		List<Vector3> positions = new List<Vector3>();
+		List<FixVector3> positions = new List<FixVector3>();
 		List<Vector2> uvs = new List<Vector2>();
-		List<Vector3> normals = new List<Vector3>();
+		List<FixVector3> normals = new List<FixVector3>();
 
-		public List<Vector3> Positions {
+		public List<FixVector3> Positions {
 			get {
 				return positions;
 			}
@@ -31,7 +31,7 @@ namespace Sabresaurus.SabreCSG
 			}
 		}
 
-		public List<Vector3> Normals {
+		public List<FixVector3> Normals {
 			get {
 				return normals;
 			}
