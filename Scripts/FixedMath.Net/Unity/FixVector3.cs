@@ -211,9 +211,51 @@ namespace Sabresaurus.SabreCSG
             return Fix64.Sqrt((vector.x * vector.x) + (vector.y * vector.y) + (vector.z * vector.z));
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="System.Object"/>, is equal to this instance.
+        /// </summary>
+        /// <param name="obj">The <see cref="System.Object"/> to compare with this instance.</param>
+        /// <returns>
+        /// <c>true</c> if the specified <see cref="System.Object"/> is equal to this instance;
+        /// otherwise, <c>false</c>.
+        /// </returns>
+        public override bool Equals(object obj)
+        {
+            if (!(obj is FixVector3))
+            {
+                return false;
+            }
 
+            var vector = (FixVector3)obj;
+            return x.Equals(vector.x) &&
+                   y.Equals(vector.y) &&
+                   z.Equals(vector.z);
+        }
 
+        /// <summary>Returns a hash code for this instance.</summary>
+        /// <returns>
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures
+        /// like a hash table.
+        /// </returns>
+        public override int GetHashCode()
+        {
+            var hashCode = 373119288;
+            hashCode = hashCode * -1521134295 + base.GetHashCode();
+            hashCode = hashCode * -1521134295 + EqualityComparer<Fix64>.Default.GetHashCode(x);
+            hashCode = hashCode * -1521134295 + EqualityComparer<Fix64>.Default.GetHashCode(y);
+            hashCode = hashCode * -1521134295 + EqualityComparer<Fix64>.Default.GetHashCode(z);
+            return hashCode;
+        }
 
+        public static explicit operator Vector3(FixVector3 value)
+        {
+            return new Vector3((float)value.x, (float)value.y, (float)value.z);
+        }
+
+        public static explicit operator FixVector3(Vector3 value)
+        {
+            return new FixVector3((Fix64)value.x, (Fix64)value.y, (Fix64)value.z);
+        }
 
         public static FixVector3 operator +(FixVector3 a, FixVector3 b)
         {

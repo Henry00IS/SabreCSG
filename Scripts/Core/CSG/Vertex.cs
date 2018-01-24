@@ -11,23 +11,23 @@ namespace Sabresaurus.SabreCSG
 	[System.Serializable]
 	public class Vertex : IDeepCopyable<Vertex>
 	{
-	    public Vector3 Position; // Vertex position
+	    public FixVector3 Position; // Vertex position
 	    public Vector2 UV;
 	    //	public Vector2 UV2; // Second UV, i.e. lightmapping UVs
-	    public Vector3 Normal;
+	    public FixVector3 Normal;
 	    //	public Vector3 Tangent; // Optional, needed for some shaders
 		public Color32 Color = UnityEngine.Color.white; // Vertex colour, used for tinting individual verts
 
 		public Vertex() {}
 
-		public Vertex(Vector3 position, Vector3 normal, Vector2 uv)
+		public Vertex(FixVector3 position, FixVector3 normal, Vector2 uv)
 		{
 			this.Position = position;
 			this.UV = uv;
 			this.Normal = normal;
 		}
 
-		public Vertex(Vector3 position, Vector3 normal, Vector2 uv, Color32 color)
+		public Vertex(FixVector3 position, FixVector3 normal, Vector2 uv, Color32 color)
 		{
 			this.Position = position;
 			this.UV = uv;
@@ -41,14 +41,14 @@ namespace Sabresaurus.SabreCSG
 			Normal = -Normal;
 		}
 
-	    public static Vertex Lerp(Vertex from, Vertex to, float t)
+	    public static Vertex Lerp(Vertex from, Vertex to, Fix64 t)
 	    {
 	        return new Vertex()
 	        {
-	            Position = Vector3.Lerp(from.Position, to.Position, t),
-	            UV = Vector2.Lerp(from.UV, to.UV, t),
-	            Normal = Vector3.Lerp(from.Normal, to.Normal, t),
-				Color = Color32.Lerp(from.Color, to.Color, t),
+	            Position = FixVector3.Lerp(from.Position, to.Position, t),
+	            UV = Vector2.Lerp(from.UV, to.UV, (float)t),
+	            Normal = FixVector3.Lerp(from.Normal, to.Normal, t),
+				Color = Color32.Lerp(from.Color, to.Color, (float)t),
 	        };
 	    }
 
