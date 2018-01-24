@@ -6,7 +6,7 @@ namespace Sabresaurus.SabreCSG
 {
     public class Edge
     {
-        public const float EPSILON = 1e-5f;
+        public static Fix64 EPSILON = Fix64.Epsilon;
 		
 		Vertex vertex1;
 		Vertex vertex2;
@@ -27,9 +27,9 @@ namespace Sabresaurus.SabreCSG
             }
         }
 
-		public Vector3 GetCenterPoint()
+		public FixVector3 GetCenterPoint()
 		{
-			return (vertex1.Position + vertex2.Position) * 0.5f;
+			return (vertex1.Position + vertex2.Position) * (Fix64)0.5M;
 		}
 
         // TODO: Should track entire Vertex here? May be necessary for edge collapse where positions align but UV's don't. Currently unsure if that will be a problem.		
@@ -59,12 +59,12 @@ namespace Sabresaurus.SabreCSG
 
 		public bool Intersects(Edge otherEdge)
 		{
-			Vector3 vector1 = vertex2.Position - vertex1.Position;
-			Vector3 vector2 = otherEdge.Vertex2.Position - otherEdge.Vertex1.Position;
+            FixVector3 vector1 = vertex2.Position - vertex1.Position;
+            FixVector3 vector2 = otherEdge.Vertex2.Position - otherEdge.Vertex1.Position;
 
-			float dot = (Vector3.Dot(vector1.normalized, vector2.normalized));
+            Fix64 dot = (FixVector3.Dot(vector1.normalized, vector2.normalized));
 
-			bool parallel =  Mathf.Abs(dot) > 1 - EPSILON;
+			bool parallel =  Fix64.Abs(dot) > Fix64.One - (Fix64)EPSILON;
 
             // Edges not parallel, they can't be collinear
             if (!parallel)
@@ -73,8 +73,8 @@ namespace Sabresaurus.SabreCSG
 			// TODO: Hacky way of finding out if they are on the same line because we know two points must be the same
 			bool matchedPoint = false;
 
-            Vector3 delta1 = Vector3.zero; // Delta from the matched point on this edge to the other point on this edge
-            Vector3 delta2 = Vector3.zero; // Delta from the matched point on otherEdge to the other point on otherEdge
+            FixVector3 delta1 = FixVector3.zero; // Delta from the matched point on this edge to the other point on this edge
+            FixVector3 delta2 = FixVector3.zero; // Delta from the matched point on otherEdge to the other point on otherEdge
 
             if (vertex1.Position.EqualsWithEpsilon(otherEdge.Vertex1.Position))
 			{
@@ -106,7 +106,7 @@ namespace Sabresaurus.SabreCSG
                 return false;
 
             // If the two edges actually share a portion then the vectors on the edges from the matched points will be in opposite directions
-            bool actuallySharePortion = (Vector3.Dot(delta1, delta2) > 0);
+            bool actuallySharePortion = (FixVector3.Dot(delta1, delta2) > Fix64.Zero);
 
 			return actuallySharePortion;
 		}
@@ -117,13 +117,13 @@ namespace Sabresaurus.SabreCSG
         /// <param name="otherEdge">Other edge.</param>
         public bool Collinear(Edge otherEdge)
         {
-            Vector3 vector1 = vertex2.Position - vertex1.Position;
-            Vector3 vector2 = otherEdge.Vertex2.Position - otherEdge.Vertex1.Position;
+            FixVector3 vector1 = vertex2.Position - vertex1.Position;
+            FixVector3 vector2 = otherEdge.Vertex2.Position - otherEdge.Vertex1.Position;
 
-            float dot = (Vector3.Dot(vector1.normalized, vector2.normalized));
+            Fix64 dot = (FixVector3.Dot(vector1.normalized, vector2.normalized));
 
             //bool parallel = Mathf.Abs(dot) > 1-Plane.EPSILON;
-            bool parallel = dot > 1 - EPSILON;
+            bool parallel = dot > Fix64.One - EPSILON;
 
             // TODO: Hacky way of finding out if they are on the same line because we know two points must be the same
             bool matchedPoint = false;

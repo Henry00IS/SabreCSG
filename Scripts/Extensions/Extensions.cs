@@ -12,22 +12,22 @@ namespace Sabresaurus.SabreCSG
         const float EPSILON_LOWER_2 = 1e-3f;
         const float EPSILON_LOWER_3 = 1e-2f;
 
-        public static Vector3 Abs(this Vector3 a)
+        public static FixVector3 Abs(this FixVector3 a)
 	    {
-	        return new Vector3(Mathf.Abs(a.x), Mathf.Abs(a.y), Mathf.Abs(a.z));
+	        return new FixVector3(Fix64.Abs(a.x), Fix64.Abs(a.y), Fix64.Abs(a.z));
 	    }
 
-	    public static Vector3 Multiply(this Vector3 a, Vector3 b)
+	    public static FixVector3 Multiply(this FixVector3 a, FixVector3 b)
 	    {
-	        return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
+	        return new FixVector3(a.x * b.x, a.y * b.y, a.z * b.z);
 	    }
 
-		public static Vector3 Divide(this Vector3 a, Vector3 b)
+		public static FixVector3 Divide(this FixVector3 a, FixVector3 b)
 		{
-			return new Vector3(a.x / b.x, a.y / b.y, a.z / b.z);
+			return new FixVector3(a.x / b.x, a.y / b.y, a.z / b.z);
 		}
 
-		public static Vector3 SetAxis(this Vector3 vector, int axis, float newValue)
+		public static FixVector3 SetAxis(this FixVector3 vector, int axis, Fix64 newValue)
 		{
 			if(axis < 0 || axis > 2)
 			{
@@ -43,12 +43,12 @@ namespace Sabresaurus.SabreCSG
 		/// </summary>
 		/// <returns>Number of components that are not zero.</returns>
 		/// <param name="vector">Vector.</param>
-		public static int GetSetAxisCount(this Vector3 vector)
+		public static int GetSetAxisCount(this FixVector3 vector)
 		{
 			int count = 0;
 			for (int i = 0; i < 3; i++) 
 			{
-                if(Mathf.Abs(vector[i]) > 1e-3f)
+                if(Fix64.Abs(vector[i]) > (Fix64)1e-3f)
 				{
 					count++;
 				}
@@ -227,7 +227,7 @@ namespace Sabresaurus.SabreCSG
 			sharedMesh.vertices = vertices;
 		}
 
-		public static string ToStringLong(this Vector3 source)
+		public static string ToStringLong(this FixVector3 source)
 		{
 			return string.Format("{0},{1},{2}", source.x,source.y,source.z);
 		}
@@ -348,19 +348,19 @@ namespace Sabresaurus.SabreCSG
         /// <summary>
         /// Determines whether two vector's are equal, allowing for floating point differences with an Epsilon value taken into account in per component comparisons
         /// </summary>
-        public static bool EqualsWithEpsilon(this Vector3 a, Vector3 b)
+        public static bool EqualsWithEpsilon(this FixVector3 a, FixVector3 b)
 		{
-			return Mathf.Abs(a.x - b.x) < EPSILON && Mathf.Abs(a.y - b.y) < EPSILON && Mathf.Abs(a.z - b.z) < EPSILON;
+			return Fix64.Abs(a.x - b.x) < (Fix64)EPSILON && Fix64.Abs(a.y - b.y) < (Fix64)EPSILON && Fix64.Abs(a.z - b.z) < (Fix64)EPSILON;
 		}
 
-		public static bool EqualsWithEpsilonLower(this Vector3 a, Vector3 b)
+		public static bool EqualsWithEpsilonLower(this FixVector3 a, FixVector3 b)
 		{
-			return Mathf.Abs(a.x - b.x) < EPSILON_LOWER && Mathf.Abs(a.y - b.y) < EPSILON_LOWER && Mathf.Abs(a.z - b.z) < EPSILON_LOWER;
+			return Fix64.Abs(a.x - b.x) < (Fix64)EPSILON_LOWER && Fix64.Abs(a.y - b.y) < (Fix64)EPSILON_LOWER && Fix64.Abs(a.z - b.z) < (Fix64)EPSILON_LOWER;
 		}
 
-        public static bool EqualsWithEpsilonLower3(this Vector3 a, Vector3 b)
+        public static bool EqualsWithEpsilonLower3(this FixVector3 a, FixVector3 b)
         {
-            return Mathf.Abs(a.x - b.x) < EPSILON_LOWER_3 && Mathf.Abs(a.y - b.y) < EPSILON_LOWER_3 && Mathf.Abs(a.z - b.z) < EPSILON_LOWER_3;
+            return Fix64.Abs(a.x - b.x) < (Fix64)EPSILON_LOWER_3 && Fix64.Abs(a.y - b.y) < (Fix64)EPSILON_LOWER_3 && Fix64.Abs(a.z - b.z) < (Fix64)EPSILON_LOWER_3;
         }
 
         public static Rect ExpandFromCenter(this Rect rect, Vector2 expansion)
@@ -404,14 +404,14 @@ namespace Sabresaurus.SabreCSG
                 && bounds2.max.z < bounds1.max.z);
         }
 
-        internal static bool ContainsApproximate(this Bounds bounds1, Vector3 point)
+        internal static bool ContainsApproximate(this Bounds bounds1, FixVector3 point)
         {
-            return (point.x > bounds1.min.x - EPSILON_LOWER_2
-                && point.y > bounds1.min.y - EPSILON_LOWER_2
-                && point.z > bounds1.min.z - EPSILON_LOWER_2
-                && point.x < bounds1.max.x + EPSILON_LOWER_2
-                && point.y < bounds1.max.y + EPSILON_LOWER_2
-                && point.z < bounds1.max.z + EPSILON_LOWER_2);
+            return (point.x > (Fix64)bounds1.min.x - (Fix64)EPSILON_LOWER_2
+                && point.y > (Fix64)bounds1.min.y - (Fix64)EPSILON_LOWER_2
+                && point.z > (Fix64)bounds1.min.z - (Fix64)EPSILON_LOWER_2
+                && point.x < (Fix64)bounds1.max.x + (Fix64)EPSILON_LOWER_2
+                && point.y < (Fix64)bounds1.max.y + (Fix64)EPSILON_LOWER_2
+                && point.z < (Fix64)bounds1.max.z + (Fix64)EPSILON_LOWER_2);
         }
     }
 }

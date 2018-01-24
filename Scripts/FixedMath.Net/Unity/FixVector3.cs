@@ -84,7 +84,7 @@ namespace Sabresaurus.SabreCSG
         /// <summary>
         /// Shorthand for writing FixVector3(0, 0, 0).
         /// </summary>
-        public FixVector3 zero
+        public static FixVector3 zero
         {
             get
             {
@@ -95,7 +95,7 @@ namespace Sabresaurus.SabreCSG
         /// <summary>
         /// Shorthand for writing FixVector3(1, 1, 1).
         /// </summary>
-        public FixVector3 one
+        public static FixVector3 one
         {
             get
             {
@@ -106,7 +106,7 @@ namespace Sabresaurus.SabreCSG
         /// <summary>
         /// Shorthand for writing FixVector3(0, 0, 1).
         /// </summary>
-        public FixVector3 forward
+        public static FixVector3 forward
         {
             get
             {
@@ -117,7 +117,7 @@ namespace Sabresaurus.SabreCSG
         /// <summary>
         /// Shorthand for writing FixVector3(0, 0, -1).
         /// </summary>
-        public FixVector3 back
+        public static FixVector3 back
         {
             get
             {
@@ -128,7 +128,7 @@ namespace Sabresaurus.SabreCSG
         /// <summary>
         /// Shorthand for writing FixVector3(-1, 0, 0).
         /// </summary>
-        public FixVector3 left
+        public static FixVector3 left
         {
             get
             {
@@ -139,7 +139,7 @@ namespace Sabresaurus.SabreCSG
         /// <summary>
         /// Shorthand for writing FixVector3(0, -1, 0).
         /// </summary>
-        public FixVector3 down
+        public static FixVector3 down
         {
             get
             {
@@ -150,7 +150,7 @@ namespace Sabresaurus.SabreCSG
         /// <summary>
         /// Shorthand for writing FixVector3(1, 0, 0).
         /// </summary>
-        public FixVector3 right
+        public static FixVector3 right
         {
             get
             {
@@ -161,7 +161,7 @@ namespace Sabresaurus.SabreCSG
         /// <summary>
         /// Shorthand for writing FixVector3(Fix64.MaxValue, Fix64.MaxValue, Fix64.MaxValue).
         /// </summary>
-        public FixVector3 positiveInfinity
+        public static FixVector3 positiveInfinity
         {
             get
             {
@@ -173,7 +173,7 @@ namespace Sabresaurus.SabreCSG
         /// <summary>
         /// Shorthand for writing FixVector3(0, 1, 0).
         /// </summary>
-        public FixVector3 up
+        public static FixVector3 up
         {
             get
             {
@@ -184,7 +184,7 @@ namespace Sabresaurus.SabreCSG
         /// <summary>
         /// Shorthand for writing FixVector3(Fix64.MaxValue, Fix64.MaxValue, Fix64.MaxValue).
         /// </summary>
-        public FixVector3 negativeInfinity
+        public static FixVector3 negativeInfinity
         {
             get
             {
@@ -193,22 +193,38 @@ namespace Sabresaurus.SabreCSG
             }
         }
 
+        public FixVector3 normalized
+        {
+            get
+            {
+                Fix64 length = magnitude;
+                if (length != Fix64.Zero)
+                    return new FixVector3(x / length, y / length, z / length);
+                return zero;
+            }
+        }
 
-
-
-
+        public Fix64 magnitude
+        {
+            get
+            {
+                return Magnitude(this);
+            }
+        }
 
         public static FixVector3 Lerp(FixVector3 start, FixVector3 end, Fix64 percent)
         {
             return (start + percent * (end - start));
         }
 
-
-
-
         public static Fix64 Magnitude(FixVector3 vector)
         {
             return Fix64.Sqrt((vector.x * vector.x) + (vector.y * vector.y) + (vector.z * vector.z));
+        }
+
+        public static Fix64 Dot(FixVector3 lhs, FixVector3 rhs)
+        {
+            return (lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z);
         }
 
         /// <summary>
