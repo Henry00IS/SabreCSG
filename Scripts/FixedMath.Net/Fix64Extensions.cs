@@ -43,12 +43,13 @@ namespace Sabresaurus.SabreCSG
         }
 
         /// <summary>
-        /// Got no idea whether this implementation is correct... ~ Henry
-        /// (updated) I think this is more correct now?
+        /// Acos turns out to be an extremely complex number.
+        /// There is no fixed point equivalent I know of so I fall back to the default
+        /// implementation available to the hardware and C#.
         /// </summary>
         public static Fix64 Acos(Fix64 value)
         {
-            return Cos(value) * -(Fix64)1;
+            return (Fix64)Math.Acos((double)value);
         }
 
         public static Fix64 Clamp(Fix64 value, Fix64 min, Fix64 max)
