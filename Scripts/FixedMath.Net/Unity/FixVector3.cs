@@ -192,5 +192,67 @@ namespace Sabresaurus.SabreCSG
                 return new FixVector3(Fix64.MinValue, Fix64.MinValue, Fix64.MinValue);
             }
         }
+
+
+
+
+
+
+        public static FixVector3 Lerp(FixVector3 start, FixVector3 end, Fix64 percent)
+        {
+            return (start + percent * (end - start));
+        }
+
+
+
+
+        public static Fix64 Magnitude(FixVector3 vector)
+        {
+            return Fix64.Sqrt((vector.x * vector.x) + (vector.y * vector.y) + (vector.z * vector.z));
+        }
+
+
+
+
+
+        public static FixVector3 operator +(FixVector3 a, FixVector3 b)
+        {
+            return new FixVector3(a.x + b.x, a.y + b.y, a.z + b.z);
+        }
+
+        public static FixVector3 operator -(FixVector3 a)
+        {
+            return new FixVector3(-a.x, -a.y, -a.z);
+        }
+
+        public static FixVector3 operator -(FixVector3 a, FixVector3 b)
+        {
+            return new FixVector3(a.x - b.x, a.y - b.y, a.z - b.z);
+        }
+
+        public static FixVector3 operator *(Fix64 d, FixVector3 a)
+        {
+            return new FixVector3(d * a.x, d * a.y, d * a.z);
+        }
+
+        public static FixVector3 operator *(FixVector3 a, Fix64 d)
+        {
+            return new FixVector3(a.x * d, a.y * d, a.z * d);
+        }
+
+        public static FixVector3 operator /(FixVector3 a, Fix64 d)
+        {
+            return new FixVector3(a.x / d, a.y / d, a.z / d);
+        }
+
+        public static bool operator ==(FixVector3 lhs, FixVector3 rhs)
+        {
+            return lhs.x == rhs.x && lhs.y == rhs.y && lhs.z == rhs.z;
+        }
+
+        public static bool operator !=(FixVector3 lhs, FixVector3 rhs)
+        {
+            return lhs.x != rhs.x || lhs.y != rhs.y || lhs.z != rhs.z;
+        }
     }
 }
