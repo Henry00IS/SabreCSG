@@ -119,7 +119,7 @@ namespace Sabresaurus.SabreCSG
 					{
 						// Polygons are sometimes constructed facing the wrong way, possibly due to a winding order
 						// mismatch. If the two normals are opposite, flip the new polygon
-						if(FixVector3.Dot(newPolygon.Plane.normal, splitPlane.normal) < -0.9f)
+						if(FixVector3.Dot((FixVector3)newPolygon.Plane.normal, (FixVector3)splitPlane.normal) < -(Fix64)0.9f)
 						{
 							newPolygon.Flip();
 						}
@@ -135,7 +135,7 @@ namespace Sabresaurus.SabreCSG
 					newPolygon.ExcludeFromFinal = excludeNewPolygons;
 					
 					
-					if(newPolygon.Plane.normal == FixVector3.zero)
+					if((FixVector3)newPolygon.Plane.normal == FixVector3.zero)
 					{
 						Debug.LogError("Invalid Normal! Shouldn't be zero. This is unexpected since extraneous positions should have been removed!");
 						//						Polygon fooNewPolygon = PolygonFactory.ConstructPolygon(positions, true);
@@ -287,7 +287,7 @@ namespace Sabresaurus.SabreCSG
 				center += positions[i];
 			}
 			
-			center *= 1f / positions.Count;
+			center *= Fix64.One / (Fix64)positions.Count;
 			
 			if(positions.Count < 3)
 			{
@@ -295,14 +295,14 @@ namespace Sabresaurus.SabreCSG
 			}
 			
 			// Find the plane
-			UnityEngine.Plane plane = new UnityEngine.Plane(positions[0], positions[1], positions[2]);
+			UnityEngine.Plane plane = new UnityEngine.Plane((Vector3)positions[0], (Vector3)positions[1], (Vector3)positions[2]);
 			
 			
 			
 			// Rotation to go from the polygon's plane to XY plane (for sorting)
 			Quaternion cancellingRotation;
 
-			if(plane.normal != FixVector3.zero)
+			if((FixVector3)plane.normal != FixVector3.zero)
 			{
 				cancellingRotation = Quaternion.Inverse(Quaternion.LookRotation(plane.normal));
 			}
@@ -312,7 +312,7 @@ namespace Sabresaurus.SabreCSG
 			}
 
 			// Rotate the center point onto the plane too
-			FixVector3 rotatedCenter = cancellingRotation * center;
+			FixVector3 rotatedCenter = (FixVector3)(cancellingRotation * (Vector3)center);
 
             // Sort the positions, passing the rotation to put the positions on XY plane and the rotated center point
             IComparer<FixVector3> comparer = new SortVectorsClockwise(cancellingRotation, rotatedCenter);
@@ -322,11 +322,11 @@ namespace Sabresaurus.SabreCSG
 			Vertex[] newPolygonVertices = new Vertex[positions.Count];
 			for (int i = 0; i < positions.Count; i++)
 			{
-				newPolygonVertices[i] = new Vertex(positions[i], -plane.normal, (cancellingRotation * positions[i]) * 0.5f);
+				newPolygonVertices[i] = new Vertex(positions[i], -(FixVector3)plane.normal, (cancellingRotation * (Vector3)positions[i]) * 0.5f);
 			}
 			Polygon newPolygon = new Polygon(newPolygonVertices, null, false, false);
 			
-			if(newPolygon.Plane.normal == FixVector3.zero)
+			if((FixVector3)newPolygon.Plane.normal == FixVector3.zero)
 			{
 				Debug.LogError("Zero normal found, this leads to invalid polyhedron-point tests");
 				return null;
@@ -401,7 +401,7 @@ namespace Sabresaurus.SabreCSG
                 center += vertices[i].Position;
             }
 
-            center *= 1f / vertices.Count;
+            center *= Fix64.One / (Fix64)vertices.Count;
 
             if (vertices.Count < 3)
             {
@@ -413,7 +413,7 @@ namespace Sabresaurus.SabreCSG
 
             if (normal != FixVector3.zero)
             {
-                cancellingRotation = Quaternion.Inverse(Quaternion.LookRotation(normal));
+                cancellingRotation = Quaternion.Inverse(Quaternion.LookRotation((Vector3)normal));
             }
             else
             {
@@ -421,7 +421,7 @@ namespace Sabresaurus.SabreCSG
             }
 
             // Rotate the center point onto the plane too
-            FixVector3 rotatedCenter = cancellingRotation * center;
+            FixVector3 rotatedCenter = (FixVector3)(cancellingRotation * (Vector3)center);
 
             if (constructConvexHull)
             {
@@ -441,7 +441,7 @@ namespace Sabresaurus.SabreCSG
                 {
                     FixVector3 nextDirection = (vertices[(i + 1) % vertices.Count].Position - vertices[i].Position).normalized;
 
-                    if (FixVector3.Dot(lastDirection, nextDirection) < 0.99f)
+                    if (FixVector3.Dot(lastDirection, nextDirection) < (Fix64)0.99f)
                     {
                         positionsCopy.Add(vertices[i]);
                     }
@@ -471,7 +471,7 @@ namespace Sabresaurus.SabreCSG
 
             for (int i = 0; i < positions.Count; i++)
             {
-                positionsComplex.Add(new KeyValuePair<Vertex, FixVector3>(positions[i], cancellingRotation * positions[i].Position));
+                positionsComplex.Add(new KeyValuePair<Vertex, FixVector3>(positions[i], (FixVector3)(cancellingRotation * (Vector3)positions[i].Position)));
             }
 
             // Sort from left to right, then from bottom to top for values with the same X
@@ -485,7 +485,7 @@ namespace Sabresaurus.SabreCSG
             // Build lower hull
             for (int i = 0; i < positionCount; ++i)
             {
-                while (numberAdded >= 2 && Cross(hullArray[numberAdded - 2].Value, hullArray[numberAdded - 1].Value, positionsComplex[i].Value) <= 0)
+                while (numberAdded >= 2 && Cross(hullArray[numberAdded - 2].Value, hullArray[numberAdded - 1].Value, positionsComplex[i].Value) <= Fix64.Zero)
                 {
                     numberAdded--;
                 }
@@ -497,7 +497,7 @@ namespace Sabresaurus.SabreCSG
             // Build upper hull
             for (int i = positionCount - 2, t = numberAdded + 1; i >= 0; i--)
             {
-                while (numberAdded >= t && Cross(hullArray[numberAdded - 2].Value, hullArray[numberAdded - 1].Value, positionsComplex[i].Value) <= 0)
+                while (numberAdded >= t && Cross(hullArray[numberAdded - 2].Value, hullArray[numberAdded - 1].Value, positionsComplex[i].Value) <= Fix64.Zero)
                 {
                     numberAdded--;
                 }
@@ -558,8 +558,8 @@ namespace Sabresaurus.SabreCSG
 			public int Compare(FixVector3 position1, FixVector3 position2)
 			{
 				// Rotate the positions and subtract the center, so they become vectors from the center point on the plane
-				FixVector3 vector1 = (cancellingRotation * position1) - rotatedCenter;
-				FixVector3 vector2 = (cancellingRotation * position2) - rotatedCenter;
+				FixVector3 vector1 = (FixVector3)(cancellingRotation * (Vector3)position1) - rotatedCenter;
+				FixVector3 vector2 = (FixVector3)(cancellingRotation * (Vector3)position2) - rotatedCenter;
 				
 				// Find the angle of each vector on the plane
 				Fix64 angle1 = Fix64.Atan2(vector1.x, vector1.y);
@@ -584,8 +584,8 @@ namespace Sabresaurus.SabreCSG
             public int Compare(Vertex vertex1, Vertex vertex2)
             {
                 // Rotate the positions and subtract the center, so they become vectors from the center point on the plane
-                FixVector3 vector1 = (cancellingRotation * vertex1.Position) - rotatedCenter;
-                FixVector3 vector2 = (cancellingRotation * vertex2.Position) - rotatedCenter;
+                FixVector3 vector1 = (FixVector3)(cancellingRotation * (Vector3)vertex1.Position) - rotatedCenter;
+                FixVector3 vector2 = (FixVector3)(cancellingRotation * (Vector3)vertex2.Position) - rotatedCenter;
 
                 // Find the angle of each vector on the plane
                 Fix64 angle1 = Fix64.Atan2(vector1.x, vector1.y);
@@ -863,9 +863,9 @@ namespace Sabresaurus.SabreCSG
 			}
 
 			// Set the mesh buffers
-			mesh.vertices = vertices.ToArray();
-			mesh.normals = normals.ToArray();
-			mesh.colors = colors.ToArray();
+			mesh.vertices = Array.ConvertAll(vertices.ToArray(), item => (Vector3)item);
+			mesh.normals = Array.ConvertAll(normals.ToArray(), item => (Vector3)item);
+            mesh.colors = colors.ToArray();
 			mesh.uv = uvs.ToArray();
 			mesh.triangles = triangles.ToArray();
 		}

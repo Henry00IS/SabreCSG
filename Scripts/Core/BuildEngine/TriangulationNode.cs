@@ -31,8 +31,8 @@ namespace Sabresaurus.SabreCSG
 
 					for (int j = i+1; j < edges.Count; j++) 
 					{
-//						Vector3 point = planes[j].normal * planes[j].distance;
-						Vector3 point = edges[j].MidPoint;
+//						FixVector3 point = planes[j].normal * planes[j].distance;
+						FixVector3 point = edges[j].MidPoint;
 						int side = MathHelper.GetSideThick(edges[i].Plane, point);
                         if (side == -1)
                         {
