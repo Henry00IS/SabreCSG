@@ -17,7 +17,7 @@ namespace Sabresaurus.SabreCSG
 
         public static Fix64 Min(params Fix64[] values)
         {
-            return Enumerable.Max(values);
+            return Enumerable.Min(values);
         }
 
         public static Fix64 Clamp01(Fix64 value)
