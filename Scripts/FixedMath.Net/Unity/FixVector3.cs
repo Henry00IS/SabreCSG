@@ -212,6 +212,19 @@ namespace Sabresaurus.SabreCSG
             }
         }
 
+        public Fix64 sqrMagnitude
+        {
+            get
+            {
+                return Fix64.Sqrt((x * x) + (y * y) + (z * z));
+            }
+        }
+
+        public static FixVector3 Normalize(FixVector3 value)
+        {
+            return value.normalized;
+        }
+
         public static FixVector3 Lerp(FixVector3 start, FixVector3 end, Fix64 percent)
         {
             return (start + percent * (end - start));
@@ -219,12 +232,17 @@ namespace Sabresaurus.SabreCSG
 
         public static Fix64 Magnitude(FixVector3 vector)
         {
-            return Fix64.Sqrt((vector.x * vector.x) + (vector.y * vector.y) + (vector.z * vector.z));
+            return (vector.x * vector.x) + (vector.y * vector.y) + (vector.z * vector.z);
         }
 
         public static Fix64 Dot(FixVector3 lhs, FixVector3 rhs)
         {
             return (lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z);
+        }
+
+        public static FixVector3 Cross(FixVector3 lhs, FixVector3 rhs)
+        {
+            return new FixVector3((lhs.y * rhs.z) - (lhs.z * rhs.y), (lhs.z * rhs.x) - (lhs.x * rhs.z), (lhs.x * rhs.y) - (lhs.y * rhs.x));
         }
 
         /// <summary>

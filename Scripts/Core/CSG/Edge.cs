@@ -158,11 +158,11 @@ namespace Sabresaurus.SabreCSG
         /// Returns the normalized interpolant between point1 and point2 where the edge they represent intersects with the
         /// supplied plane.
         /// </summary>
-        public static float IntersectsPlane(UnityEngine.Plane plane, Vector3 point1, Vector3 point2)
+        public static Fix64 IntersectsPlane(UnityEngine.Plane plane, FixVector3 point1, FixVector3 point2)
         {
-			// TODO: The plane might need flipping here
-            float interpolant = (-plane.normal.x * point1.x - plane.normal.y * point1.y - plane.normal.z * point1.z - plane.distance)
-                / (-plane.normal.x * (point1.x - point2.x) - plane.normal.y * (point1.y - point2.y) - plane.normal.z * (point1.z - point2.z));
+            // TODO: The plane might need flipping here
+            Fix64 interpolant = (-(Fix64)plane.normal.x * point1.x - (Fix64)plane.normal.y * point1.y - (Fix64)plane.normal.z * point1.z - (Fix64)plane.distance)
+                / (-(Fix64)plane.normal.x * (point1.x - point2.x) - (Fix64)plane.normal.y * (point1.y - point2.y) - (Fix64)plane.normal.z * (point1.z - point2.z));
 
 // DISABLED: Should find a way of making this work with the new Assert support in Unity
 //			DebugHelper.Assert((interpolant >= 0 && interpolant <= 1), "Edge Interpolant outside (0,1) range");

@@ -11,8 +11,8 @@ namespace Sabresaurus.SabreCSG
 	/// </summary>
 	public struct PolygonRaycastHit
 	{
-		public Vector3 Point; // Point at which the ray hit the polygon
-		public Vector3 Normal; // Surface normal of the hit polygon
+		public FixVector3 Point; // Point at which the ray hit the polygon
+		public FixVector3 Normal; // Surface normal of the hit polygon
 		public float Distance; // Distance along the ray at which the hit occurred
 		public GameObject GameObject; // Brush that the polygon exists on (or <c>null</c> if not relevant)
 		public Polygon Polygon; // Hit polygon
@@ -23,12 +23,12 @@ namespace Sabresaurus.SabreCSG
 	/// </summary>
 	public static class GeometryHelper
 	{
-        const float TEST_EPSILON = 0.003f;
-        private const float CONVEX_EPSILON = 0.01f;
+        public static Fix64 TEST_EPSILON = (Fix64)0.003f;
+        public static Fix64 CONVEX_EPSILON = (Fix64)0.01f;
 
-        const float EPSILON = 1e-5f; // Used to avoid floating point test issues, e.g. -0.000001 may be considered 0
-        const float EPSILON_LOWER = 1e-4f;
-        const float EPSILON_LOWER_2 = 1e-3f;
+        public static Fix64 EPSILON = (Fix64)1e-5f; // Used to avoid floating point test issues, e.g. -0.000001 may be considered 0
+        public static Fix64 EPSILON_LOWER = (Fix64)1e-4f;
+        public static Fix64 EPSILON_LOWER_2 = (Fix64)1e-3f;
 
 
         /// <summary>
@@ -48,12 +48,12 @@ namespace Sabresaurus.SabreCSG
 						Polygon polygon = polygons[i];
 						for (int z = 2; z < polygon.Vertices.Length; z++) 
 						{
-							Plane polygonPlane = new Plane(polygon.Vertices[0].Position, 
-								polygon.Vertices[z-1].Position, 
-								polygon.Vertices[z].Position);
+							Plane polygonPlane = new Plane((Vector3)polygon.Vertices[0].Position,
+                                (Vector3)polygon.Vertices[z-1].Position,
+                                (Vector3)polygon.Vertices[z].Position);
 
 
-							float dot = Vector3.Dot(polygonPlane.normal, polygons[n].Vertices[k].Position) + polygonPlane.distance;
+							Fix64 dot = FixVector3.Dot((FixVector3)polygonPlane.normal, polygons[n].Vertices[k].Position) + (Fix64)polygonPlane.distance;
 
 							if(dot > CONVEX_EPSILON)
 							{
@@ -63,12 +63,12 @@ namespace Sabresaurus.SabreCSG
 
 						for (int z = 0; z < polygon.Vertices.Length; z++) 
 						{
-							Plane polygonPlane = new Plane(polygon.Vertices[z].Position, 
-								polygon.Vertices[(z+1)%polygon.Vertices.Length].Position, 
-								polygon.Vertices[(z+2)%polygon.Vertices.Length].Position);
+							Plane polygonPlane = new Plane((Vector3)polygon.Vertices[z].Position,
+                                (Vector3)polygon.Vertices[(z+1)%polygon.Vertices.Length].Position,
+                                (Vector3)polygon.Vertices[(z+2)%polygon.Vertices.Length].Position);
 
 
-							float dot = Vector3.Dot(polygonPlane.normal, polygons[n].Vertices[k].Position) + polygonPlane.distance;
+							Fix64 dot = FixVector3.Dot((FixVector3)polygonPlane.normal, polygons[n].Vertices[k].Position) + (Fix64)polygonPlane.distance;
 
 							if(dot > CONVEX_EPSILON)
 							{
@@ -102,7 +102,7 @@ namespace Sabresaurus.SabreCSG
                     }
 
                     // Skip any polygons that are facing away from the ray
-                    if (Vector3.Dot(polygons[i].Plane.normal, ray.direction) > 0)
+                    if (FixVector3.Dot((FixVector3)polygons[i].Plane.normal, (FixVector3)ray.direction) > Fix64.Zero)
                     {
                         continue;
                     }
@@ -114,13 +114,13 @@ namespace Sabresaurus.SabreCSG
 
                         float rayDistance;
                         plane.Raycast(ray, out rayDistance);
-                        Vector3 hitPoint = ray.GetPoint(rayDistance);
+                        FixVector3 hitPoint = (FixVector3)ray.GetPoint(rayDistance);
 
                         hits.Add(new PolygonRaycastHit()
                         {
                             Distance = rayDistance,
                             Point = hitPoint,
-                            Normal = polygons[i].Plane.normal,
+                            Normal = (FixVector3)polygons[i].Plane.normal,
                             GameObject = null,
                             Polygon = polygons[i]
                         });
@@ -143,7 +143,7 @@ namespace Sabresaurus.SabreCSG
         public static Polygon RaycastPolygons(List<Polygon> polygons, Ray ray, out float hitDistance, float polygonSkin = 0)
 		{
 			Polygon closestPolygon = null;
-			float closestSquareDistance = float.PositiveInfinity;
+			Fix64 closestSquareDistance = Fix64.MaxValue; // instead of positive infinity.
 			hitDistance = 0;
 
 			if(polygons != null)
@@ -157,7 +157,7 @@ namespace Sabresaurus.SabreCSG
 					}
 
 					// Skip any polygons that are facing away from the ray
-					if(Vector3.Dot(polygons[i].Plane.normal, ray.direction) > 0)
+					if(FixVector3.Dot((FixVector3)polygons[i].Plane.normal, (FixVector3)ray.direction) > Fix64.Zero)
 					{
 						continue;
 					}
@@ -169,10 +169,10 @@ namespace Sabresaurus.SabreCSG
 
 						float rayDistance;
 						plane.Raycast(ray, out rayDistance);
-						Vector3 hitPoint = ray.GetPoint(rayDistance);
+						FixVector3 hitPoint = (FixVector3)ray.GetPoint(rayDistance);
 
 						// Find the square distance from the camera to the hit point (squares used for speed)
-						float squareDistance = (ray.origin - hitPoint).sqrMagnitude;
+						Fix64 squareDistance = ((FixVector3)ray.origin - hitPoint).sqrMagnitude;
 						// If the distance is closer than the previous closest polygon, use this one.
 						if(squareDistance < closestSquareDistance)
 						{
@@ -213,31 +213,31 @@ namespace Sabresaurus.SabreCSG
 			// First of all find if and where the ray hit's the polygon's plane
 			if(plane.Raycast(ray, out distance))
 			{
-				Vector3 hitPoint = ray.GetPoint(distance);
+				FixVector3 hitPoint = (FixVector3)ray.GetPoint(distance);
 
 				// Now find out if the point on the polygon plane is behind each polygon edge
 				for (int i = 0; i < polygon.Vertices.Length; i++) 
 				{
-					Vector3 point1 = polygon.Vertices[i].Position;
-					Vector3 point2 = polygon.Vertices[(i+1)%polygon.Vertices.Length].Position;
+					FixVector3 point1 = polygon.Vertices[i].Position;
+					FixVector3 point2 = polygon.Vertices[(i+1)%polygon.Vertices.Length].Position;
 
-					Vector3 edge = point2 - point1; // Direction from a vertex to the next
-					Vector3 polygonNormal = plane.normal;
+					FixVector3 edge = point2 - point1; // Direction from a vertex to the next
+					FixVector3 polygonNormal = (FixVector3)plane.normal;
 
 					// Cross product of the edge with the polygon's normal gives the edge's normal
-					Vector3 edgeNormal = Vector3.Cross(edge, polygonNormal);
+					FixVector3 edgeNormal = FixVector3.Cross(edge, polygonNormal);
 
-					Vector3 edgeCenter = (point1+point2) * 0.5f;
+					FixVector3 edgeCenter = (point1+point2) * (Fix64)0.5f;
 
 					if(polygonSkin != 0)
 					{
-						edgeCenter += edgeNormal.normalized * polygonSkin;
+						edgeCenter += edgeNormal.normalized * (Fix64)polygonSkin;
 					}
 
-					Vector3 pointToEdgeCentroid = edgeCenter - hitPoint;
+					FixVector3 pointToEdgeCentroid = edgeCenter - hitPoint;
 
 					// If the point is outside an edge this will return a negative value
-					if(Vector3.Dot(edgeNormal, pointToEdgeCentroid) < 0)
+					if(FixVector3.Dot(edgeNormal, pointToEdgeCentroid) < Fix64.Zero)
 					{
 						return false;
 					}
@@ -262,28 +262,28 @@ namespace Sabresaurus.SabreCSG
 			int numberInFront = 0;
 			int numberBehind = 0;
 
-			float distanceInFront = 0f;
-			float distanceBehind = 0f;
+            Fix64 distanceInFront = Fix64.Zero;
+            Fix64 distanceBehind = Fix64.Zero;
 
 			for (int polygonIndex = 0; polygonIndex < polygons.Count; polygonIndex++) 
 			{
 				for (int vertexIndex = 0; vertexIndex < polygons[polygonIndex].Vertices.Length; vertexIndex++) 
 				{
-					Vector3 point = polygons[polygonIndex].Vertices[vertexIndex].Position;
+					FixVector3 point = polygons[polygonIndex].Vertices[vertexIndex].Position;
 
-					float distance = testPlane.GetDistanceToPoint(point);
+					Fix64 distance = (Fix64)testPlane.GetDistanceToPoint((Vector3)point);
 
 					if (distance < -TEST_EPSILON)
 					{
 						numberInFront++;
 
-						distanceInFront = Mathf.Min(distanceInFront, distance);
+						distanceInFront = Fix64.Min(distanceInFront, distance);
 					}
 					else if (distance > TEST_EPSILON)
 					{
 						numberBehind++;
 
-						distanceBehind = Mathf.Max(distanceBehind, distance);
+						distanceBehind = Fix64.Max(distanceBehind, distance);
 					}
 				}
 			}
@@ -304,7 +304,7 @@ namespace Sabresaurus.SabreCSG
 		/// <returns>The UV for the supplied position.</returns>
 		/// <param name="polygon">Polygon.</param>
 		/// <param name="newPosition">Position to find the UV for.</param>
-		public static Vector2 GetUVForPosition(Polygon polygon, Vector3 newPosition)
+		public static Vector2 GetUVForPosition(Polygon polygon, FixVector3 newPosition)
 		{
 			int vertexIndex1 = 0;
 			int vertexIndex2 = 0;
@@ -330,12 +330,12 @@ namespace Sabresaurus.SabreCSG
 			}
 
 			// Now account for the fact that the picked three vertices might be collinear
-			Vector3 pos1 = polygon.Vertices[vertexIndex1].Position;
-			Vector3 pos2 = polygon.Vertices[vertexIndex2].Position;
-			Vector3 pos3 = polygon.Vertices[vertexIndex3].Position;
+			FixVector3 pos1 = polygon.Vertices[vertexIndex1].Position;
+			FixVector3 pos2 = polygon.Vertices[vertexIndex2].Position;
+			FixVector3 pos3 = polygon.Vertices[vertexIndex3].Position;
 
-			Plane plane = new Plane(pos1,pos2,pos3);
-			if(plane.normal == Vector3.zero)
+			Plane plane = new Plane((Vector3)pos1, (Vector3)pos2, (Vector3)pos3);
+			if((FixVector3)plane.normal == FixVector3.zero)
 			{
 				for (int i = 2; i < polygon.Vertices.Length; i++) 
 				{
@@ -343,41 +343,41 @@ namespace Sabresaurus.SabreCSG
 
 					pos3 = polygon.Vertices[vertexIndex3].Position;
 
-					Plane tempPlane = new Plane(pos1,pos2,pos3);
+					Plane tempPlane = new Plane((Vector3)pos1, (Vector3)pos2, (Vector3)pos3);
 
-					if(tempPlane.normal != Vector3.zero)
+                    if ((FixVector3)tempPlane.normal != FixVector3.zero)
 					{
 						break;
 					}
 				}
-				plane = new Plane(pos1,pos2,pos3);
-			}
+				plane = new Plane((Vector3)pos1, (Vector3)pos2, (Vector3)pos3);
+            }
 
 			// Should now have a good set of positions, so continue
 
-			Vector3 planePoint = MathHelper.ClosestPointOnPlane(newPosition, plane);
+			FixVector3 planePoint = MathHelper.ClosestPointOnPlane(newPosition, plane);
 
 			Vector2 uv1 = polygon.Vertices[vertexIndex1].UV;
 			Vector2 uv2 = polygon.Vertices[vertexIndex2].UV;
 			Vector2 uv3 = polygon.Vertices[vertexIndex3].UV;
 
 			// calculate vectors from point f to vertices p1, p2 and p3:
-			Vector3 f1 = pos1-planePoint;
-			Vector3 f2 = pos2-planePoint;
-			Vector3 f3 = pos3-planePoint;
+			FixVector3 f1 = pos1-planePoint;
+			FixVector3 f2 = pos2-planePoint;
+			FixVector3 f3 = pos3-planePoint;
 
 			// calculate the areas (parameters order is essential in this case):
-			Vector3 va = Vector3.Cross(pos1-pos2, pos1-pos3); // main triangle cross product
-			Vector3 va1 = Vector3.Cross(f2, f3); // p1's triangle cross product
-			Vector3 va2 = Vector3.Cross(f3, f1); // p2's triangle cross product
-			Vector3 va3 = Vector3.Cross(f1, f2); // p3's triangle cross product
+			FixVector3 va = FixVector3.Cross(pos1-pos2, pos1-pos3); // main triangle cross product
+			FixVector3 va1 = FixVector3.Cross(f2, f3); // p1's triangle cross product
+			FixVector3 va2 = FixVector3.Cross(f3, f1); // p2's triangle cross product
+			FixVector3 va3 = FixVector3.Cross(f1, f2); // p3's triangle cross product
 
 			float a = va.magnitude; // main triangle area
 
 			// calculate barycentric coordinates with sign:
-			float a1 = va1.magnitude/a * Mathf.Sign(Vector3.Dot(va, va1));
-			float a2 = va2.magnitude/a * Mathf.Sign(Vector3.Dot(va, va2));
-			float a3 = va3.magnitude/a * Mathf.Sign(Vector3.Dot(va, va3));
+			float a1 = va1.magnitude/a * Mathf.Sign(FixVector3.Dot(va, va1));
+			float a2 = va2.magnitude/a * Mathf.Sign(FixVector3.Dot(va, va2));
+			float a3 = va3.magnitude/a * Mathf.Sign(FixVector3.Dot(va, va3));
 
 			// find the uv corresponding to point f (uv1/uv2/uv3 are associated to p1/p2/p3):
 			Vector2 uv = uv1 * a1 + uv2 * a2 + uv3 * a3;
@@ -396,30 +396,30 @@ namespace Sabresaurus.SabreCSG
 		/// <param name="uv2">UV 2 (corresponding to Pos2).</param>
 		/// <param name="uv3">UV 3 (corresponding to Pos3).</param>
 		/// <param name="newPosition">Position to find the UV for.</param>
-		public static Vector2 GetUVForPosition(Vector3 pos1, Vector3 pos2, Vector3 pos3, 
+		public static Vector2 GetUVForPosition(FixVector3 pos1, FixVector3 pos2, FixVector3 pos3, 
 			Vector2 uv1, Vector2 uv2, Vector2 uv3, 
-			Vector3 newPosition)
+			FixVector3 newPosition)
 		{
 			Plane plane = new Plane(pos1,pos2,pos3);
-			Vector3 planePoint = MathHelper.ClosestPointOnPlane(newPosition, plane);
+			FixVector3 planePoint = MathHelper.ClosestPointOnPlane(newPosition, plane);
 
 			// calculate vectors from point f to vertices p1, p2 and p3:
-			Vector3 f1 = pos1-planePoint;
-			Vector3 f2 = pos2-planePoint;
-			Vector3 f3 = pos3-planePoint;
+			FixVector3 f1 = pos1-planePoint;
+			FixVector3 f2 = pos2-planePoint;
+			FixVector3 f3 = pos3-planePoint;
 
 			// calculate the areas (parameters order is essential in this case):
-			Vector3 va = Vector3.Cross(pos1-pos2, pos1-pos3); // main triangle cross product
-			Vector3 va1 = Vector3.Cross(f2, f3); // p1's triangle cross product
-			Vector3 va2 = Vector3.Cross(f3, f1); // p2's triangle cross product
-			Vector3 va3 = Vector3.Cross(f1, f2); // p3's triangle cross product
+			FixVector3 va = FixVector3.Cross(pos1-pos2, pos1-pos3); // main triangle cross product
+			FixVector3 va1 = FixVector3.Cross(f2, f3); // p1's triangle cross product
+			FixVector3 va2 = FixVector3.Cross(f3, f1); // p2's triangle cross product
+			FixVector3 va3 = FixVector3.Cross(f1, f2); // p3's triangle cross product
 
 			float a = va.magnitude; // main triangle area
 
 			// calculate barycentric coordinates with sign:
-			float a1 = va1.magnitude/a * Mathf.Sign(Vector3.Dot(va, va1));
-			float a2 = va2.magnitude/a * Mathf.Sign(Vector3.Dot(va, va2));
-			float a3 = va3.magnitude/a * Mathf.Sign(Vector3.Dot(va, va3));
+			float a1 = va1.magnitude/a * Mathf.Sign(FixVector3.Dot(va, va1));
+			float a2 = va2.magnitude/a * Mathf.Sign(FixVector3.Dot(va, va2));
+			float a3 = va3.magnitude/a * Mathf.Sign(FixVector3.Dot(va, va3));
 
 			// find the uv corresponding to point f (uv1/uv2/uv3 are associated to p1/p2/p3):
 			Vector2 uv = uv1 * a1 + uv2 * a2 + uv3 * a3;
@@ -429,13 +429,13 @@ namespace Sabresaurus.SabreCSG
 
         // Used for testing if a polygon is within a polyhedron. The epsilon usage here gives the polygons a generous skin
         // so if the polygon is on the edge of where there'd be ambiguity the polyhedron spreads out slightly to encompass it
-        internal static bool PolyhedronContainsPointEpsilon2(List<Polygon> polygons, Vector3 point)
+        internal static bool PolyhedronContainsPointEpsilon2(List<Polygon> polygons, FixVector3 point)
         {
             for (int i = 0; i < polygons.Count; i++)
             {
                 Plane plane = polygons[i].Plane;
                 // Use positive epsilon
-                float distance = Vector3.Dot(plane.normal, point) + plane.distance;
+                float distance = FixVector3.Dot(plane.normal, point) + plane.distance;
                 if (distance > EPSILON_LOWER)
                 {
                     return false;
@@ -444,13 +444,13 @@ namespace Sabresaurus.SabreCSG
             return true;
         }
 
-        internal static bool PolyhedronContainsPointEpsilon3(List<Polygon> polygons, Vector3 point)
+        internal static bool PolyhedronContainsPointEpsilon3(List<Polygon> polygons, FixVector3 point)
         {
             for (int i = 0; i < polygons.Count; i++)
             {
                 Plane plane = polygons[i].Plane;
                 // Use positive epsilon
-                float distance = Vector3.Dot(plane.normal, point) + plane.distance;
+                float distance = FixVector3.Dot(plane.normal, point) + plane.distance;
                 if (distance > EPSILON_LOWER_2)
                 {
                     return false;
@@ -459,14 +459,14 @@ namespace Sabresaurus.SabreCSG
             return true;
         }
 
-        internal static bool PolyhedronContainsPoint(List<Polygon> polygons, Vector3 point)//, bool thickPlanes)
+        internal static bool PolyhedronContainsPoint(List<Polygon> polygons, FixVector3 point)//, bool thickPlanes)
         {
             for (int i = 0; i < polygons.Count; i++)
             {
                 Plane plane = polygons[i].Plane;
                 // No epsilon here, maybe needs a -EPSILON?
-                //				if(Vector3.Dot (plane.normal, point) + plane.distance >= 0f)
-                if (Vector3.Dot(plane.normal, point) + plane.distance > 0)
+                //				if(FixVector3.Dot (plane.normal, point) + plane.distance >= 0f)
+                if (FixVector3.Dot(plane.normal, point) + plane.distance > 0)
                 {
                     return false;
                 }
@@ -480,14 +480,14 @@ namespace Sabresaurus.SabreCSG
             {
                 for (int v = 0; v < polygons2[i2].Vertices.Length; v++)
                 {
-                    Vector3 point = polygons2[i2].Vertices[v].Position;
+                    FixVector3 point = polygons2[i2].Vertices[v].Position;
 
                     for (int i1 = 0; i1 < polygons1.Length; i1++)
                     {
                         Plane plane = polygons1[i1].Plane;
                         // No epsilon here, maybe needs a -EPSILON?
-                        //				if(Vector3.Dot (plane.normal, point) + plane.distance >= 0f)
-                        float distance = Vector3.Dot(plane.normal, point) + plane.distance;
+                        //				if(FixVector3.Dot (plane.normal, point) + plane.distance >= 0f)
+                        float distance = FixVector3.Dot(plane.normal, point) + plane.distance;
                         if (distance > 0.003f) // EPSILON_LOWER_2)
                         {
                             return false;
@@ -504,14 +504,14 @@ namespace Sabresaurus.SabreCSG
             {
                 for (int v = 0; v < polygons2[i2].Vertices.Length; v++)
                 {
-                    Vector3 point = polygons2[i2].Vertices[v].Position;
+                    FixVector3 point = polygons2[i2].Vertices[v].Position;
 
                     for (int i1 = 0; i1 < polygons1.Length; i1++)
                     {
                         Plane plane = polygons1[i1].Plane;
                         // No epsilon here, maybe needs a -EPSILON?
-                        //				if(Vector3.Dot (plane.normal, point) + plane.distance >= 0f)
-                        float distance = Vector3.Dot(plane.normal, point) + plane.distance;
+                        //				if(FixVector3.Dot (plane.normal, point) + plane.distance >= 0f)
+                        float distance = FixVector3.Dot(plane.normal, point) + plane.distance;
                         if (distance >= 0)// 0.003f) // EPSILON_LOWER_2)
                         {
                             return false;
@@ -522,14 +522,14 @@ namespace Sabresaurus.SabreCSG
             return true;
         }
 
-        internal static bool PolyhedronContainsPoint(Polygon[] polygons, Vector3 point)//, bool thickPlanes)
+        internal static bool PolyhedronContainsPoint(Polygon[] polygons, FixVector3 point)//, bool thickPlanes)
         {
             for (int i = 0; i < polygons.Length; i++)
             {
                 Plane plane = polygons[i].Plane;
                 // No epsilon here
-                //				if(Vector3.Dot (plane.normal, point) + plane.distance >= 0f)
-                float dist = Vector3.Dot(plane.normal, point) + plane.distance;
+                //				if(FixVector3.Dot (plane.normal, point) + plane.distance >= 0f)
+                float dist = FixVector3.Dot(plane.normal, point) + plane.distance;
                 if (dist > EPSILON)
                 {
                     return false;
@@ -538,15 +538,15 @@ namespace Sabresaurus.SabreCSG
             return true;
         }
 
-        internal static float PolyhedronContainsPointDistance(Polygon[] polygons, Vector3 point)//, bool thickPlanes)
+        internal static float PolyhedronContainsPointDistance(Polygon[] polygons, FixVector3 point)//, bool thickPlanes)
         {
             float bestDistance = float.PositiveInfinity;
             for (int i = 0; i < polygons.Length; i++)
             {
                 Plane plane = polygons[i].Plane;
                 // No epsilon here
-                //				if(Vector3.Dot (plane.normal, point) + plane.distance >= 0f)
-                float distance = -(Vector3.Dot(plane.normal, point) + plane.distance);
+                //				if(FixVector3.Dot (plane.normal, point) + plane.distance >= 0f)
+                float distance = -(FixVector3.Dot(plane.normal, point) + plane.distance);
                 if (distance < bestDistance)
                 {
                     bestDistance = distance;
@@ -559,13 +559,13 @@ namespace Sabresaurus.SabreCSG
             return bestDistance;
         }
 
-        internal static bool PolyhedronContainsPointEpsilon1(Polygon[] polygons, Vector3 point)
+        internal static bool PolyhedronContainsPointEpsilon1(Polygon[] polygons, FixVector3 point)
         {
             for (int i = 0; i < polygons.Length; i++)
             {
                 Plane plane = polygons[i].Plane;
                 // Use negative epsilon
-                if (Vector3.Dot(plane.normal, point) + plane.distance >= -EPSILON)
+                if (FixVector3.Dot(plane.normal, point) + plane.distance >= -EPSILON)
                 {
                     return false;
                 }
@@ -573,13 +573,13 @@ namespace Sabresaurus.SabreCSG
             return true;
         }
 
-        internal static bool PolyhedronContainsPointEpsilon1(List<Polygon> polygons, Vector3 point)
+        internal static bool PolyhedronContainsPointEpsilon1(List<Polygon> polygons, FixVector3 point)
         {
             for (int i = 0; i < polygons.Count; i++)
             {
                 Plane plane = polygons[i].Plane;
                 // Use negative epsilon
-                if (Vector3.Dot(plane.normal, point) + plane.distance >= -EPSILON)
+                if (FixVector3.Dot(plane.normal, point) + plane.distance >= -EPSILON)
                 {
                     return false;
                 }
@@ -587,14 +587,14 @@ namespace Sabresaurus.SabreCSG
             return true;
         }
 
-        internal static bool PolyhedronIntersectsLine(Polygon[] polygons, Vector3 lineStart, Vector3 lineEnd)
+        internal static bool PolyhedronIntersectsLine(Polygon[] polygons, FixVector3 lineStart, FixVector3 lineEnd)
         {
             // Use two time values to represent the reduced line segment, at the start 0 represents lineStart and 1
             // represents lineEnd
             float timeStart = 0;
             float timeEnd = 1f;
 
-            Vector3 lineDelta = lineEnd - lineStart;
+            FixVector3 lineDelta = lineEnd - lineStart;
 
             for (int i = 0; i < polygons.Length; i++)
             {
@@ -604,7 +604,7 @@ namespace Sabresaurus.SabreCSG
                 // Essentially we test the direction the line is moving in against the polygon's normal to see whether
                 // the line is enterring or exiting through the polygon.
 
-                float dot = Vector3.Dot(plane.normal, lineDelta);
+                float dot = FixVector3.Dot(plane.normal, lineDelta);
 
                 // Find the intersection time between the plane and the position
                 // Note this essentially substitutes the line segment equation into the plane equation then makes t the
@@ -612,7 +612,7 @@ namespace Sabresaurus.SabreCSG
 
                 // Not sure why we have to flip time intersection's sign, probably to do with the pecularity of the way
                 // Unity's Plane works
-                float timeIntersection = -(Vector3.Dot(plane.normal, lineStart) + plane.distance) / dot;
+                float timeIntersection = -(FixVector3.Dot(plane.normal, lineStart) + plane.distance) / dot;
 
                 if (dot < 0) // Directions are opposing, must be enterring through the polygon
                 {
@@ -690,7 +690,7 @@ namespace Sabresaurus.SabreCSG
             // 2.1: Test each centroid in polyhedron 1 against the entirity of polyhedron 2
             for (int polygonIndex = 0; polygonIndex < polygons1.Length; polygonIndex++)
             {
-                Vector3 centroid = polygons1[polygonIndex].GetCenterPoint();
+                FixVector3 centroid = polygons1[polygonIndex].GetCenterPoint();
                 // TODO: Should we use epsilon here?
                 if (PolyhedronContainsPoint(polygons2, centroid))
                 {
@@ -701,7 +701,7 @@ namespace Sabresaurus.SabreCSG
             // 2.2: Test each centroid in polyhedron 2 against the entirity of polyhedron 1
             for (int polygonIndex = 0; polygonIndex < polygons2.Length; polygonIndex++)
             {
-                Vector3 centroid = polygons2[polygonIndex].GetCenterPoint();
+                FixVector3 centroid = polygons2[polygonIndex].GetCenterPoint();
                 // TODO: Should we use epsilon here?
                 if (PolyhedronContainsPoint(polygons1, centroid))
                 {
@@ -726,16 +726,16 @@ namespace Sabresaurus.SabreCSG
                 Plane plane = container.Plane;
                 for (int j = 0; j < container.Vertices.Length; j++)
                 {
-                    Vector3 point1 = container.Vertices[j].Position;
-                    Vector3 point2 = container.Vertices[(j + 1) % container.Vertices.Length].Position;
+                    FixVector3 point1 = container.Vertices[j].Position;
+                    FixVector3 point2 = container.Vertices[(j + 1) % container.Vertices.Length].Position;
 
-                    Vector3 edge = point2 - point1; // Direction from a vertex to the next
-                    Vector3 polygonNormal = plane.normal;
+                    FixVector3 edge = point2 - point1; // Direction from a vertex to the next
+                    FixVector3 polygonNormal = plane.normal;
 
                     // Cross product of the edge with the polygon's normal gives the edge's normal
-                    Vector3 edgeNormal = Vector3.Cross(edge, polygonNormal);
+                    FixVector3 edgeNormal = FixVector3.Cross(edge, polygonNormal);
 
-                    Vector3 edgeCenter = (point1 + point2) * 0.5f;
+                    FixVector3 edgeCenter = (point1 + point2) * 0.5f;
 
                     float polygonSkin = 0.03f;
                     if (polygonSkin != 0)
@@ -746,11 +746,11 @@ namespace Sabresaurus.SabreCSG
 
                     for (int i = 0; i < containee.Vertices.Length; i++)
                     {
-                        Vector3 point = containee.Vertices[i].Position;
-                        Vector3 pointToEdgeCentroid = edgeCenter - point;
+                        FixVector3 point = containee.Vertices[i].Position;
+                        FixVector3 pointToEdgeCentroid = edgeCenter - point;
 
                         // If the point is outside an edge this will return a negative value
-                        if (Vector3.Dot(edgeNormal, pointToEdgeCentroid) < 0)
+                        if (FixVector3.Dot(edgeNormal, pointToEdgeCentroid) < 0)
                         {
                             return false;
                         }

@@ -8,7 +8,7 @@ namespace Sabresaurus.SabreCSG
 {
 	internal class BrushChunk
 	{
-		Vector3 centerPoint;
+		FixVector3 centerPoint;
 		Bounds bounds;
 		List<Polygon> polygons;
 
@@ -84,7 +84,7 @@ namespace Sabresaurus.SabreCSG
 					count++;
 				}
 			}
-			centerPoint *= 1f / count;
+			centerPoint *= Fix64.One / (Fix64)count;
 
 			CalculateBounds();
 		}
@@ -93,13 +93,13 @@ namespace Sabresaurus.SabreCSG
 		{
 			if (polygons.Count > 0)
 			{
-				bounds = new Bounds(polygons[0].Vertices[0].Position, Vector3.zero);
+				bounds = new Bounds((Vector3)polygons[0].Vertices[0].Position, Vector3.zero);
 				
 				for (int i = 0; i < polygons.Count; i++)
 				{
 					for (int j = 0; j < polygons[i].Vertices.Length; j++)
 					{
-						bounds.Encapsulate(polygons[i].Vertices[j].Position);
+						bounds.Encapsulate((Vector3)polygons[i].Vertices[j].Position);
 					}
 				}
 			}
@@ -172,8 +172,8 @@ namespace Sabresaurus.SabreCSG
 						bool added = false;
 						if(anyFound)
 						{
-							// TODO: Is GetCenterPoint expensive?
-							Vector3 target = polygon.GetCenterPoint();
+                            // TODO: Is GetCenterPoint expensive?
+                            FixVector3 target = polygon.GetCenterPoint();
 							// If this brush chunk contains the subtraction polygon
 							// TODO: This is a heftly call a lot of the time, so see about optimising
 							if(GeometryHelper.PolyhedronContainsPointEpsilon3(this.polygons, target))
@@ -216,7 +216,7 @@ namespace Sabresaurus.SabreCSG
 
 			return damagedPolygons;
 		}
-		internal Vector3 GetCenterPoint()
+		internal FixVector3 GetCenterPoint()
 		{
 			return centerPoint;
 		}
