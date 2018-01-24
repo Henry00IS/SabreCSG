@@ -224,7 +224,7 @@ namespace Sabresaurus.SabreCSG
 			}
 		}
 
-		private static Vertex CalculateInterpolated(Polygon[] triangles, Vector3 worldPosition)
+		private static Vertex CalculateInterpolated(Polygon[] triangles, FixVector3 worldPosition)
 		{
 			// Find which triangle contains the target point
 			for (int i = 0; i < triangles.Length; i++) 
@@ -244,28 +244,28 @@ namespace Sabresaurus.SabreCSG
 			return triangles[0].Vertices[0].DeepCopy();
 		}
 
-		private static bool TriangleContainsPoint(Polygon polygon, Vector3 point)
+		private static bool TriangleContainsPoint(Polygon polygon, FixVector3 point)
 		{
 			Vertex[] vertices = polygon.Vertices;
-			Vector3 planeNormal = polygon.Plane.normal;
+            FixVector3 planeNormal = (FixVector3)polygon.Plane.normal;
 			for (int i = 0; i < vertices.Length; i++) 
 			{
-				Vector3 point1 = vertices[i].Position;
-				Vector3 point2 = vertices[(i+1)%vertices.Length].Position;
+                FixVector3 point1 = vertices[i].Position;
+                FixVector3 point2 = vertices[(i+1)%vertices.Length].Position;
 
-				Vector3 edge = point2 - point1; // Direction from a vertex to the next
-				Vector3 polygonNormal = planeNormal;
+                FixVector3 edge = point2 - point1; // Direction from a vertex to the next
+                FixVector3 polygonNormal = planeNormal;
 
-				// Cross product of the edge with the polygon's normal gives the edge's normal
-				Vector3 edgeNormal = Vector3.Cross(edge.normalized, polygonNormal);
+                // Cross product of the edge with the polygon's normal gives the edge's normal
+                FixVector3 edgeNormal = FixVector3.Cross(edge.normalized, polygonNormal);
 
-				Vector3 edgeCenter = (point1+point2) * 0.5f;
+                FixVector3 edgeCenter = (point1+point2) * (Fix64)0.5f;
 
-				Vector3 pointToEdgeCentroid = edgeCenter - point;
+                FixVector3 pointToEdgeCentroid = edgeCenter - point;
 
-				float dot = Vector3.Dot(edgeNormal, pointToEdgeCentroid);
+				Fix64 dot = FixVector3.Dot(edgeNormal, pointToEdgeCentroid);
 				// If the point is outside an edge this will return a negative value
-				if(dot < -0.1f)
+				if(dot < -(Fix64)0.1f)
 				{
 					return false;
 				}
@@ -279,42 +279,42 @@ namespace Sabresaurus.SabreCSG
 		/// Adapted from GetUVForPosition
 		/// </summary>
 		public static Vertex GetVertexForPosition(Vertex vertex1, Vertex vertex2, Vertex vertex3,
-			Vector3 newPosition)
+			FixVector3 newPosition)
 		{
-			Vector3 pos1 = vertex1.Position;
-			Vector3 pos2 = vertex2.Position;
-			Vector3 pos3 = vertex3.Position;
+            FixVector3 pos1 = vertex1.Position;
+            FixVector3 pos2 = vertex2.Position;
+            FixVector3 pos3 = vertex3.Position;
 
-			//Plane plane = new Plane(pos1,pos2,pos3); // TODO Is it safe to replace this with the polygon Plane property?
-			//Vector3 planePoint = MathHelper.ClosestPointOnPlane(newPosition, plane);
-			Vector3 planePoint = newPosition;
-			// calculate vectors from point f to vertices p1, p2 and p3:
-			Vector3 f1 = pos1-planePoint;
-			Vector3 f2 = pos2-planePoint;
-			Vector3 f3 = pos3-planePoint;
+            //Plane plane = new Plane(pos1,pos2,pos3); // TODO Is it safe to replace this with the polygon Plane property?
+            //Vector3 planePoint = MathHelper.ClosestPointOnPlane(newPosition, plane);
+            FixVector3 planePoint = newPosition;
+            // calculate vectors from point f to vertices p1, p2 and p3:
+            FixVector3 f1 = pos1-planePoint;
+            FixVector3 f2 = pos2-planePoint;
+            FixVector3 f3 = pos3-planePoint;
 
-			// calculate the areas (parameters order is essential in this case):
-			Vector3 va = Vector3.Cross(pos1-pos2, pos1-pos3); // main triangle cross product
-			Vector3 va1 = Vector3.Cross(f2, f3); // p1's triangle cross product
-			Vector3 va2 = Vector3.Cross(f3, f1); // p2's triangle cross product
-			Vector3 va3 = Vector3.Cross(f1, f2); // p3's triangle cross product
+            // calculate the areas (parameters order is essential in this case):
+            FixVector3 va = FixVector3.Cross(pos1-pos2, pos1-pos3); // main triangle cross product
+            FixVector3 va1 = FixVector3.Cross(f2, f3); // p1's triangle cross product
+            FixVector3 va2 = FixVector3.Cross(f3, f1); // p2's triangle cross product
+            FixVector3 va3 = FixVector3.Cross(f1, f2); // p3's triangle cross product
 
-			float a = va.magnitude; // main triangle area
+			Fix64 a = va.magnitude; // main triangle area
 
-			// calculate barycentric coordinates with sign:
-			float a1 = va1.magnitude/a * Mathf.Sign(Vector3.Dot(va, va1));
-			float a2 = va2.magnitude/a * Mathf.Sign(Vector3.Dot(va, va2));
-			float a3 = va3.magnitude/a * Mathf.Sign(Vector3.Dot(va, va3));
+            // calculate barycentric coordinates with sign:
+            Fix64 a1 = va1.magnitude/a * Fix64.FixSign(FixVector3.Dot(va, va1));
+            Fix64 a2 = va2.magnitude/a * Fix64.FixSign(FixVector3.Dot(va, va2));
+            Fix64 a3 = va3.magnitude/a * Fix64.FixSign(FixVector3.Dot(va, va3));
 
 			Vertex vertex = vertex1.DeepCopy();
 			// Interpolate normal and UV based on the barycentric coordinates
 			vertex.Normal = vertex1.Normal * a1 + vertex2.Normal * a2 + vertex3.Normal * a3;
-			vertex.UV = vertex1.UV * a1 + vertex2.UV * a2 + vertex3.UV * a3;
+			vertex.UV = vertex1.UV * (float)a1 + vertex2.UV * (float)a2 + vertex3.UV * (float)a3;
 			// Interpolate the color, slightly more complex as need to implicit cast from Color32 to Color and back for interpolation
 			Color color1 = vertex1.Color;
 			Color color2 = vertex1.Color;
 			Color color3 = vertex1.Color;
-			vertex.Color = color1 * a1 + color2 * a2 + color3 * a3;
+			vertex.Color = color1 * (float)a1 + color2 * (float)a2 + color3 * (float)a3;
 
 			return vertex;
 		}
@@ -323,7 +323,7 @@ namespace Sabresaurus.SabreCSG
 		{
 			// TODO: If a polygon is in a subtract last rather than an add it shold not be removed
 			Polygon[] polygons = removee.Polygons;
-			Vector3 brushCenter = removee.Bounds.center;
+            FixVector3 brushCenter = (FixVector3)removee.Bounds.center;
 
             for (LinkedListNode<BrushChunk> current = brushChunks.First; current != null; current = current.Next)
 			{
@@ -339,7 +339,7 @@ namespace Sabresaurus.SabreCSG
 				{
 					if(chunkPolygons[i].ExcludeFromFinal == false)
 					{
-						Vector3 polygonCenter = chunkPolygons[i].GetCenterPoint();
+						FixVector3 polygonCenter = chunkPolygons[i].GetCenterPoint();
 						float distanceInside = GeometryHelper.PolyhedronContainsPointDistance(polygons, polygonCenter);
 						if(distanceInside > 1E-05)
 						{
@@ -353,7 +353,7 @@ namespace Sabresaurus.SabreCSG
 						else if(distanceInside >= -1E-05)
 						{
 							// Edge case, make sure the face is towards the brush
-							if(Vector3.Dot(brushCenter - polygonCenter, chunkPolygons[i].Plane.normal) > 0)
+							if(FixVector3.Dot(brushCenter - polygonCenter, (FixVector3)chunkPolygons[i].Plane.normal) > Fix64.Zero)
 							{
 								int relativeIndex = chunkPolygons[i].UniqueIndex - firstPolygonUID;
 								MarkPolygonRemoved(relativeIndex, polygonsRemoved);
@@ -371,11 +371,11 @@ namespace Sabresaurus.SabreCSG
 		{
 			// TODO: If a polygon is in a subtract last rather than an add it shold not be removed
 			Polygon[] polygons = removee.Polygons;
-			Vector3 brushCenter = removee.Bounds.center;
+            FixVector3 brushCenter = (FixVector3)removee.Bounds.center;
 
 			for (int i = 0; i < excludedPolygons.Count; i++) 
 			{
-				Vector3 polygonCenter = excludedPolygons[i].GetCenterPoint();
+                FixVector3 polygonCenter = excludedPolygons[i].GetCenterPoint();
 
 #if !NO_EARLYOUT
                 if(!removee.Bounds.ContainsApproximate(polygonCenter))
@@ -398,7 +398,7 @@ namespace Sabresaurus.SabreCSG
 				else if(distanceInside >= -1e-5f)
 				{
 					// Edge case, make sure the face is towards the brush
-					if(Vector3.Dot(brushCenter - polygonCenter, excludedPolygons[i].Plane.normal) > 0)
+					if(FixVector3.Dot(brushCenter - polygonCenter, (FixVector3)excludedPolygons[i].Plane.normal) > Fix64.Zero)
 					{
 						int relativeIndex = excludedPolygons[i].UniqueIndex - firstPolygonUID;
 						MarkPolygonRestored(relativeIndex, polygonsRemoved);

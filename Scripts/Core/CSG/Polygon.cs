@@ -271,16 +271,16 @@ namespace Sabresaurus.SabreCSG
 
 
 
-		public class Vector3ComparerEpsilon : IEqualityComparer<Vector3>
+		public class FixVector3ComparerEpsilon : IEqualityComparer<FixVector3>
 		{
-			public bool Equals (Vector3 a, Vector3 b)
+			public bool Equals (FixVector3 a, FixVector3 b)
 			{
-				return Mathf.Abs(a.x - b.x) < EPSILON_LOWER
-					&& Mathf.Abs(a.y - b.y) < EPSILON_LOWER
-						&& Mathf.Abs(a.z - b.z) < EPSILON_LOWER;
+				return Fix64.Abs(a.x - b.x) < EPSILON_LOWER
+					&& Fix64.Abs(a.y - b.y) < EPSILON_LOWER
+						&& Fix64.Abs(a.z - b.z) < EPSILON_LOWER;
 			}
 
-			public int GetHashCode (Vector3 obj)
+			public int GetHashCode (FixVector3 obj)
 			{
 				// The similarity or difference between two positions can only be calculated if both are supplied
 				// when Distinct is called GetHashCode is used to determine which values are in collision first
@@ -321,8 +321,8 @@ namespace Sabresaurus.SabreCSG
 		}
 
 
-		const float EPSILON = 0.00001f;
-		const float EPSILON_LOWER = 0.001f;
+		static Fix64 EPSILON = (Fix64)0.00001f;
+		static Fix64 EPSILON_LOWER = (Fix64)0.001f;
 		
 //		const float EPSILON_LOWER = 0.003f;
 
@@ -341,7 +341,7 @@ namespace Sabresaurus.SabreCSG
 
 	        for (int i = 0; i < polygon.Vertices.Length; i++)
 	        {
-				float distance = testPlane.GetDistanceToPoint((Vector3)polygon.Vertices[i].Position);
+				Fix64 distance = (Fix64)testPlane.GetDistanceToPoint((Vector3)polygon.Vertices[i].Position);
 				if (distance < -EPSILON_LOWER) // Is the point in front of the plane (with thickness)
 	            {
 	                verticesInFront++;
@@ -421,8 +421,8 @@ namespace Sabresaurus.SabreCSG
 				Vertex currentVertex = polygon.vertices[i];
 				Vertex previousVertex = polygon.vertices[previousIndex];
 
-				PointPlaneRelation currentRelation = ComparePointToPlane((Vector3)currentVertex.Position, clipPlane);
-				PointPlaneRelation previousRelation = ComparePointToPlane((Vector3)previousVertex.Position, clipPlane);
+				PointPlaneRelation currentRelation = ComparePointToPlane((FixVector3)currentVertex.Position, clipPlane);
+				PointPlaneRelation previousRelation = ComparePointToPlane((FixVector3)previousVertex.Position, clipPlane);
 
 				if(previousRelation == PointPlaneRelation.InFront && currentRelation == PointPlaneRelation.InFront)
 				{
@@ -544,8 +544,8 @@ namespace Sabresaurus.SabreCSG
 				Vertex currentVertex = polygon.vertices[i];
 				Vertex previousVertex = polygon.vertices[previousIndex];
 
-				PointPlaneRelation currentRelation = ComparePointToPlane((Vector3)currentVertex.Position, testPlane);
-				PointPlaneRelation previousRelation = ComparePointToPlane((Vector3)previousVertex.Position, testPlane);
+				PointPlaneRelation currentRelation = ComparePointToPlane((FixVector3)currentVertex.Position, testPlane);
+				PointPlaneRelation previousRelation = ComparePointToPlane((FixVector3)previousVertex.Position, testPlane);
 
 				if(previousRelation == PointPlaneRelation.InFront && currentRelation == PointPlaneRelation.InFront)
 				{
@@ -599,9 +599,9 @@ namespace Sabresaurus.SabreCSG
 
 		public enum PointPlaneRelation { InFront, Behind, On };
 
-		public static PointPlaneRelation ComparePointToPlane2(Vector3 point, Plane plane)
+		public static PointPlaneRelation ComparePointToPlane2(FixVector3 point, Plane plane)
 		{
-			float distance = plane.GetDistanceToPoint(point);
+			Fix64 distance = (Fix64)plane.GetDistanceToPoint((Vector3)point);
 			if (distance < -EPSILON)
 			{
 				return PointPlaneRelation.InFront;
@@ -616,9 +616,9 @@ namespace Sabresaurus.SabreCSG
 			}
 		}
 
-		public static PointPlaneRelation ComparePointToPlane(Vector3 point, Plane plane)
+		public static PointPlaneRelation ComparePointToPlane(FixVector3 point, Plane plane)
 		{
-			float distance = plane.GetDistanceToPoint(point);
+			Fix64 distance = (Fix64)plane.GetDistanceToPoint((Vector3)point);
 			if (distance < -EPSILON_LOWER)
 			{
 				return PointPlaneRelation.InFront;

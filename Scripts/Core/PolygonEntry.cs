@@ -9,10 +9,10 @@ namespace Sabresaurus.SabreCSG
 	public class PolygonEntry : IDeepCopyable<PolygonEntry>
 	{
 		[SerializeField]
-		public Vector3[] Positions;
+		public FixVector3[] Positions;
 
 		[SerializeField]
-		public Vector3[] Normals;
+		public FixVector3[] Normals;
 
 		[SerializeField]
 		public Vector2[] UV;
@@ -39,8 +39,8 @@ namespace Sabresaurus.SabreCSG
 		[SerializeField]
 		public int BuiltTriangleOffset;
 
-		public PolygonEntry (Vector3[] positions, 
-			Vector3[] normals, 
+		public PolygonEntry (FixVector3[] positions,
+            FixVector3[] normals, 
 			Vector2[] uv, 
 			Color[] colors,
 			int[] triangles, 

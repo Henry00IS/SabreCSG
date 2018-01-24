@@ -23,5 +23,17 @@ namespace Sabresaurus.SabreCSG
             if (value > One) return One;
             return value;
         }
+
+        /// <summary>
+        /// Returns a number indicating the sign of a Fix64 number.
+        /// Returns 1 if the value is positive, 0 if is 0, and -1 if it is negative.
+        /// </summary>
+        public static Fix64 FixSign(Fix64 value)
+        {
+            return
+                value < Fix64.Zero ? -Fix64.One :
+                value > Fix64.Zero ? Fix64.One :
+                Fix64.Zero;
+        }
     }
 }

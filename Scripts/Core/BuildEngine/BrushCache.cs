@@ -340,9 +340,9 @@ namespace Sabresaurus.SabreCSG
 						|| (vertex1A.Position.EqualsWithEpsilon(vertex2B.Position)
 							&& vertex1B.Position.EqualsWithEpsilon(vertex2A.Position)))
 					{
-						Vector3 thirdPoint = vertex1A.Position + polygon1.Plane.normal;
+						FixVector3 thirdPoint = vertex1A.Position + (FixVector3)polygon1.Plane.normal;
 
-						plane = new Plane(vertex1A.Position, vertex1B.Position, thirdPoint);
+						plane = new Plane((Vector3)vertex1A.Position, (Vector3)vertex1B.Position, (Vector3)thirdPoint);
 
 						return true;
 					}

@@ -7,29 +7,29 @@ namespace Sabresaurus.SabreCSG
 {
 	internal class SimpleEdge
 	{
-		public Vector3 Position1;
-		public Vector3 Position2;
+		public FixVector3 Position1;
+		public FixVector3 Position2;
 
-		public Vector3 MidPoint; // Used by the BSP Tree
+		public FixVector3 MidPoint; // Used by the BSP Tree
 
 		public Plane Plane = new Plane();
 
 		public int Count = 1;
 
-		public SimpleEdge(Vector3 position1, Vector3 position2, Vector3 normal, int startingCount = 1)
+		public SimpleEdge(FixVector3 position1, FixVector3 position2, FixVector3 normal, int startingCount = 1)
 		{
 			this.Position1 = position1;
 			this.Position2 = position2;
             this.Count = startingCount;
 
 			// Cache the mid point of the two positions
-			this.MidPoint = (position1 + position2) * 0.5f;
+			this.MidPoint = (position1 + position2) * (Fix64)0.5f;
 
 			// Cache the plane that this edge forms perpendicular with the polygon it came from
-			Plane = new Plane(position1, position2, position1 + normal);
+			Plane = new Plane((Vector3)position1, (Vector3)position2, (Vector3)position1 + (Vector3)normal);
 		}
 
-		public bool Matches(Vector3 otherPosition1, Vector3 otherPosition2)
+		public bool Matches(FixVector3 otherPosition1, FixVector3 otherPosition2)
 		{
 			if (Position1.EqualsWithEpsilonLower3(otherPosition1)
 				&& Position2.EqualsWithEpsilonLower3(otherPosition2))
@@ -47,59 +47,59 @@ namespace Sabresaurus.SabreCSG
 			}
 		}
 
-        public bool CollinearIntersects(Vector3 otherPosition1, Vector3 otherPosition2)
+        public bool CollinearIntersects(FixVector3 otherPosition1, FixVector3 otherPosition2)
         {
             // TODO Cache this
-            Vector3 tangent = (Position2 - Position1).normalized;
-            Vector3 otherTangent = (otherPosition2 - otherPosition1).normalized;
+            FixVector3 tangent = (Position2 - Position1).normalized;
+            FixVector3 otherTangent = (otherPosition2 - otherPosition1).normalized;
 
-            float dot = Vector3.Dot(tangent, otherTangent);
-            if(dot > 0.99f
-                || dot < -0.99f)
+            Fix64 dot = FixVector3.Dot(tangent, otherTangent);
+            if(dot > (Fix64)0.99f
+                || dot < -(Fix64)0.99f)
             {
                 // It is parallel
-                float upDot = Vector3.Dot(tangent, Vector3.up);
-                Vector3 normal;
-                if (Mathf.Abs(upDot) > 0.9f)
+                Fix64 upDot = FixVector3.Dot(tangent, FixVector3.up);
+                FixVector3 normal;
+                if (Fix64.Abs(upDot) > (Fix64)0.9f)
                 {
-                    normal = Vector3.Cross(Vector3.forward, tangent).normalized;
+                    normal = FixVector3.Cross(FixVector3.forward, tangent).normalized;
                 }
                 else
                 {
-                    normal = Vector3.Cross(Vector3.up, tangent).normalized;
+                    normal = FixVector3.Cross(FixVector3.up, tangent).normalized;
                 }
 
-                Vector3 binormal = Vector3.Cross(normal, tangent);
+                FixVector3 binormal = FixVector3.Cross(normal, tangent);
 
-                float dotNormal = Vector3.Dot(Position1, normal);
-                float dotBinormal = Vector3.Dot(Position1, binormal);
+                Fix64 dotNormal = FixVector3.Dot(Position1, normal);
+                Fix64 dotBinormal = FixVector3.Dot(Position1, binormal);
 
-                float otherDotNormal = Vector3.Dot(otherPosition1, normal);
-                float otherDotBinormal = Vector3.Dot(otherPosition1, binormal);
+                Fix64 otherDotNormal = FixVector3.Dot(otherPosition1, normal);
+                Fix64 otherDotBinormal = FixVector3.Dot(otherPosition1, binormal);
 
-                if(Mathf.Abs(dotNormal - otherDotNormal) < 0.1f
-                    && Mathf.Abs(dotBinormal - otherDotBinormal) < 0.1f)
+                if(Fix64.Abs(dotNormal - otherDotNormal) < (Fix64)0.1f
+                    && Fix64.Abs(dotBinormal - otherDotBinormal) < (Fix64)0.1f)
                 {
                     // It is collinear
-                    float t1 = Vector3.Dot(tangent, Position1);
-                    float t2 = Vector3.Dot(tangent, Position2);
+                    Fix64 t1 = FixVector3.Dot(tangent, Position1);
+                    Fix64 t2 = FixVector3.Dot(tangent, Position2);
 
-                    float ot1;
-                    float ot2;
+                    Fix64 ot1;
+                    Fix64 ot2;
 
-                    if(dot > 0)
+                    if(dot > Fix64.Zero)
                     {
-                        ot1 = Vector3.Dot(tangent, otherPosition1);
-                        ot2 = Vector3.Dot(tangent, otherPosition2);
+                        ot1 = FixVector3.Dot(tangent, otherPosition1);
+                        ot2 = FixVector3.Dot(tangent, otherPosition2);
                     }
                     else
                     {
-                        ot1 = Vector3.Dot(tangent, otherPosition2);
-                        ot2 = Vector3.Dot(tangent, otherPosition1);
+                        ot1 = FixVector3.Dot(tangent, otherPosition2);
+                        ot2 = FixVector3.Dot(tangent, otherPosition1);
                     }
 
-                    if (ot1 < t2 - 0.01f
-                        && ot2 > t1 + 0.01f)
+                    if (ot1 < t2 - (Fix64)0.01f
+                        && ot2 > t1 + (Fix64)0.01f)
                     {
                         return true;
                     }
@@ -139,7 +139,7 @@ namespace Sabresaurus.SabreCSG
             //}
 
 			// Cache the polygon's normal so that we don't have to calculate it for the new polygons
-            Vector3 normal = polygons[0].Plane.normal;
+            FixVector3 normal = (FixVector3)polygons[0].Plane.normal;
 
             // TODO: Generate islands
 
@@ -155,8 +155,8 @@ namespace Sabresaurus.SabreCSG
 
                 for (int j = 0; j < polygonEdges.Length; j++)
                 {
-                    Vector3 position1 = polygonEdges[j].Vertex1.Position;
-                    Vector3 position2 = polygonEdges[j].Vertex2.Position;
+                    FixVector3 position1 = polygonEdges[j].Vertex1.Position;
+                    FixVector3 position2 = polygonEdges[j].Vertex2.Position;
                     //int foundIndex = edges.FindIndex(item => item.Matches(position1, position2));
                     List<SimpleEdge> found = edges.FindAll(item => item.CollinearIntersects(position1, position2));
 
@@ -166,11 +166,11 @@ namespace Sabresaurus.SabreCSG
                         {
                             found[k].Count++;
                         }
-                        edges.Add(new SimpleEdge(position1, position2, polygons[0].Plane.normal, 2));
+                        edges.Add(new SimpleEdge(position1, position2, (FixVector3)polygons[0].Plane.normal, 2));
                     }
                     else
                     {
-						edges.Add(new SimpleEdge(position1, position2, polygons[0].Plane.normal));
+						edges.Add(new SimpleEdge(position1, position2, (FixVector3)polygons[0].Plane.normal));
                     }
                 }
             }
@@ -205,8 +205,8 @@ namespace Sabresaurus.SabreCSG
             // Walk through each set of polygons that maps to a convex hull
             for (int i = 0; i < convexHulls.Count; i++)
             {
-                //float hue = i / 6f;
-                //float sat = 1 - 0.6f * Mathf.Floor(i / 6f);
+                //Fix64 hue = i / 6f;
+                //Fix64 sat = 1 - 0.6f * Mathf.Floor(i / 6f);
                 //Color color = Color.HSVToRGB(hue, sat, 1);
 
 

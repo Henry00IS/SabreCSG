@@ -87,8 +87,8 @@ namespace Sabresaurus.SabreCSG
 			{
 				Mesh mesh = new Mesh();
 
-				List<Vector3> positionsList = new List<Vector3>();
-				List<Vector3> normalsList = new List<Vector3>();
+				List<FixVector3> positionsList = new List<FixVector3>();
+				List<FixVector3> normalsList = new List<FixVector3>();
 				List<Vector2> uvList = new List<Vector2>();
 				List<Color> colorsList = new List<Color>();
 				List<int> trianglesList = new List<int>();
@@ -134,15 +134,15 @@ namespace Sabresaurus.SabreCSG
 						Material material,
 						CSGBuildSettings buildSettings,
 						CSGBuildContext.BuildContext buildContext,
-						List<Vector3> positionsList,
-						List<Vector3> normalsList,
+						List<FixVector3> positionsList,
+						List<FixVector3> normalsList,
 						List<Vector2> uvList, 
 						List<Color> colorsList, 
 						List<int> trianglesList,
 						MaterialMeshDictionary materialMeshDictionary)
 		{
-			Vector3[] positionsArray = new Vector3[positionsList.Count];
-			Vector3[] normalsArray = new Vector3[normalsList.Count];
+            FixVector3[] positionsArray = new FixVector3[positionsList.Count];
+            FixVector3[] normalsArray = new FixVector3[normalsList.Count];
 			Vector2[] uvArray = new Vector2[uvList.Count];
 			Color[] colorsArray = new Color[colorsList.Count];
 			int[] trianglesArray = new int[trianglesList.Count];
@@ -153,9 +153,9 @@ namespace Sabresaurus.SabreCSG
 			trianglesList.CopyTo(trianglesArray);
 			colorsList.CopyTo(colorsArray);
 
-			mesh.vertices = positionsArray;
-			mesh.normals = normalsArray;
-			mesh.uv = uvArray;
+			mesh.vertices = Array.ConvertAll(positionsArray, item => (Vector3)item);
+			mesh.normals = Array.ConvertAll(normalsArray, item => (Vector3)item);
+            mesh.uv = uvArray;
 			mesh.colors = colorsArray;
 
 
@@ -222,8 +222,8 @@ namespace Sabresaurus.SabreCSG
 			if(polygonIndex.Length > 0)
 			{
 				Mesh mesh = new Mesh();
-				List<Vector3> positionsList = new List<Vector3>();
-				List<Vector3> normalsList = new List<Vector3>();
+				List<FixVector3> positionsList = new List<FixVector3>();
+				List<FixVector3> normalsList = new List<FixVector3>();
 				List<Vector2> uvList = new List<Vector2>();
 				List<int> trianglesList = new List<int>();
 
@@ -272,14 +272,14 @@ namespace Sabresaurus.SabreCSG
 		internal static void FinalizeCollisionMesh(Transform meshGroupHolder, 
 			Mesh mesh,
 			CSGBuildSettings buildSettings,
-			List<Vector3> positionsList,
-			List<Vector3> normalsList,
+			List<FixVector3> positionsList,
+			List<FixVector3> normalsList,
 			List<Vector2> uvList, 
 			List<int> trianglesList,
 			List<Mesh> collisionMeshDictionary)
 		{
-			Vector3[] positionsArray = new Vector3[positionsList.Count];
-			Vector3[] normalsArray = new Vector3[normalsList.Count];
+            FixVector3[] positionsArray = new FixVector3[positionsList.Count];
+            FixVector3[] normalsArray = new FixVector3[normalsList.Count];
 			Vector2[] uvArray = new Vector2[uvList.Count];
 			int[] trianglesArray = new int[trianglesList.Count];
 
@@ -288,14 +288,14 @@ namespace Sabresaurus.SabreCSG
 			uvList.CopyTo(uvArray);
 			trianglesList.CopyTo(trianglesArray);
 
-			mesh.vertices = positionsArray;
-			mesh.normals = normalsArray;
+			mesh.vertices = Array.ConvertAll(positionsArray, item => (Vector3)item);
+			mesh.normals = Array.ConvertAll(normalsArray, item => (Vector3)item);
 			mesh.uv = uvArray;
 
 
-			if(meshGroupHolder.position != Vector3.zero
+			if((FixVector3)meshGroupHolder.position != FixVector3.zero
 				|| meshGroupHolder.rotation != Quaternion.identity
-				|| meshGroupHolder.lossyScale != Vector3.one)
+				|| (FixVector3)meshGroupHolder.lossyScale != FixVector3.one)
 			{
 				mesh.LocalizeToTransform(meshGroupHolder);
 			}
@@ -340,8 +340,8 @@ namespace Sabresaurus.SabreCSG
 		{
 			foreach (KeyValuePair<int, List<Polygon>> row in groupedPolygons)
 			{
-				Vector3[] newPositions;
-				Vector3[] newNormals;
+                FixVector3[] newPositions;
+                FixVector3[] newNormals;
 				Vector2[] newUV;
 				Color[] newColors;
 				int[] newTriangles;
@@ -354,7 +354,7 @@ namespace Sabresaurus.SabreCSG
 			}
 		}
 
-		internal static void TriangulatePolygons(bool individualVertices, List<Polygon> polygons, out int[] triangesToAppend, out Vector3[] positions, out Vector3[] normals, out Vector2[] uv, out Color[] colors)
+		internal static void TriangulatePolygons(bool individualVertices, List<Polygon> polygons, out int[] triangesToAppend, out FixVector3[] positions, out FixVector3[] normals, out Vector2[] uv, out Color[] colors)
 		{
 			if(individualVertices)
 			{
@@ -365,8 +365,8 @@ namespace Sabresaurus.SabreCSG
 				}
 				int totalVertexCount = totalTriangleCount * 3;
 
-				positions = new Vector3[totalVertexCount];
-				normals = new Vector3[totalVertexCount];
+				positions = new FixVector3[totalVertexCount];
+				normals = new FixVector3[totalVertexCount];
 				uv = new Vector2[totalVertexCount];
 				colors = new Color[totalVertexCount];
 
@@ -427,8 +427,8 @@ namespace Sabresaurus.SabreCSG
 
 				int totalTriangleCount = totalVertexCount - 2 * polygons.Count;
 
-				positions = new Vector3[totalVertexCount];
-				normals = new Vector3[totalVertexCount];
+				positions = new FixVector3[totalVertexCount];
+				normals = new FixVector3[totalVertexCount];
 				uv = new Vector2[totalVertexCount];
 				colors = new Color[totalVertexCount];
 

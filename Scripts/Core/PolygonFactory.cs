@@ -104,7 +104,7 @@ namespace Sabresaurus.SabreCSG
 				&& polygonsFront.Count >= 3)
 			{
 				// HACK: This code is awful, because we end up with lots of duplicate vertices
-				List<Vector3> positions = new List<Vector3>(newVertices.Count);
+				List<FixVector3> positions = new List<FixVector3>(newVertices.Count);
 				for (int i = 0; i < newVertices.Count; i++) 
 				{
 					positions.Add(newVertices[i].Position);
@@ -119,7 +119,7 @@ namespace Sabresaurus.SabreCSG
 					{
 						// Polygons are sometimes constructed facing the wrong way, possibly due to a winding order
 						// mismatch. If the two normals are opposite, flip the new polygon
-						if(Vector3.Dot(newPolygon.Plane.normal, splitPlane.normal) < -0.9f)
+						if(FixVector3.Dot(newPolygon.Plane.normal, splitPlane.normal) < -0.9f)
 						{
 							newPolygon.Flip();
 						}
@@ -135,7 +135,7 @@ namespace Sabresaurus.SabreCSG
 					newPolygon.ExcludeFromFinal = excludeNewPolygons;
 					
 					
-					if(newPolygon.Plane.normal == Vector3.zero)
+					if(newPolygon.Plane.normal == FixVector3.zero)
 					{
 						Debug.LogError("Invalid Normal! Shouldn't be zero. This is unexpected since extraneous positions should have been removed!");
 						//						Polygon fooNewPolygon = PolygonFactory.ConstructPolygon(positions, true);
@@ -235,16 +235,16 @@ namespace Sabresaurus.SabreCSG
         /// <param name="sourcePositions"></param>
         /// <param name="removeExtraPositions"></param>
         /// <returns></returns>
-		public static Polygon ConstructPolygon(List<Vector3> sourcePositions, bool removeExtraPositions)
+		public static Polygon ConstructPolygon(List<FixVector3> sourcePositions, bool removeExtraPositions)
 		{
-			List<Vector3> positions;
+			List<FixVector3> positions;
 			
 			if(removeExtraPositions)
 			{
-				positions = new List<Vector3>();
+				positions = new List<FixVector3>();
 				for (int i = 0; i < sourcePositions.Count; i++) 
 				{
-					Vector3 sourcePosition = sourcePositions[i];
+					FixVector3 sourcePosition = sourcePositions[i];
 					bool contained = false;
 
 					for (int j = 0; j < positions.Count; j++) 
@@ -280,7 +280,7 @@ namespace Sabresaurus.SabreCSG
 			}
 			
 			// Find center point, so we can sort the positions around it
-			Vector3 center = positions[0];
+			FixVector3 center = positions[0];
 			
 			for (int i = 1; i < positions.Count; i++)
 			{
@@ -302,7 +302,7 @@ namespace Sabresaurus.SabreCSG
 			// Rotation to go from the polygon's plane to XY plane (for sorting)
 			Quaternion cancellingRotation;
 
-			if(plane.normal != Vector3.zero)
+			if(plane.normal != FixVector3.zero)
 			{
 				cancellingRotation = Quaternion.Inverse(Quaternion.LookRotation(plane.normal));
 			}
@@ -312,10 +312,10 @@ namespace Sabresaurus.SabreCSG
 			}
 
 			// Rotate the center point onto the plane too
-			Vector3 rotatedCenter = cancellingRotation * center;
+			FixVector3 rotatedCenter = cancellingRotation * center;
 
             // Sort the positions, passing the rotation to put the positions on XY plane and the rotated center point
-            IComparer<Vector3> comparer = new SortVectorsClockwise(cancellingRotation, rotatedCenter);
+            IComparer<FixVector3> comparer = new SortVectorsClockwise(cancellingRotation, rotatedCenter);
 			positions.Sort(comparer);
 
 			// Create the vertices from the positions
@@ -326,7 +326,7 @@ namespace Sabresaurus.SabreCSG
 			}
 			Polygon newPolygon = new Polygon(newPolygonVertices, null, false, false);
 			
-			if(newPolygon.Plane.normal == Vector3.zero)
+			if(newPolygon.Plane.normal == FixVector3.zero)
 			{
 				Debug.LogError("Zero normal found, this leads to invalid polyhedron-point tests");
 				return null;
@@ -334,7 +334,7 @@ namespace Sabresaurus.SabreCSG
 				//				if(removeExtraPositions)
 				//				{
 				//					Polygon.Vector3ComparerEpsilon equalityComparer = new Polygon.Vector3ComparerEpsilon();
-				//					List<Vector3> testFoo = newPolygonVertices.Select(item => item.Position).Distinct(equalityComparer).ToList();
+				//					List<FixVector3> testFoo = newPolygonVertices.Select(item => item.Position).Distinct(equalityComparer).ToList();
 				//				}
 			}
 			return newPolygon;
@@ -350,7 +350,7 @@ namespace Sabresaurus.SabreCSG
         /// <param name="removeCollinearPoints"></param>
         /// <param name="constructConvexHull"></param>
         /// <returns></returns>
-        public static List<Vertex> RefineVertices(Vector3 normal, List<Vertex> sourceVertices, bool removeExtraPositions, bool removeCollinearPoints, bool constructConvexHull)
+        public static List<Vertex> RefineVertices(FixVector3 normal, List<Vertex> sourceVertices, bool removeExtraPositions, bool removeCollinearPoints, bool constructConvexHull)
         {
             List<Vertex> vertices;
 
@@ -394,7 +394,7 @@ namespace Sabresaurus.SabreCSG
             }
 
             // Find center point, so we can sort the positions around it
-            Vector3 center = vertices[0].Position;
+            FixVector3 center = vertices[0].Position;
 
             for (int i = 1; i < vertices.Count; i++)
             {
@@ -411,7 +411,7 @@ namespace Sabresaurus.SabreCSG
             // Rotation to go from the polygon's plane to XY plane (for sorting)
             Quaternion cancellingRotation;
 
-            if (normal != Vector3.zero)
+            if (normal != FixVector3.zero)
             {
                 cancellingRotation = Quaternion.Inverse(Quaternion.LookRotation(normal));
             }
@@ -421,7 +421,7 @@ namespace Sabresaurus.SabreCSG
             }
 
             // Rotate the center point onto the plane too
-            Vector3 rotatedCenter = cancellingRotation * center;
+            FixVector3 rotatedCenter = cancellingRotation * center;
 
             if (constructConvexHull)
             {
@@ -436,12 +436,12 @@ namespace Sabresaurus.SabreCSG
             {
                 List<Vertex> positionsCopy = new List<Vertex>();
 
-                Vector3 lastDirection = (vertices[0].Position - vertices[vertices.Count - 1].Position).normalized;
+                FixVector3 lastDirection = (vertices[0].Position - vertices[vertices.Count - 1].Position).normalized;
                 for (int i = 0; i < vertices.Count; i++)
                 {
-                    Vector3 nextDirection = (vertices[(i + 1) % vertices.Count].Position - vertices[i].Position).normalized;
+                    FixVector3 nextDirection = (vertices[(i + 1) % vertices.Count].Position - vertices[i].Position).normalized;
 
-                    if (Vector3.Dot(lastDirection, nextDirection) < 0.99f)
+                    if (FixVector3.Dot(lastDirection, nextDirection) < 0.99f)
                     {
                         positionsCopy.Add(vertices[i]);
                     }
@@ -459,28 +459,28 @@ namespace Sabresaurus.SabreCSG
         }
 
 
-        public static float Cross(Vector3 origin, Vector3 pointA, Vector3 pointB)
+        public static Fix64 Cross(FixVector3 origin, FixVector3 pointA, FixVector3 pointB)
         {
             return (pointA.x - origin.x) * (pointB.y - origin.y) - (pointA.y - origin.y) * (pointB.x - origin.x);
         }
 
-        public static List<Vertex> CalculateConvexHull(List<Vertex> positions, Quaternion cancellingRotation, Vector3 rotatedCenter)
+        public static List<Vertex> CalculateConvexHull(List<Vertex> positions, Quaternion cancellingRotation, FixVector3 rotatedCenter)
         {
             // Key is position, Value is the position transformed to the XY plane
-            List<KeyValuePair<Vertex, Vector3>> positionsComplex = new List<KeyValuePair<Vertex, Vector3>>(positions.Count);
+            List<KeyValuePair<Vertex, FixVector3>> positionsComplex = new List<KeyValuePair<Vertex, FixVector3>>(positions.Count);
 
             for (int i = 0; i < positions.Count; i++)
             {
-                positionsComplex.Add(new KeyValuePair<Vertex, Vector3>(positions[i], cancellingRotation * positions[i].Position));
+                positionsComplex.Add(new KeyValuePair<Vertex, FixVector3>(positions[i], cancellingRotation * positions[i].Position));
             }
 
             // Sort from left to right, then from bottom to top for values with the same X
-            IComparer<KeyValuePair<Vertex, Vector3>> comparer = new SortVerticesByXThenY();
+            IComparer<KeyValuePair<Vertex, FixVector3>> comparer = new SortVerticesByXThenY();
             positionsComplex.Sort(comparer);
 
             int positionCount = positions.Count;
             int numberAdded = 0;
-            KeyValuePair<Vertex, Vector3>[] hullArray = new KeyValuePair<Vertex, Vector3>[2 * positionCount];
+            KeyValuePair<Vertex, FixVector3>[] hullArray = new KeyValuePair<Vertex, FixVector3>[2 * positionCount];
 
             // Build lower hull
             for (int i = 0; i < positionCount; ++i)
@@ -544,26 +544,26 @@ namespace Sabresaurus.SabreCSG
 
 #region PRIVATE
 		// Used to sort a collection of Vectors in a clockwise direction
-		internal class SortVectorsClockwise : IComparer<Vector3>
+		internal class SortVectorsClockwise : IComparer<FixVector3>
 		{
 			Quaternion cancellingRotation; // Used to transform the positions from an arbitrary plane to the XY plane
-			Vector3 rotatedCenter; // Transformed center point, used as the center point to find the angles around
+			FixVector3 rotatedCenter; // Transformed center point, used as the center point to find the angles around
 			
-			public SortVectorsClockwise(Quaternion cancellingRotation, Vector3 rotatedCenter)
+			public SortVectorsClockwise(Quaternion cancellingRotation, FixVector3 rotatedCenter)
 			{
 				this.cancellingRotation = cancellingRotation;
 				this.rotatedCenter = rotatedCenter;
 			}
 			
-			public int Compare(Vector3 position1, Vector3 position2)
+			public int Compare(FixVector3 position1, FixVector3 position2)
 			{
 				// Rotate the positions and subtract the center, so they become vectors from the center point on the plane
-				Vector3 vector1 = (cancellingRotation * position1) - rotatedCenter;
-				Vector3 vector2 = (cancellingRotation * position2) - rotatedCenter;
+				FixVector3 vector1 = (cancellingRotation * position1) - rotatedCenter;
+				FixVector3 vector2 = (cancellingRotation * position2) - rotatedCenter;
 				
 				// Find the angle of each vector on the plane
-				float angle1 = Mathf.Atan2(vector1.x, vector1.y);
-				float angle2 = Mathf.Atan2(vector2.x, vector2.y);
+				Fix64 angle1 = Fix64.Atan2(vector1.x, vector1.y);
+				Fix64 angle2 = Fix64.Atan2(vector2.x, vector2.y);
 				
 				// Compare the angles
 				return angle1.CompareTo(angle2);
@@ -573,9 +573,9 @@ namespace Sabresaurus.SabreCSG
         internal class SortVerticesClockwise : IComparer<Vertex>
         {
             Quaternion cancellingRotation; // Used to transform the positions from an arbitrary plane to the XY plane
-            Vector3 rotatedCenter; // Transformed center point, used as the center point to find the angles around
+            FixVector3 rotatedCenter; // Transformed center point, used as the center point to find the angles around
 
-            public SortVerticesClockwise(Quaternion cancellingRotation, Vector3 rotatedCenter)
+            public SortVerticesClockwise(Quaternion cancellingRotation, FixVector3 rotatedCenter)
             {
                 this.cancellingRotation = cancellingRotation;
                 this.rotatedCenter = rotatedCenter;
@@ -584,24 +584,24 @@ namespace Sabresaurus.SabreCSG
             public int Compare(Vertex vertex1, Vertex vertex2)
             {
                 // Rotate the positions and subtract the center, so they become vectors from the center point on the plane
-                Vector3 vector1 = (cancellingRotation * vertex1.Position) - rotatedCenter;
-                Vector3 vector2 = (cancellingRotation * vertex2.Position) - rotatedCenter;
+                FixVector3 vector1 = (cancellingRotation * vertex1.Position) - rotatedCenter;
+                FixVector3 vector2 = (cancellingRotation * vertex2.Position) - rotatedCenter;
 
                 // Find the angle of each vector on the plane
-                float angle1 = Mathf.Atan2(vector1.x, vector1.y);
-                float angle2 = Mathf.Atan2(vector2.x, vector2.y);
+                Fix64 angle1 = Fix64.Atan2(vector1.x, vector1.y);
+                Fix64 angle2 = Fix64.Atan2(vector2.x, vector2.y);
 
                 // Compare the angles
                 return angle1.CompareTo(angle2);
             }
         }
 
-        internal class SortVerticesByXThenY : IComparer<KeyValuePair<Vertex, Vector3>>
+        internal class SortVerticesByXThenY : IComparer<KeyValuePair<Vertex, FixVector3>>
         {
-            public int Compare(KeyValuePair<Vertex, Vector3> vertex1, KeyValuePair<Vertex, Vector3> vertex2)
+            public int Compare(KeyValuePair<Vertex, FixVector3> vertex1, KeyValuePair<Vertex, FixVector3> vertex2)
             {
-                Vector3 localPosition1 = vertex1.Value;
-                Vector3 localPosition2 = vertex2.Value;
+                FixVector3 localPosition1 = vertex1.Value;
+                FixVector3 localPosition2 = vertex2.Value;
 
                 if (localPosition1.x != localPosition2.x) // If x is difference compare by them
                 {
@@ -749,8 +749,8 @@ namespace Sabresaurus.SabreCSG
 			int index3 = 4;
 			int index4 = 3;
 			
-			Vector3 originalNormal = vertices[index1 - 1].Normal;
-			Vector3 newNormal = Vector3.Cross(vertices[index1 - 1].Position - vertices[index2 - 1].Position, vertices[index1 - 1].Position - vertices[index4 - 1].Position).normalized;
+			FixVector3 originalNormal = vertices[index1 - 1].Normal;
+			FixVector3 newNormal = FixVector3.Cross(vertices[index1 - 1].Position - vertices[index2 - 1].Position, vertices[index1 - 1].Position - vertices[index4 - 1].Position).normalized;
 			
 			// Flip if necessary - unsure if the requirement of this step is a result of a mistake earlier in the process (TODO: Investigate)
 			if (newNormal != originalNormal)
@@ -819,8 +819,8 @@ namespace Sabresaurus.SabreCSG
 			}
 			mesh.Clear();
 			//	        mesh = new Mesh();
-			List<Vector3> vertices = new List<Vector3>();
-			List<Vector3> normals = new List<Vector3>();
+			List<FixVector3> vertices = new List<FixVector3>();
+			List<FixVector3> normals = new List<FixVector3>();
 			List<Vector2> uvs = new List<Vector2>();
 			List<Color> colors = new List<Color>();
 			List<int> triangles = new List<int>();
