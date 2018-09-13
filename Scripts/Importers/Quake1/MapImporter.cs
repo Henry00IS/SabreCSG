@@ -79,7 +79,7 @@ namespace Sabresaurus.SabreCSG.Importers.Quake1
 
                         // parse brush sides.
                         MapBrushSide mapBrushSide;
-                        if (TryParseBrushSide(line, out mapBrushSide))
+                        if (TryParseBrushSide(world, line, out mapBrushSide))
                         {
                             brush.Sides.Add(mapBrushSide);
                         }
@@ -139,30 +139,63 @@ namespace Sabresaurus.SabreCSG.Importers.Quake1
         /// <param name="line">The line to be parsed.</param>
         /// <param name="mapBrushSide">The map brush side or null.</param>
         /// <returns>True if successful else false.</returns>
-        private bool TryParseBrushSide(string line, out MapBrushSide mapBrushSide)
+        private bool TryParseBrushSide(MapWorld world, string line, out MapBrushSide mapBrushSide)
         {
             mapBrushSide = new MapBrushSide();
 
             // detect brush side definition.
             if (line[0] == '(')
             {
-                string[] values = line.Replace("(", "").Replace(")", "").Replace("  ", " ").Replace("  ", " ").Trim().Split(' ');
-                if (values.Length != 15) return false;
+                string[] values = line.Replace("(", "").Replace(")", "").Replace("[", "").Replace("]", "").Replace("  ", " ").Replace("  ", " ").Trim().Split(' ');
 
-                try
+                // quake 1:
+                if (values.Length == 15)
                 {
-                    MapVector3 p1 = new MapVector3(float.Parse(values[0]), float.Parse(values[1]), float.Parse(values[2]));
-                    MapVector3 p2 = new MapVector3(float.Parse(values[3]), float.Parse(values[4]), float.Parse(values[5]));
-                    MapVector3 p3 = new MapVector3(float.Parse(values[6]), float.Parse(values[7]), float.Parse(values[8]));
-                    mapBrushSide.Plane = new MapPlane(p1, p2, p3);
-                    mapBrushSide.Material = values[9];
-                    mapBrushSide.Offset = new MapVector2(float.Parse(values[10]), float.Parse(values[11]));
-                    mapBrushSide.Rotation = float.Parse(values[12]);
-                    mapBrushSide.Scale = new MapVector2(float.Parse(values[13]), float.Parse(values[14]));
+                    world.MapWorldType = MapWorldType.Quake1;
+
+                    try
+                    {
+                        MapVector3 p1 = new MapVector3(float.Parse(values[0]), float.Parse(values[1]), float.Parse(values[2]));
+                        MapVector3 p2 = new MapVector3(float.Parse(values[3]), float.Parse(values[4]), float.Parse(values[5]));
+                        MapVector3 p3 = new MapVector3(float.Parse(values[6]), float.Parse(values[7]), float.Parse(values[8]));
+                        mapBrushSide.Plane = new MapPlane(p1, p2, p3);
+                        mapBrushSide.Material = values[9];
+                        mapBrushSide.Offset = new MapVector2(float.Parse(values[10]), float.Parse(values[11]));
+                        mapBrushSide.Rotation = float.Parse(values[12]);
+                        mapBrushSide.Scale = new MapVector2(float.Parse(values[13]), float.Parse(values[14]));
+                    }
+                    catch (Exception)
+                    {
+                        throw new Exception("Encountered invalid brush side. The format of the map file must be slightly different, please open an issue on github if you think you did everything right.");
+                    }
                 }
-                catch (Exception)
+
+                // gold source:
+                else if (values.Length == 21)
                 {
-                    throw new Exception("Encountered invalid brush side. The format of the map file must be slightly different, please open an issue on github if you think you did everything right.");
+                    world.MapWorldType = MapWorldType.GoldSource;
+
+                    try
+                    {
+                        MapVector3 p1 = new MapVector3(float.Parse(values[0]), float.Parse(values[1]), float.Parse(values[2]));
+                        MapVector3 p2 = new MapVector3(float.Parse(values[3]), float.Parse(values[4]), float.Parse(values[5]));
+                        MapVector3 p3 = new MapVector3(float.Parse(values[6]), float.Parse(values[7]), float.Parse(values[8]));
+                        mapBrushSide.Plane = new MapPlane(p1, p2, p3);
+                        mapBrushSide.Material = values[9];
+                        mapBrushSide.UAxis = new MapVector3(float.Parse(values[10]), float.Parse(values[11]), float.Parse(values[12]));
+                        mapBrushSide.VAxis = new MapVector3(float.Parse(values[14]), float.Parse(values[15]), float.Parse(values[16]));
+                        mapBrushSide.Offset = new MapVector2(float.Parse(values[13]), float.Parse(values[17]));
+                        mapBrushSide.Rotation = float.Parse(values[18]);
+                        mapBrushSide.Scale = new MapVector2(float.Parse(values[19]), float.Parse(values[20]));
+                    }
+                    catch (Exception)
+                    {
+                        throw new Exception("Encountered invalid brush side. The format of the map file must be slightly different, please open an issue on github if you think you did everything right.");
+                    }
+                }
+                else
+                {
+                    return false;
                 }
 
                 return true;

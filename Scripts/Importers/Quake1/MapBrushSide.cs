@@ -13,6 +13,11 @@ namespace Sabresaurus.SabreCSG.Importers.Quake1
         public float Rotation;
         public MapVector2 Scale;
 
+        // gold source valve map format support:
+
+        public MapVector3 UAxis = new MapVector3(0, 0, 0);
+        public MapVector3 VAxis = new MapVector3(0, 0, 0);
+
         /// <summary>
         /// Returns a <see cref="System.String"/> that represents this instance.
         /// </summary>

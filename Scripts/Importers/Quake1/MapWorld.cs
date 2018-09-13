@@ -25,6 +25,21 @@ namespace Sabresaurus.SabreCSG.Importers.Quake1
         /// The entities in the world.
         /// </summary>
         public List<MapEntity> Entities = new List<MapEntity>();
+
+        /// <summary>
+        /// The type of the world (depends on the .map file format).
+        /// </summary>
+        private MapWorldType m_MapWorldType = MapWorldType.Quake1;
+
+        /// <summary>
+        /// Gets or sets the type of the world (depends on the .map file format).
+        /// </summary>
+        /// <value>The type of the world (depends on the .map file format).</value>
+        public MapWorldType MapWorldType
+        {
+            get { return m_MapWorldType; }
+            set { m_MapWorldType = value; }
+        }
     }
 }
 

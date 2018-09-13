@@ -260,7 +260,7 @@ namespace Sabresaurus.SabreCSG
                 EditorGUILayout.Space();
                 //
 
-                GuiLayoutBeginImporterSection(SabreCSGResources.ImporterQuake1Texture, "Quake 1 Importer", "Jasmine Mickle");
+                GuiLayoutBeginImporterSection(SabreCSGResources.ImporterQuake1Texture, "Quake 1 & GoldSrc Importer", "Jasmine Mickle");
 
                 EditorGUILayout.BeginHorizontal();
                 if (GUILayout.Button("Import Quake 1 Map (*.map)"))

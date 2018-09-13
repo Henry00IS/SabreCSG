@@ -25,18 +25,21 @@ namespace Sabresaurus.SabreCSG.Importers.Quake1
             {
                 model.BeginUpdate();
 
+                // detect the game title.
+                string gameTitle = world.MapWorldType == MapWorldType.Quake1 ? "Quake 1" : "Gold Source";
+
                 // create a material searcher to associate materials automatically.
                 MaterialSearcher materialSearcher = new MaterialSearcher();
 
                 // group all the brushes together.
-                GroupBrush groupBrush = new GameObject("Quake 1 Map").AddComponent<GroupBrush>();
+                GroupBrush groupBrush = new GameObject(gameTitle + " Map").AddComponent<GroupBrush>();
                 groupBrush.transform.SetParent(model.transform);
 
                 // iterate through all entities.
                 for (int e = 0; e < world.Entities.Count; e++)
                 {
 #if UNITY_EDITOR
-                    UnityEditor.EditorUtility.DisplayProgressBar("SabreCSG: Importing Quake 1 Map", "Converting Quake 1 Entities To SabreCSG Brushes (" + (e + 1) + " / " + world.Entities.Count + ")...", e / (float)world.Entities.Count);
+                    UnityEditor.EditorUtility.DisplayProgressBar("SabreCSG: Importing " + gameTitle + " Map", "Converting " + gameTitle + " Entities To SabreCSG Brushes (" + (e + 1) + " / " + world.Entities.Count + ")...", e / (float)world.Entities.Count);
 #endif
                     MapEntity entity = world.Entities[e];
 
@@ -46,7 +49,7 @@ namespace Sabresaurus.SabreCSG.Importers.Quake1
                         MapBrush brush = entity.Brushes[i];
 #if UNITY_EDITOR
                         if (world.Entities[e].ClassName == "worldspawn")
-                            UnityEditor.EditorUtility.DisplayProgressBar("SabreCSG: Importing Quake 1 Map", "Converting Quake 1 Brushes To SabreCSG Brushes (" + (i + 1) + " / " + entity.Brushes.Count + ")...", i / (float)entity.Brushes.Count);
+                            UnityEditor.EditorUtility.DisplayProgressBar("SabreCSG: Importing " + gameTitle + " Map", "Converting " + gameTitle + " Brushes To SabreCSG Brushes (" + (i + 1) + " / " + entity.Brushes.Count + ")...", i / (float)entity.Brushes.Count);
 #endif
                         // don't add triggers to the scene.
                         if (brush.Sides.Count > 0 && IsSpecialMaterial(brush.Sides[0].Material))
@@ -91,7 +94,7 @@ namespace Sabresaurus.SabreCSG.Importers.Quake1
                                     w = polygon.Material.mainTexture.width;
                                     h = polygon.Material.mainTexture.height;
                                 }
-                                CalculateTextureCoordinates(pr, polygon, w, h, new Vector2(side.Offset.X, -side.Offset.Y), new Vector2(side.Scale.X, side.Scale.Y), side.Rotation);
+                                CalculateTextureCoordinates(world.MapWorldType, pr, polygon, w, h, new Vector2(side.Offset.X, -side.Offset.Y), new Vector2(side.Scale.X, side.Scale.Y), side.Rotation, new Vector3(side.UAxis.X, side.UAxis.Y, side.UAxis.Z), new Vector3(side.VAxis.X, side.VAxis.Y, side.VAxis.Z));
                             }
                         }
 
@@ -115,70 +118,81 @@ namespace Sabresaurus.SabreCSG.Importers.Quake1
         }
 
         // shoutouts to Jasmine Mickle for your insight and UV texture coordinates code.
-        private static void CalculateTextureCoordinates(PrimitiveBrush pr, Polygon polygon, int textureWidth, int textureHeight, Vector2 offset, Vector2 scale, float rotation)
+        private static void CalculateTextureCoordinates(MapWorldType worldType, PrimitiveBrush pr, Polygon polygon, int textureWidth, int textureHeight, Vector2 offset, Vector2 scale, float rotation, Vector3 UAxis, Vector3 VAxis)
         {
-            // feel free to improve this uv mapping code, it has some issues.
-            // • 45 degree angled walls may not have correct UV texture coordinates (are not correctly picking the dominant axis because there are two).
-            // • negative vertex coordinates may not have correct UV texture coordinates.
-
-            // calculate texture coordinates.
-            for (int i = 0; i < polygon.Vertices.Length; i++)
+            switch (worldType)
             {
-                // we scaled down the level so scale up the math here.
-                var vertex = (pr.transform.position + polygon.Vertices[i].Position) * s_Scale;
+                case MapWorldType.Quake1:
+                    // feel free to improve this uv mapping code, it has some issues.
+                    // • 45 degree angled walls may not have correct UV texture coordinates (are not correctly picking the dominant axis because there are two).
+                    // • negative vertex coordinates may not have correct UV texture coordinates.
 
-                Vector2 uv = new Vector2(0, 0);
+                    // calculate texture coordinates.
+                    for (int i = 0; i < polygon.Vertices.Length; i++)
+                    {
+                        // we scaled down the level so scale up the math here.
+                        var vertex = (pr.transform.position + polygon.Vertices[i].Position) * s_Scale;
 
-                int dominantAxis = 0; // 0 == x, 1 == y, 2 == z
+                        Vector2 uv = new Vector2(0, 0);
 
-                // find the axis closest to the polygon's normal.
-                float[] axes =
-                {
-                    Mathf.Abs(polygon.Plane.normal.x),
-                    Mathf.Abs(polygon.Plane.normal.z),
-                    Mathf.Abs(polygon.Plane.normal.y)
-                };
+                        int dominantAxis = 0; // 0 == x, 1 == y, 2 == z
 
-                // defaults to use x-axis.
-                dominantAxis = 0;
-                // check whether the y-axis is more likely.
-                if (axes[1] > axes[dominantAxis])
-                    dominantAxis = 1;
-                // check whether the z-axis is more likely.
-                if (axes[2] >= axes[dominantAxis])
-                    dominantAxis = 2;
+                        // find the axis closest to the polygon's normal.
+                        float[] axes =
+                        {
+                            Mathf.Abs(polygon.Plane.normal.x),
+                            Mathf.Abs(polygon.Plane.normal.z),
+                            Mathf.Abs(polygon.Plane.normal.y)
+                        };
 
-                // x-axis:
-                if (dominantAxis == 0)
-                {
-                    uv.x = vertex.z;
-                    uv.y = vertex.y;
-                }
+                        // defaults to use x-axis.
+                        dominantAxis = 0;
+                        // check whether the y-axis is more likely.
+                        if (axes[1] > axes[dominantAxis])
+                            dominantAxis = 1;
+                        // check whether the z-axis is more likely.
+                        if (axes[2] >= axes[dominantAxis])
+                            dominantAxis = 2;
 
-                // y-axis:
-                if (dominantAxis == 1)
-                {
-                    uv.x = vertex.x;
-                    uv.y = vertex.y;
-                }
+                        // x-axis:
+                        if (dominantAxis == 0)
+                        {
+                            uv.x = vertex.z;
+                            uv.y = vertex.y;
+                        }
 
-                // z-axis:
-                if (dominantAxis == 2)
-                {
-                    uv.x = vertex.x;
-                    uv.y = vertex.z;
-                }
+                        // y-axis:
+                        if (dominantAxis == 1)
+                        {
+                            uv.x = vertex.x;
+                            uv.y = vertex.y;
+                        }
 
-                // rotate the texture coordinates.
-                uv = uv.Rotate(-rotation);
-                // scale the texture coordinates.
-                uv = uv.Divide(scale);
-                // move the texture coordinates.
-                uv += offset;
-                // finally divide the result by the texture size.
-                uv = uv.Divide(new Vector2(textureWidth, textureHeight));
+                        // z-axis:
+                        if (dominantAxis == 2)
+                        {
+                            uv.x = vertex.x;
+                            uv.y = vertex.z;
+                        }
 
-                polygon.Vertices[i].UV = uv;
+                        // rotate the texture coordinates.
+                        uv = uv.Rotate(-rotation);
+                        // scale the texture coordinates.
+                        uv = uv.Divide(scale);
+                        // move the texture coordinates.
+                        uv += offset;
+                        // finally divide the result by the texture size.
+                        uv = uv.Divide(new Vector2(textureWidth, textureHeight));
+
+                        polygon.Vertices[i].UV = uv;
+                    }
+                    break;
+
+                case MapWorldType.GoldSource:
+
+                    // todo, you have the UAxis and VAxis variables available here.
+
+                    break;
             }
         }
 
