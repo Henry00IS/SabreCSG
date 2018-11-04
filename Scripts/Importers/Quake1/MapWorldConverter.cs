@@ -190,7 +190,21 @@ namespace Sabresaurus.SabreCSG.Importers.Quake1
 
                 case MapWorldType.GoldSource:
 
-                    // todo, you have the UAxis and VAxis variables available here.
+                    // calculate texture coordinates.
+                    for (int i = 0; i < polygon.Vertices.Length; i++)
+                    {
+                        // we scaled down the level so scale up the math here.
+                        var vertex = (pr.transform.position + polygon.Vertices[i].Position) * s_Scale;
+
+                        Vector3 uaxis = new Vector3(UAxis.x, UAxis.z, UAxis.y);
+                        Vector3 vaxis = new Vector3(VAxis.x, VAxis.z, VAxis.y);
+
+                        var u = Vector3.Dot(vertex, uaxis) / (textureWidth * scale.x) + offset.x / textureWidth;
+                        var v = Vector3.Dot(vertex, vaxis) / (textureHeight * scale.y) - offset.y / textureHeight;
+
+                        polygon.Vertices[i].UV.x = u;
+                        polygon.Vertices[i].UV.y = -v;
+                    }
 
                     break;
             }
