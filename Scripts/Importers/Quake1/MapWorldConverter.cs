@@ -98,6 +98,17 @@ namespace Sabresaurus.SabreCSG.Importers.Quake1
                             }
                         }
 
+                        // detail brushes that do not affect the CSG world.
+                        switch (entity.ClassName)
+                        {
+                            case "func_wall":
+                            case "func_detail_wall":
+                            case "func_illusionary":
+                            case "func_detail_fence":
+                                pr.IsNoCSG = true;
+                                break;
+                        }
+
                         // add the brush to the group.
                         pr.transform.SetParent(groupBrush.transform);
                     }
@@ -219,6 +230,14 @@ namespace Sabresaurus.SabreCSG.Importers.Quake1
         {
             if (name.StartsWith("sky"))
                 return true;
+            switch (name)
+            {
+                case "skip":
+                case "*waterskip":
+                case "*slimeskip":
+                case "*lavaskip":
+                    return true;
+            }
             return false;
         }
 
@@ -247,8 +266,10 @@ namespace Sabresaurus.SabreCSG.Importers.Quake1
         {
             switch (name)
             {
-                case "skip":
-                case "waterskip":
+                case "hint":
+                case "hintskip":
+                // gold source:
+                case "trigger":
                     return true;
             }
             return false;
