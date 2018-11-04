@@ -52,7 +52,7 @@ namespace Sabresaurus.SabreCSG.Importers.Quake1
                             UnityEditor.EditorUtility.DisplayProgressBar("SabreCSG: Importing " + gameTitle + " Map", "Converting " + gameTitle + " Brushes To SabreCSG Brushes (" + (i + 1) + " / " + entity.Brushes.Count + ")...", i / (float)entity.Brushes.Count);
 #endif
                         // don't add triggers to the scene.
-                        if (brush.Sides.Count > 0 && IsSpecialMaterial(brush.Sides[0].Material))
+                        if (brush.Sides.Count > 0 && brush.Sides.Any(s => IsSpecialMaterial(s.Material)))
                             continue;
 
                         // build a very large cube brush.
@@ -228,6 +228,7 @@ namespace Sabresaurus.SabreCSG.Importers.Quake1
         /// <returns><c>true</c> if the specified name is an excluded material; otherwise, <c>false</c>.</returns>
         private static bool IsExcludedMaterial(string name)
         {
+            name = name.ToLower();
             if (name.StartsWith("sky"))
                 return true;
             switch (name)
@@ -248,7 +249,7 @@ namespace Sabresaurus.SabreCSG.Importers.Quake1
         /// <returns><c>true</c> if the specified name is an invisible material; otherwise, <c>false</c>.</returns>
         private static bool IsInvisibleMaterial(string name)
         {
-            switch (name)
+            switch (name.ToLower())
             {
                 case "clip":
                     return true;
@@ -257,19 +258,21 @@ namespace Sabresaurus.SabreCSG.Importers.Quake1
         }
 
         /// <summary>
-        /// Determines whether the specified name is a special material, these brush will not be
+        /// Determines whether the specified name is a special material, these brushes will not be
         /// imported into SabreCSG.
         /// </summary>
         /// <param name="name">The name of the material.</param>
         /// <returns><c>true</c> if the specified name is a special material; otherwise, <c>false</c>.</returns>
         private static bool IsSpecialMaterial(string name)
         {
-            switch (name)
+            switch (name.ToLower())
             {
                 case "hint":
                 case "hintskip":
                 // gold source:
                 case "trigger":
+                case "aaatrigger":
+                case "origin":
                     return true;
             }
             return false;
