@@ -7,26 +7,26 @@ namespace Sabresaurus.SabreCSG
 {
 	internal static class DebugTimer
 	{
-#if DEBUG_CSG
+#if SABRE_CSG_DEBUG
 		static DateTime startTime;
 		static DateTime lastEvent = DateTime.MinValue;
 #endif
 
-		[System.Diagnostics.Conditional("DEBUG_CSG")]
+		[System.Diagnostics.Conditional("SABRE_CSG_DEBUG")]
 	    public static void StartTimer()
 		{
-#if DEBUG_CSG
-			startTime = DateTime.UtcNow;
+#if SABRE_CSG_DEBUG
+            startTime = DateTime.UtcNow;
 			lastEvent =  DateTime.UtcNow;
 	        Debug.Log("Started timer");
 #endif
 	    }
 
-		[System.Diagnostics.Conditional("DEBUG_CSG")]
+		[System.Diagnostics.Conditional("SABRE_CSG_DEBUG")]
 	    public static void LogEvent(string message)
 	    {
-#if DEBUG_CSG			
-	        Debug.Log("Event " + (DateTime.UtcNow - startTime) + " " + (DateTime.UtcNow - lastEvent) + " - " + message);
+#if SABRE_CSG_DEBUG
+            Debug.Log("Event " + (DateTime.UtcNow - startTime) + " " + (DateTime.UtcNow - lastEvent) + " - " + message);
 	        lastEvent = DateTime.UtcNow;
 #endif
 	    }

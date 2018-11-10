@@ -46,6 +46,27 @@ namespace Sabresaurus.SabreCSG
         [NonSerialized]
         protected CSGBuildContext buildContextBehaviour;
 
+        /// <summary>
+        /// The brush bounds octree provides an efficient tree data structure to query where brushes
+        /// are in the scene by their bounds.
+        /// </summary>
+        [NonSerialized]
+        protected BoundsOctree<Brush> brushBoundsOctree = new BoundsOctree<Brush>(1.0f, Vector3.zero, 0.25f, 1.0f);
+
+        /// <summary>
+        /// Gets the current brush bounds octree that provides an efficient tree data structure to
+        /// query where brushes are in the scene by their bounds.
+        /// </summary>
+        /// <value>The brush bounds octree.</value>
+        public BoundsOctree<Brush> BrushBoundsOctree { get { return brushBoundsOctree; } }
+
+        public void OnDrawGizmos()
+        {
+            brushBoundsOctree.DrawAllBounds();
+            //brushBoundsOctree.DrawAllObjects();
+            //brushBoundsOctree.DrawCollisionChecks();
+        }
+
         // A reference to a component which holds a lot of build time data that helps change built geometry on the fly
         // This is used by the surface tools heavily.
         [NonSerialized]
@@ -198,6 +219,18 @@ namespace Sabresaurus.SabreCSG
         }
 
         /// <summary>
+        /// Builds a new octree that contains all brushes, used to optimize all intersecting brush calculations.
+        /// </summary>
+        private BoundsOctree<Brush> InvalidateOctree()
+        {
+            brushBoundsOctree = new BoundsOctree<Brush>(1.0f, Vector3.zero, 0.25f, 1.0f);
+            // register all brushes in the octree:
+            for (int i = 0; i < brushes.Count; i++)
+                brushBoundsOctree.Add(brushes[i], brushes[i].GetBoundsTransformed());
+            return brushBoundsOctree;
+        }
+
+        /// <summary>
         /// Builds the brushes into final meshes
         /// </summary>
         /// <param name="forceRebuild">If set to <c>true</c> all brushes will be built and cached data ignored, otherwise SabreCSG will only rebuild brushes it knows have changed</param>
@@ -213,11 +246,17 @@ namespace Sabresaurus.SabreCSG
             // Make sure we have the most accurate list of brushes, ignoring inactive objects
             brushes = new List<Brush>(transform.GetComponentsInChildren<Brush>(false));
 
+            // create an octree to optimize all intersecting brush calculations.
+            InvalidateOctree();
+
             // Let each brush know it's about to be built
+            //DebugTimer.StartTimer();
             for (int i = 0; i < brushes.Count; i++)
             {
-                brushes[i].PrepareToBuild(brushes, forceRebuild);
+                brushes[i].PrepareToBuild(brushes, brushBoundsOctree, forceRebuild);
             }
+            //DebugTimer.LogEvent("PrepareToBuild");
+
 
             // Perform a check to make sure the default material is OK
             Material defaultMaterial = GetDefaultMaterial();

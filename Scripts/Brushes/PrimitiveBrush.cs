@@ -455,17 +455,17 @@ namespace Sabresaurus.SabreCSG
 
                 brushes.Sort(comparer);
 
-                RecalculateIntersections(brushes, true);
+                RecalculateIntersections(brushes, csgModel.BrushBoundsOctree, true);
             }
         }
 
-        public override void RecalculateIntersections(List<Brush> brushes, bool isRootChange)
+        public override void RecalculateIntersections(List<Brush> brushes, BoundsOctree<Brush> brushBoundsOctree, bool isRootChange)
         {
             List<Brush> previousVisualIntersections = brushCache.IntersectingVisualBrushes;
             List<Brush> previousCollisionIntersections = brushCache.IntersectingCollisionBrushes;
 
-            List<Brush> intersectingVisualBrushes = CalculateIntersectingBrushes(this, brushes, false);
-            List<Brush> intersectingCollisionBrushes = CalculateIntersectingBrushes(this, brushes, true);
+            List<Brush> intersectingVisualBrushes = CalculateIntersectingBrushes(this, brushes, brushBoundsOctree, false);
+            List<Brush> intersectingCollisionBrushes = CalculateIntersectingBrushes(this, brushes, brushBoundsOctree, true);
 
             brushCache.SetIntersection(intersectingVisualBrushes, intersectingCollisionBrushes);
 
@@ -557,7 +557,7 @@ namespace Sabresaurus.SabreCSG
                 for (int i = 0; i < brushesToRecalcAndRebuild.Count; i++)
                 {
                     // Brush intersection has changed
-                    brushesToRecalcAndRebuild[i].RecalculateIntersections(brushes, false);
+                    brushesToRecalcAndRebuild[i].RecalculateIntersections(brushes, brushBoundsOctree, false);
                     // Brush needs to be built
                     brushesToRecalcAndRebuild[i].BrushCache.SetUnbuilt();
                 }
@@ -566,7 +566,7 @@ namespace Sabresaurus.SabreCSG
                 for (int i = 0; i < brushesToRecalculateOnly.Count; i++)
                 {
                     // Brush intersection has changed
-                    brushesToRecalculateOnly[i].RecalculateIntersections(brushes, false);
+                    brushesToRecalculateOnly[i].RecalculateIntersections(brushes, brushBoundsOctree, false);
                 }
             }
         }
@@ -1005,13 +1005,13 @@ namespace Sabresaurus.SabreCSG
             return newObject;
         }
 
-        public override void PrepareToBuild(List<Brush> brushes, bool forceRebuild)
+        public override void PrepareToBuild(List<Brush> brushes, BoundsOctree<Brush> brushBoundsOctree, bool forceRebuild)
         {
             if (forceRebuild)
             {
                 brushCache.SetUnbuilt();
                 RecachePolygons(true);
-                RecalculateIntersections(brushes, false);
+                RecalculateIntersections(brushes, brushBoundsOctree, false);
             }
         }
 

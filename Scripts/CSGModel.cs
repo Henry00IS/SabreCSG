@@ -217,7 +217,7 @@ namespace Sabresaurus.SabreCSG
                 {
                     if (brushes[i] != null)
                     {
-                        brushes[i].RecalculateIntersections(brushes, false);
+                        brushes[i].RecalculateIntersections(brushes, brushBoundsOctree, false);
                     }
                 }
 
